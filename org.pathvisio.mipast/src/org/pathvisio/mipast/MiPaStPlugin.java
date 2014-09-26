@@ -1,6 +1,7 @@
 package org.pathvisio.mipast;
 
 import java.awt.event.ActionEvent;
+
 import java.awt.event.ActionListener;
 
 import java.awt.Desktop;
@@ -8,12 +9,14 @@ import java.net.URI;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JFrame;
 
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.plugin.Plugin;
+import org.pathvisio.mipast.gui.DatasetLoadingScreen;
 
 public class MiPaStPlugin implements BundleActivator, Plugin {
 	
@@ -22,6 +25,7 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 	private JMenuItem menuLoadFiles;
 	private JMenuItem help;
 	private JMenuItem documentation;
+	private MiPaStPlugin plugin;
 	
 	@Override
 	public void init(PvDesktop desktop) {
@@ -36,7 +40,7 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 		desktop.registerSubMenu("Plugins", miPaStMenu);
 		
 		menuLoadFiles = new JMenuItem("Load dataset files");
-		//menuLoadFiles.addActionLister(new menuActionListener());
+		menuLoadFiles.addActionListener(new menuLoadFilesActionListener());
 		
 		help = new JMenuItem("Help");
 		help.addActionListener(new HelpActionListener());
@@ -95,6 +99,17 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 		    
 		}
 		
+	
+		}
+		
+	
+		
+	class menuLoadFilesActionListener implements ActionListener{
+		public void actionPerformed(ActionEvent e){
+			DatasetLoadingScreen dls = new DatasetLoadingScreen(desktop,plugin);
+			dls.setVisible(true);
+		
+		}
 	}
 	
 	
