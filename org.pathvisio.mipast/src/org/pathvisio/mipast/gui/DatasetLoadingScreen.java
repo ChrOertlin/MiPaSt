@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
 
@@ -15,6 +16,7 @@ import org.pathvisio.desktop.PvDesktop;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -36,6 +38,8 @@ public class DatasetLoadingScreen extends JDialog {
 	JDialog dialog;
 	JPanel mainPanel;
 	
+	JLabel screenLabel = new JLabel("Load your datasets");
+	
 	JButton miRNABrowse=new JButton("browse");
 	JButton transcriptomicsBrowse= new JButton("Browse");
 	
@@ -49,13 +53,17 @@ public class DatasetLoadingScreen extends JDialog {
 	JButton previous = new JButton("Previous");
 	JButton cancel = new JButton("Cancel");
 	
+	JCheckBox transcriptomicsBox= new JCheckBox("Transcriptomics available");
+	
+	JPanel fileHeaderPanel = new JPanel();
+	
 	// Initializes the loading screen within Pathvisio
 	public DatasetLoadingScreen(PvDesktop desktop, MiPaStPlugin plugin){	
 		
 		this.plugin = plugin;
 		this.desktop = desktop;
-		JFrame frame= new JFrame("Loading Screen");
-		frame.setBounds(50, 100, 700, 500);
+		JFrame frame= new JFrame("Dataset Loading Screen");
+		frame.setBounds(50, 100, 750, 400);
 		frame.add(addContents());
 		frame.setVisible(true);
 		
@@ -64,51 +72,32 @@ public class DatasetLoadingScreen extends JDialog {
 		
 	// Here the components for the loading screen are created and added to the frame
 	public JComponent addContents(){
+		CellConstraints cc= new CellConstraints();
+		
+		// Components properties
+		
+		
 		mainPanel= new JPanel();
-		mainPanel.setLayout(new GridLayout(4,3));
 		
-		//Panel that holds the miRNA features
-		JPanel miRNAPanel= new JPanel();
-		miRNAPanel.setLayout(new FlowLayout());
-		miRNAPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		miRNALabel.setPreferredSize(new Dimension(250,24));
-		miRNAText.setPreferredSize(new Dimension(200,24));
-		miRNAPanel.add(miRNABrowse);
-		miRNAPanel.add(miRNAText);
-		miRNAPanel.add(miRNALabel);
+		mainPanel.setLayout(new FormLayout("pref,50dlu,pref,50dlu,50dlu,pref,default","pref,4dlu,pref,4dlu,pref,4dlu,pref,4dlu,pref,150dlu,pref"));
 		
-		//Panel that holds the Transcriptomics features
-		JPanel transcriptomicsPanel = new JPanel();
-		transcriptomicsPanel.setLayout(new FlowLayout());
-		transcriptomicsPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		transcriptomicsLabel.setPreferredSize(new Dimension(250,24));
-		transcriptomicsText.setPreferredSize(new Dimension(200,24));
-		transcriptomicsPanel.add(transcriptomicsBrowse);
-		transcriptomicsPanel.add(transcriptomicsText);
-		transcriptomicsPanel.add(transcriptomicsLabel);
+		mainPanel.add(screenLabel, cc.xy(1,1));
 		
-		//Panel that holds the file Headers
-		JPanel fileHeaderPanel= new JPanel();
-		fileHeaderPanel.setLayout(new FlowLayout());
-		fileHeaderPanel.add(new JTextField("TESTPANEL"));
+		mainPanel.add(miRNALabel, cc.xy(1, 3));
+		mainPanel.add(miRNAText, cc.xywh(2, 3,3,1));
+		mainPanel.add(miRNABrowse, cc.xy(6, 3));
 		
+		mainPanel.add(transcriptomicsBox,cc.xy(1, 5));
 		
-		//Panel that holds the frame functionality buttons
-		JPanel buttonPanel= new JPanel();
-		buttonPanel.setLayout(new FlowLayout());
-		buttonPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-		buttonPanel.add(next);
-		buttonPanel.add(previous);	
-		buttonPanel.add(cancel);
-			
+		mainPanel.add(transcriptomicsLabel, cc.xy(1, 7));
+		mainPanel.add(transcriptomicsText, cc.xywh(2, 7,3,1));
+		mainPanel.add(transcriptomicsBrowse, cc.xy(6, 7));
 		
-		mainPanel.add(miRNAPanel);
-		mainPanel.add(transcriptomicsPanel);
-		mainPanel.add(fileHeaderPanel);
-		mainPanel.add(buttonPanel);
+		mainPanel.add(fileHeaderPanel, cc.xywh(1, 9,3,2));
 		
-		
-		
+		mainPanel.add(next,cc.xy(3,11));
+		mainPanel.add(previous,cc.xy(2,11));
+		mainPanel.add(cancel,cc.xy(1,11));
 		
 		
 		return mainPanel;
