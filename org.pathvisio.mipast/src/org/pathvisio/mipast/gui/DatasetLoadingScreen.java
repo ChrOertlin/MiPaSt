@@ -1,33 +1,26 @@
 package org.pathvisio.mipast.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.ComponentOrientation;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Point;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import org.pathvisio.mipast.MiPaStPlugin;
 import org.pathvisio.desktop.PvDesktop;
-
-
-
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SpringLayout.Constraints;
-
-import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 
 // This class opens and displays the GUI for the data loading of the miRNA and Transcriptomics Dataset
 
@@ -35,7 +28,7 @@ public class DatasetLoadingScreen extends JDialog {
 	private MiPaStPlugin plugin;
 	private PvDesktop desktop;
 	
-	JDialog dialog;
+	
 	JPanel mainPanel;
 	
 	JLabel screenLabel = new JLabel("Load your datasets");
@@ -56,6 +49,10 @@ public class DatasetLoadingScreen extends JDialog {
 	JCheckBox transcriptomicsBox= new JCheckBox("Transcriptomics available");
 	
 	JPanel fileHeaderPanel = new JPanel();
+	JFileChooser fc=new JFileChooser();
+	
+	File miRNAFile;
+	File transcriptomicsFile;
 	
 	// Initializes the loading screen within Pathvisio
 	public DatasetLoadingScreen(PvDesktop desktop, MiPaStPlugin plugin){	
@@ -79,7 +76,7 @@ public class DatasetLoadingScreen extends JDialog {
 		
 		mainPanel= new JPanel();
 		
-		mainPanel.setLayout(new FormLayout("pref,50dlu,pref,50dlu,50dlu,pref,default","pref,4dlu,pref,4dlu,pref,4dlu,pref,4dlu,pref,150dlu,pref"));
+		mainPanel.setLayout(new FormLayout("pref,50dlu,pref,50dlu,50dlu,pref,default","pref,4dlu,pref,4dlu,pref,4dlu,pref,4dlu,pref,150dlu,pref,4dlu"));
 		
 		mainPanel.add(screenLabel, cc.xy(1,1));
 		
@@ -95,18 +92,41 @@ public class DatasetLoadingScreen extends JDialog {
 		
 		mainPanel.add(fileHeaderPanel, cc.xywh(1, 9,3,2));
 		
-		mainPanel.add(next,cc.xy(3,11));
-		mainPanel.add(previous,cc.xy(2,11));
+		mainPanel.add(next,cc.xy(6,11));
+		mainPanel.add(previous,cc.xy(3,11));
 		mainPanel.add(cancel,cc.xy(1,11));
 		
+		miRNABrowse.addActionListener(new BrowseActionListener());
+		transcriptomicsBrowse.addActionListener(new BrowseActionListener());
 		
 		return mainPanel;
 	}
-		
-		
-		
-		
-		
+		// Functionality for the Browse buttons, opens a browse dialog and let's the user select a file.
+	public class BrowseActionListener implements ActionListener{
+		public void actionPerformed(ActionEvent e){
+			if (e.getSource() == miRNABrowse) {
+		        int returnVal = fc.showDialog(null, "Open miRNA Datasetfile");
+		        if (returnVal == JFileChooser.APPROVE_OPTION) {
+		            File miRNAFile = fc.getSelectedFile();
+		            miRNAText.setText(miRNAFile.getAbsolutePath());
+				} 
+			}
+			
+			if (e.getSource() == transcriptomicsBrowse) {
+		        int returnVal = fc.showDialog(null, "Open Transcriptomics datasetfile");
+		        if (returnVal == JFileChooser.APPROVE_OPTION) {
+		            File transcriptomicsFile = fc.getSelectedFile();
+		            transcriptomicsText.setText(transcriptomicsFile.getAbsolutePath());
+				} 
+			} 
+		}
+	}
 	
 
+
 }
+
+	
+
+
+
