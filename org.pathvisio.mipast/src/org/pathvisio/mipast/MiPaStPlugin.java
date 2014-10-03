@@ -1,16 +1,12 @@
 package org.pathvisio.mipast;
 
-import java.awt.event.ActionEvent;
-
-import java.awt.event.ActionListener;
-
 import java.awt.Desktop;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.URI;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JFrame;
-
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -106,9 +102,8 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 		
 	class menuLoadFilesActionListener implements ActionListener{
 		public void actionPerformed(ActionEvent e){
-			DatasetLoadingScreen dls = new DatasetLoadingScreen(desktop,plugin);
-			dls.setVisible(true);
-		
+			DatasetLoadingScreen wizard = new DatasetLoadingScreen(desktop);
+			wizard.showModalDialog(desktop.getSwingEngine().getFrame());
 		}
 	}
 	
