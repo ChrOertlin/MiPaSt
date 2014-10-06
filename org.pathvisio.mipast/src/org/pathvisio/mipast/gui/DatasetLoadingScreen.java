@@ -112,7 +112,7 @@ public class DatasetLoadingScreen extends Wizard {
 	
 	private boolean miRNAFileLoaded = false;
 	private boolean geneFileLoaded = false;
-	
+	private boolean checkBox=false;
 	private class FileLoaderPage extends WizardPanelDescriptor implements ActionListener {
 		public static final String IDENTIFIER = "FILE_PAGE";
 		 private boolean dataLoaded = false;
@@ -134,7 +134,7 @@ public class DatasetLoadingScreen extends Wizard {
 			mainPanel.add(screenLabel, cc.xy(1,1));
 			
 			JButton miRNABrowse = new JButton("browse");
-			JButton geneBrowse = new JButton("Browse");
+			final JButton geneBrowse = new JButton("Browse");
 			
 			// miRNA
 			miRNAText = new JTextField();
@@ -147,8 +147,10 @@ public class DatasetLoadingScreen extends Wizard {
 			// gene
 			JLabel geneLabel= new JLabel("Transcriptomics Dataset");
 			JCheckBox geneBox= new JCheckBox("Transcriptomics available");
-			
+			geneBrowse.setEnabled(checkBox);
 			geneText = new JTextField();
+			geneText.setEnabled(checkBox);
+			
 			mainPanel.add(geneBox,cc.xy(1, 5));
 			
 			mainPanel.add(geneLabel, cc.xy(1, 7));
@@ -224,15 +226,19 @@ public class DatasetLoadingScreen extends Wizard {
 			
 			
 			
-			geneBox.addActionListener(new ActionListener(){
+			geneBox.addChangeListener(new ChangeListener(){
 
 				@Override
-				public void actionPerformed(ActionEvent ae) {
-					
+				public void stateChanged(ChangeEvent ae) {
+					if(checkBox ==false){
+					checkBox =true;
 					dataLoaded = false;
-					System.out.println(dataLoaded);
 					getWizard().setNextFinishButtonEnabled(dataLoaded);
+					geneBrowse.setEnabled(checkBox);
+					geneText.setEnabled(checkBox);
+					}
 					
+				
 				}
 				
 			
@@ -457,12 +463,14 @@ public class DatasetLoadingScreen extends Wizard {
 
 	    public Object getNextPanelDescriptor()
 	    {
-	        return "gene_INFORMATIONPAGE_PAGE";
+	    	if (checkBox == true){
+	        return "gene_INFORMATIONPAGE_PAGE";}
+	    	else{return null;}
 	    }
 
 	    public Object getBackPanelDescriptor()
 	    {
-	        return "miRNA_INFORMATION_PAGE";
+	        return "miRNA_INFORMATIONPAGE_PAGE";
 	    }
 
 	    @Override
@@ -946,7 +954,7 @@ public class DatasetLoadingScreen extends Wizard {
 	        return "gene_COLUMN_PAGE";}
 		public Object getBackPanelDescriptor()
 	    {
-	        return "miRNA_INFORMATION_PAGE";
+	        return "miRNA_COLUMN_PAGE";
 	    }
 	}
 	
@@ -1400,6 +1408,7 @@ public class DatasetLoadingScreen extends Wizard {
 					pk.setTaskName("Merging data expression files");
 					FileMerger fm= new FileMerger();
 					mergedFile=fm.fileMerger(miRNAData, geneData);
+					
 					 {
 						pk.finished();
 					}
