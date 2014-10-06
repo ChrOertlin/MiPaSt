@@ -6,10 +6,14 @@ Bundle-Version: 1.0.0.qualifier
 Import-Package: com.jgoodies.forms.builder,
  com.jgoodies.forms.layout,
  org.apache.commons.io,
+ org.bridgedb.gui,
  org.osgi.framework;version="1.5.0",
  org.pathvisio.gexplugin
 Require-Bundle: org.pathvisio.core;bundle-version="3.2.0",
  org.pathvisio.desktop;bundle-version="3.2.0",
  org.pathvisio.gui;bundle-version="3.2.0",
- org.pathvisio.gex;bundle-version="3.2.0"
+ org.pathvisio.gex;bundle-version="3.2.0",
+ org.bridgedb;bundle-version="1.2.0",
+ org.bridgedb.bio;bundle-version="1.2.0",
+ org.bridgedb.rdb;bundle-version="1.2.0"
 Bundle-Activator: org.pathvisio.mipast.MiPaStPlugin
