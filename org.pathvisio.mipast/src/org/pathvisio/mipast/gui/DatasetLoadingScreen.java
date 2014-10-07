@@ -84,12 +84,8 @@ public class DatasetLoadingScreen extends Wizard {
 	private FileMergePage fmp= new FileMergePage();
 	private File mergedFile;
 	
-	private PvDesktop desktop;
-	
 	public DatasetLoadingScreen (PvDesktop pvDesktop)
 	{
-		this.desktop = pvDesktop;
-
 		getDialog().setTitle ("MiPaSt import wizard");
 
        registerWizardPanel(fpd);
@@ -102,17 +98,46 @@ public class DatasetLoadingScreen extends Wizard {
         setCurrentPanel(FileLoaderPage.IDENTIFIER);
 	}
 	
+	public String getGeneDataSourceName() {
+		return geneDataSourceName;
+	}
+
+	
+
+	public String getmiRNADataSourceName() {
+		return miRNADataSourceName;
+	}
+
+	public String getmiRNADel(){
+		return miRNADel;
+	}
+
+	public String getgeneDel(){
+		return geneDel;
+	}
+	
 	private JTextField miRNAText;
 	private JTextField geneText;
 	private File miRNAFile;
 	private File geneFile;
-	
+	public static String miRNAFileName;
+	public static String geneFileName;
+	private JLabel informationLabel;
 	private List<String> miRNAData;
 	private List<String> geneData;
-	
+	private JButton miRNABrowse;
+	private JButton geneBrowse;
 	private boolean miRNAFileLoaded = false;
 	private boolean geneFileLoaded = false;
 	private boolean checkBox=false;
+	
+	private String miRNADel;
+	private String geneDel;
+	private String miRNADataSourceName;
+	private String geneDataSourceName;
+	
+	
+	
 	private class FileLoaderPage extends WizardPanelDescriptor implements ActionListener {
 		public static final String IDENTIFIER = "FILE_PAGE";
 		 private boolean dataLoaded = false;
@@ -133,8 +158,8 @@ public class DatasetLoadingScreen extends Wizard {
 			JLabel screenLabel = new JLabel("Load your datasets");
 			mainPanel.add(screenLabel, cc.xy(1,1));
 			
-			JButton miRNABrowse = new JButton("browse");
-			final JButton geneBrowse = new JButton("Browse");
+			miRNABrowse = new JButton("browse");
+			geneBrowse = new JButton("Browse");
 			
 			// miRNA
 			miRNAText = new JTextField();
@@ -177,8 +202,11 @@ public class DatasetLoadingScreen extends Wizard {
 								System.out.println(miRNAData.size());
 								miRNAFileLoaded=true;
 								dataLoaded=true;
-								System.out.println(dataLoaded);
+								miRNAFileName= miRNAFile.getName();
+								
+								
 								checkLoaded();
+								
 								
 								
 								
@@ -202,14 +230,14 @@ public class DatasetLoadingScreen extends Wizard {
 					int returnVal = fc.showDialog(null, "Open Transcriptomics datasetfile");
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
 						geneFile = fc.getSelectedFile();
-						geneText.setText(geneFile.getAbsolutePath());
 						
 						try {
 							geneData = MiPaStFileReader.readFile(geneFile);
 							if(geneData.size() > 0) {
 								geneFileLoaded=true;
 								dataLoaded=true;
-								System.out.println(dataLoaded);
+								geneText.setText(geneFile.getAbsolutePath());
+								geneFileName= geneFile.getName();
 								
 								checkLoaded();
 								
@@ -226,36 +254,50 @@ public class DatasetLoadingScreen extends Wizard {
 			
 			
 			
-			geneBox.addChangeListener(new ChangeListener(){
+			geneBox.addActionListener(new ActionListener(){
 
 				@Override
-				public void stateChanged(ChangeEvent ae) {
-					if(checkBox ==false){
-					checkBox =true;
-					dataLoaded = false;
-					getWizard().setNextFinishButtonEnabled(dataLoaded);
-					geneBrowse.setEnabled(checkBox);
-					geneText.setEnabled(checkBox);
-					}
+				public void actionPerformed(ActionEvent ae) {
+					refreshPage();
+					
 					
 				
 				}
-				
+			
 			
 					
 				});
+			
 				
+			
 		
 			return mainPanel;
 		}
 		
+		public void refreshPage(){
+			if (checkBox== false){
+				checkBox =true;
+				dataLoaded = false;
+				getWizard().setNextFinishButtonEnabled(dataLoaded);
+				geneBrowse.setEnabled(checkBox);
+				geneText.setEnabled(checkBox);}
+			
+			else{checkBox =false;
+			dataLoaded = true;
+			getWizard().setNextFinishButtonEnabled(dataLoaded);
+			geneBrowse.setEnabled(checkBox);
+			geneText.setEnabled(checkBox);}
+		}
 		public void checkLoaded() throws IOException{
 			if (miRNAFileLoaded == true && geneFileLoaded != true){
 				miRNAImportInformation.setTxtFile(miRNAFile);
+				
 			}
 			if (miRNAFileLoaded ==true && geneFileLoaded == true){
 				miRNAImportInformation.setTxtFile(miRNAFile);
 				geneImportInformation.setTxtFile(geneFile);
+				
+				
 			}
 			getWizard().setNextFinishButtonEnabled(dataLoaded);
 		}
@@ -283,9 +325,13 @@ public class DatasetLoadingScreen extends Wizard {
 	    }
 	}
 	
+	
+	
 	/** Set information for the miRNA expression data file*/
 	private class FilesInformationPage extends WizardPanelDescriptor implements ActionListener {
 		public static final String IDENTIFIER = "miRNA_INFORMATIONPAGE_PAGE";
+		
+		
 		
 		private JRadioButton seperatorTab;
 		private JRadioButton seperatorComma;
@@ -299,6 +345,7 @@ public class DatasetLoadingScreen extends Wizard {
 		public FilesInformationPage() {
 			super(IDENTIFIER);
 			// TODO Auto-generated constructor stub
+			
 		}
 
 		@Override
@@ -310,14 +357,17 @@ public class DatasetLoadingScreen extends Wizard {
 		@Override
 		protected Component createContents() {
 			FormLayout layout = new FormLayout (
-		    		"pref, 3dlu, pref, 3dlu, pref, pref:grow",
-		    		"p, 3dlu, p, 3dlu, p, 15dlu, fill:[100dlu,min]:grow");
+		    		"pref, 3dlu,pref, 3dlu, pref, 3dlu, pref, pref:grow",
+		    		"p,3dlu,p, 3dlu, p, 3dlu, p, 15dlu, fill:[100dlu,min]:grow");
 
 		    PanelBuilder builder = new PanelBuilder(layout);
 		    builder.setDefaultDialogBorder();
 
 		    CellConstraints cc = new CellConstraints();
-
+		    
+		    informationLabel = new JLabel(DatasetLoadingScreen.miRNAFileName);
+		    System.out.println(DatasetLoadingScreen.miRNAFileName);
+		    
 			seperatorTab = new JRadioButton ("tab");
 			seperatorComma = new JRadioButton ("comma");
 			seperatorSemi = new JRadioButton ("semicolon");
@@ -330,11 +380,12 @@ public class DatasetLoadingScreen extends Wizard {
 			bgSeparator.add (seperatorSpace);
 			bgSeparator.add (seperatorOther);
 
-			builder.add (seperatorTab, cc.xy(1,1));
-			builder.add (seperatorComma, cc.xy(1,3));
-			builder.add (seperatorSemi, cc.xy(1,5));
-			builder.add (seperatorSpace, cc.xy(3,1));
-			builder.add (seperatorOther, cc.xy(3,3));
+			builder.add(informationLabel, cc.xy(1, 1));
+			builder.add (seperatorTab, cc.xy(1,3));
+			builder.add (seperatorComma, cc.xy(1,5));
+			builder.add (seperatorSemi, cc.xy(1,7));
+			builder.add (seperatorSpace, cc.xy(3,3));
+			builder.add (seperatorOther, cc.xy(3,5));
 
 			final JTextField txtOther = new JTextField(3);
 			builder.add (txtOther, cc.xy(5, 3));
@@ -344,7 +395,7 @@ public class DatasetLoadingScreen extends Wizard {
 			tblPreview.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 			JScrollPane scrTable = new JScrollPane(tblPreview);
 
-			builder.add (scrTable, cc.xyw(1,7,6));
+			builder.add (scrTable, cc.xyw(1,9,8));
 
 			txtOther.addActionListener(new ActionListener () {
 
@@ -403,13 +454,14 @@ public class DatasetLoadingScreen extends Wizard {
 		{
 	        ///getWizard().setNextFinishButtonEnabled(dataLoaded);
 			
-			getWizard().setPageTitle ("Choose data delimiter for miRNA file");
+			getWizard().setPageTitle ("Choose data delimiter for miRNA file:");
 
 	    	prevTable.refresh(); //<- doesn't work somehow
 	    	String del = miRNAImportInformation.getDelimiter();
 	    	if (del.equals ("\t"))
 	    	{
 	    		seperatorTab.setSelected(true);
+	    		miRNADel= "\t";
 	    	}
 	    	else if (del.equals (","))
 			{
@@ -455,7 +507,8 @@ public class DatasetLoadingScreen extends Wizard {
 	    private JRadioButton rbFixedYes;
 	    private JComboBox cbDataSource;
 	    private DataSourceModel miRNADataSource;
-
+	    private boolean dataSourceSelected = false;
+	   
 	    public ColumnPage()
 	    {
 	        super(IDENTIFIER);
@@ -481,12 +534,12 @@ public class DatasetLoadingScreen extends Wizard {
 		    		"p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, fill:[100dlu,min]:grow");
 
 		    PanelBuilder builder = new PanelBuilder(layout);
-		    builder.setDefaultDialogBorder();
-
+		    
+		   
 		    CellConstraints cc = new CellConstraints();
 
-			rbFixedNo = new JRadioButton("Select a column to specify system code");
-			rbFixedYes = new JRadioButton("Use the same system code for all rows");
+			rbFixedNo = new JRadioButton("Select Database");
+			rbFixedYes = new JRadioButton("Select Systemcode Column");
 			ButtonGroup bgSyscodeCol = new ButtonGroup ();
 			bgSyscodeCol.add (rbFixedNo);
 			bgSyscodeCol.add (rbFixedYes);
@@ -514,18 +567,20 @@ public class DatasetLoadingScreen extends Wizard {
 		    jv.setView(rowHeader);
 		    jv.setPreferredSize(rowHeader.getPreferredSize());
 		    scrTable.setRowHeader(jv);
-//		    scrTable.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, rowHeader
-//		            .getTableHeader());
 
-			builder.addLabel ("Select primary identifier column:", cc.xy(1,1));
+
+			builder.addLabel ("ID column:", cc.xy(1,1));
 			builder.add (cbColId, cc.xy(3,1));
-
-			builder.add (rbFixedNo, cc.xyw(1,3,3));
-			builder.add (cbColSyscode, cc.xy(3,5));
 			builder.add (rbFixedYes, cc.xyw (1,7,3));
-			builder.add (cbDataSource, cc.xy (3,9));
+			
+			
+			builder.add (cbDataSource, cc.xy (3,5));
+			builder.add (rbFixedNo, cc.xyw(1,3,3));
+			builder.add (cbColSyscode, cc.xy(3,9));
+			
 
 			builder.add (scrTable, cc.xyw(1,11,3));
+			
 
 			ActionListener rbAction = new ActionListener() {
 				public void actionPerformed (ActionEvent ae)
@@ -533,6 +588,7 @@ public class DatasetLoadingScreen extends Wizard {
 					boolean result = (ae.getSource() == rbFixedYes);
 					miRNAImportInformation.setSyscodeFixed(result);
 			    	columnPageRefresh();
+			    	
 				}
 			};
 			rbFixedYes.addActionListener(rbAction);
@@ -543,6 +599,10 @@ public class DatasetLoadingScreen extends Wizard {
 				public void contentsChanged(ListDataEvent arg0)
 				{
 					miRNAImportInformation.setDataSource(miRNADataSource.getSelectedDataSource());
+					//miRNADataSourceName=miRNADataSource.getSelectedDataSource().toString();
+					dataSourceSelected=true;
+					enableNext();
+					
 				}
 
 				public void intervalAdded(ListDataEvent arg0) {}
@@ -692,31 +752,32 @@ public class DatasetLoadingScreen extends Wizard {
 
 	    private void columnPageRefresh()
 	    {
-	    	String error = null;
-			if (miRNAImportInformation.isSyscodeFixed())
+	    	if (miRNAImportInformation.isSyscodeFixed())
 			{
 				rbFixedYes.setSelected (true);
-				cbColSyscode.setEnabled (false);
-				cbDataSource.setEnabled (true);
+				cbColSyscode.setEnabled (true);
+				cbDataSource.setEnabled (false);
 			}
 			else
 			{
 				rbFixedNo.setSelected (true);
-				cbColSyscode.setEnabled (true);
-				cbDataSource.setEnabled (false);
+				cbColSyscode.setEnabled (false);
+				cbDataSource.setEnabled (true);
 
 				if (miRNAImportInformation.getIdColumn() == miRNAImportInformation.getSyscodeColumn())
 	    		{
-	    			error = "System code column and Id column can't be the same";
 	    		}
 			}
-		    getWizard().setNextFinishButtonEnabled(error == null);
-		    getWizard().setErrorMessage(error == null ? "" : error);
-			getWizard().setPageTitle ("Choose column types");
-
+		    //getWizard().setNextFinishButtonEnabled(error == null);
+		    //getWizard().setErrorMessage(error == null ? "" : error);
+			//getWizard().setPageTitle ("Choose column types");
+			//enableNext();
 	    	ctm.refresh();
 	    }
 
+	    
+	    
+	    
 	    private void refreshComboBoxes()
 	    {
 	    	miRNADataSource.setSelectedItem(miRNAImportInformation.getDataSource());
@@ -789,6 +850,7 @@ public class DatasetLoadingScreen extends Wizard {
 			refreshComboBoxes();
 
 	    	ctm.refresh();
+	    	getWizard().setNextFinishButtonEnabled(false);
 	    }
 
 	    @Override
@@ -800,11 +862,21 @@ public class DatasetLoadingScreen extends Wizard {
 		    	miRNAImportInformation.setDataSource(miRNADataSource.getSelectedDataSource());
 	    	}
 	    }
+	    
+	    public void enableNext(){
+	    	if (dataSourceSelected == false){
+	    		getWizard().setNextFinishButtonEnabled(dataSourceSelected);
+	    	}
+	    	else{
+	    		getWizard().setNextFinishButtonEnabled(dataSourceSelected);
+	    	}
+	    }
 	}
 /** Set the information for the gene expression file*/
 	
 	private class FilesInformationPage2 extends WizardPanelDescriptor implements ActionListener {
 		public static final String IDENTIFIER = "gene_INFORMATIONPAGE_PAGE";
+		
 		
 		private JRadioButton seperatorTab;
 		private JRadioButton seperatorComma;
@@ -829,14 +901,15 @@ public class DatasetLoadingScreen extends Wizard {
 		@Override
 		protected Component createContents() {
 			FormLayout layout = new FormLayout (
-		    		"pref, 3dlu, pref, 3dlu, pref, pref:grow",
-		    		"p, 3dlu, p, 3dlu, p, 15dlu, fill:[100dlu,min]:grow");
+		    		"pref, 3dlu,pref, 3dlu, pref, 3dlu, pref, pref:grow",
+		    		"p,3dlu,p, 3dlu, p, 3dlu, p, 15dlu, fill:[100dlu,min]:grow");
 
 		    PanelBuilder builder = new PanelBuilder(layout);
 		    builder.setDefaultDialogBorder();
 
 		    CellConstraints cc = new CellConstraints();
-
+		    
+		    informationLabel = new JLabel(geneFileName);
 			seperatorTab = new JRadioButton ("tab");
 			seperatorComma = new JRadioButton ("comma");
 			seperatorSemi = new JRadioButton ("semicolon");
@@ -849,11 +922,12 @@ public class DatasetLoadingScreen extends Wizard {
 			bgSeparator.add (seperatorSpace);
 			bgSeparator.add (seperatorOther);
 
-			builder.add (seperatorTab, cc.xy(1,1));
-			builder.add (seperatorComma, cc.xy(1,3));
-			builder.add (seperatorSemi, cc.xy(1,5));
-			builder.add (seperatorSpace, cc.xy(3,1));
-			builder.add (seperatorOther, cc.xy(3,3));
+			builder.add(informationLabel, cc.xy(1, 1));
+			builder.add (seperatorTab, cc.xy(1,3));
+			builder.add (seperatorComma, cc.xy(1,5));
+			builder.add (seperatorSemi, cc.xy(1,7));
+			builder.add (seperatorSpace, cc.xy(3,3));
+			builder.add (seperatorOther, cc.xy(3,5));
 
 			final JTextField txtOther = new JTextField(3);
 			builder.add (txtOther, cc.xy(5, 3));
@@ -863,7 +937,7 @@ public class DatasetLoadingScreen extends Wizard {
 			tblPreview.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 			JScrollPane scrTable = new JScrollPane(tblPreview);
 
-			builder.add (scrTable, cc.xyw(1,7,6));
+			builder.add (scrTable, cc.xyw(1,9,8));
 
 			txtOther.addActionListener(new ActionListener () {
 
@@ -971,6 +1045,7 @@ public class DatasetLoadingScreen extends Wizard {
 	    private JRadioButton rbFixedYes;
 	    private JComboBox cbDataSource;
 	    private DataSourceModel geneDataSource;
+	    private boolean dataSourceSelected = false;
 
 	    public ColumnPage2()
 	    {
@@ -999,8 +1074,8 @@ public class DatasetLoadingScreen extends Wizard {
 
 		    CellConstraints cc = new CellConstraints();
 
-			rbFixedNo = new JRadioButton("Select a column to specify system code");
-			rbFixedYes = new JRadioButton("Use the same system code for all rows");
+		    rbFixedNo = new JRadioButton("Select Database");
+			rbFixedYes = new JRadioButton("Select Systemcode Column");
 			ButtonGroup bgSyscodeCol = new ButtonGroup ();
 			bgSyscodeCol.add (rbFixedNo);
 			bgSyscodeCol.add (rbFixedYes);
@@ -1031,13 +1106,17 @@ public class DatasetLoadingScreen extends Wizard {
 //		    scrTable.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, rowHeader
 //		            .getTableHeader());
 
-			builder.addLabel ("Select primary identifier column:", cc.xy(1,1));
-			builder.add (cbColId, cc.xy(3,1));
+			
 
-			builder.add (rbFixedNo, cc.xyw(1,3,3));
-			builder.add (cbColSyscode, cc.xy(3,5));
+			builder.addLabel ("ID column:", cc.xy(1,1));
+			builder.add (cbColId, cc.xy(3,1));
 			builder.add (rbFixedYes, cc.xyw (1,7,3));
-			builder.add (cbDataSource, cc.xy (3,9));
+			
+			
+			builder.add (cbDataSource, cc.xy (3,5));
+			builder.add (rbFixedNo, cc.xyw(1,3,3));
+			builder.add (cbColSyscode, cc.xy(3,9));
+			
 
 			builder.add (scrTable, cc.xyw(1,11,3));
 
@@ -1057,6 +1136,9 @@ public class DatasetLoadingScreen extends Wizard {
 				public void contentsChanged(ListDataEvent arg0)
 				{
 					geneImportInformation.setDataSource(geneDataSource.getSelectedDataSource());
+					//geneDataSourceName=geneDataSource.getSelectedDataSource().toString();
+					dataSourceSelected=true;
+					enableNext();
 				}
 
 				public void intervalAdded(ListDataEvent arg0) {}
@@ -1210,14 +1292,14 @@ public class DatasetLoadingScreen extends Wizard {
 			if (geneImportInformation.isSyscodeFixed())
 			{
 				rbFixedYes.setSelected (true);
-				cbColSyscode.setEnabled (false);
-				cbDataSource.setEnabled (true);
+				cbColSyscode.setEnabled (true);
+				cbDataSource.setEnabled (false);
 			}
 			else
 			{
 				rbFixedNo.setSelected (true);
-				cbColSyscode.setEnabled (true);
-				cbDataSource.setEnabled (false);
+				cbColSyscode.setEnabled (false);
+				cbDataSource.setEnabled (true);
 
 				if (geneImportInformation.getIdColumn() == geneImportInformation.getSyscodeColumn())
 	    		{
@@ -1301,10 +1383,20 @@ public class DatasetLoadingScreen extends Wizard {
 
 			columnPageRefresh();
 			refreshComboBoxes();
-
+			getWizard().setNextFinishButtonEnabled(false);
 	    	ctm.refresh();
 	    }
-
+	    
+	  
+	    
+	    public void enableNext(){
+	    	if (dataSourceSelected == false){
+	    		getWizard().setNextFinishButtonEnabled(dataSourceSelected);
+	    	}
+	    	else{
+	    		getWizard().setNextFinishButtonEnabled(dataSourceSelected);
+	    	}
+	    }
 	    @Override
 	    public void aboutToHidePanel()
 	    {
@@ -1406,8 +1498,18 @@ public class DatasetLoadingScreen extends Wizard {
 			SwingWorker<File, File> sw = new SwingWorker<File, File>() {
 				@Override protected File doInBackground() throws Exception {
 					pk.setTaskName("Merging data expression files");
+					
 					FileMerger fm= new FileMerger();
-					mergedFile=fm.fileMerger(miRNAData, geneData);
+					fm.fileMerger(miRNAData, "miRNA", miRNADel);
+					/** ADD FILEMERGER HERE!!!!!!!!!!!!!!!!!
+					 * 
+					 * 
+					 * 
+					 * 
+					 * 
+					 * 
+					 * 
+					 * */
 					
 					 {
 						pk.finished();

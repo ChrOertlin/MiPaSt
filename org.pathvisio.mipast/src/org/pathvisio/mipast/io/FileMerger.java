@@ -6,62 +6,129 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.pathvisio.mipast.DataRow;
 
 
 
 public class FileMerger {
-	
-	File mergedFile;
-	
-	public  File fileMerger(List<String> array1, List<String> array2) throws java.io.FileNotFoundException{
-		String line;
-		// Merge the ArrayLists together into one big array
-		ArrayList<String> mergedArrays = new ArrayList<String>(mergeArrays(array1, array2));
-		
-		// Write the merged arrays to a file and return it
-		File mergedFile= new File("mergedFile.txt");
-		try{
-		BufferedWriter output = new BufferedWriter(new FileWriter(mergedFile));
-	
-		for (int i=0; i< mergedArrays.size();i++){
-			line = mergedArrays.get(i);
-			System.out.println(line);
-			output.write(line);
-			output.newLine();
-		}
-		output.close();
-		}
-		catch(IOException e){
-			e.printStackTrace();
-		}
-		
-		return mergedFile;
-		}
-	
-	
-	
+	String line;
 
-	// The method that merges the arrays together into on big array
-	public static List<String> mergeArrays(List<String> array1, List<String> array2){
-		List<String> mergedArray = new ArrayList<String>();
-		for (int i=0; i< array1.size();i++){
-				if (i==0){
-				mergedArray.add(array1.get(i)+"\t"+ "type");
-			}
-				else{
-					mergedArray.add(array1.get(i)+"\t"+ "miRNA");
+	String type;
+	String systemcode;
+	String[] rowElements;
+	Set<String> keySet;
+	String[] keys;
+	DataRow dm = new DataRow("merge");
+	
+	
+	public  Map<String, String> fileMerger(List<String> array, String type, String del) throws java.io.FileNotFoundException{
+		
+		for (int i=0; i<array.size();i++){
+			if (i==0){
+			line= array.get(i);
+			rowElements=line.split(del);
+			System.out.print(rowElements);}
+			for (int j= 0; j<rowElements.length;j++){
+			dm.addProperty(rowElements[j], null);
+			dm.addProperty(type, null);
+			dm.addProperty(systemcode, null);}
+			keySet= dm.keySet();
+			keys = (String[]) keySet.toArray();
+			if(i>0){
+				
+				line = array.get(i);
+				rowElements=line.split(del);
+				for (int j=0; j<rowElements.length;j++){
+					
+					dm.addProperty(keys[j], rowElements[j]);
+					
 				}
-		}
-		
-		for (int j=1 ;j<array2.size();j++){
+			}
 			
-			mergedArray.add(array2.get(j)+"\t"+ "gene");
 		}
 		
+		dm.printMap();
+		return dm.getProperties();
+
 		
-		return mergedArray;
-	}
+	}	
+		
+		
 	
+}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		//		String line;
+//		// Merge the ArrayLists together into one big array
+//		ArrayList<String> mergedArrays = new ArrayList<String>(mergeArrays(array1, array2));
+//		
+//		// Write the merged arrays to a file and return it
+//		File mergedFile= new File("mergedFile.txt");
+//		try{
+//		BufferedWriter output = new BufferedWriter(new FileWriter(mergedFile));
+//	
+//		for (int i=0; i< mergedArrays.size();i++){
+//			line = mergedArrays.get(i);
+//			System.out.println(line);
+//			output.write(line);
+//			output.newLine();
+//		}
+//		output.close();
+//		}
+//		catch(IOException e){
+//			e.printStackTrace();
+//		}
+//		
+//		return mergedFile;
+//		}
+//	
+//	
+//	
+//
+//	// The method that merges the arrays together into on big array
+//	public static List<String> mergeArrays(List<String> array1, List<String> array2){
+//		List<String> mergedArray = new ArrayList<String>();
+//		for (int i=0; i< array1.size();i++){
+//				if (i==0){
+//				mergedArray.add(array1.get(i)+"\t"+ "type");
+//			}
+//				else{
+//					mergedArray.add(array1.get(i)+"\t"+ "miRNA");
+//				}
+//		}
+//		
+//		for (int j=1 ;j<array2.size();j++){
+//			
+//			mergedArray.add(array2.get(j)+"\t"+ "gene");
+//		}
+//		
+//		
+//		return mergedArray;
+//	}
+//	
 	
 
-}
+
