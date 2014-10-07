@@ -1,3 +1,17 @@
+//Copyright 2014 PathVisio
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
 package org.pathvisio.mipast;
 
 import java.awt.Desktop;
@@ -14,26 +28,42 @@ import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.plugin.Plugin;
 import org.pathvisio.mipast.gui.DatasetLoadingScreen;
 
+/**
+ * 
+ * @author ChrOertlin
+ * @author mkutmon
+ * 
+ * This class implements the PathVisio plugin 
+ * interface and also registeres the plugin
+ * with the OSGi registry.
+ * The MiPaSt menu is added when initialized by
+ * the PvDesktop
+ *
+ */
 public class MiPaStPlugin implements BundleActivator, Plugin {
 	
 	private JMenu miPaStMenu;
 	private PvDesktop desktop;
 	private JMenuItem menuLoadFiles;
 	private JMenuItem help;
-	private JMenuItem documentation;
-	private MiPaStPlugin plugin;
 	
+	/**
+	 * init gets called by PvDesktop to
+	 * initialize the plugin
+	 */
 	@Override
 	public void init(PvDesktop desktop) {
 		this.desktop = desktop;
-		
-		
-		menuItems();
+		JMenu menu = createMiPaStMenu();
+		desktop.registerSubMenu("Plugins", menu);
 	}
 
-	public void menuItems(){
+	/**
+	 * creates MiPaSt Menu that is added in
+	 * the PathVisio 'Plugins' menu
+	 */
+	public JMenu createMiPaStMenu(){
 		miPaStMenu = new JMenu("MiPaStMenu");
-		desktop.registerSubMenu("Plugins", miPaStMenu);
 		
 		menuLoadFiles = new JMenuItem("Load dataset files");
 		menuLoadFiles.addActionListener(new menuLoadFilesActionListener());
@@ -41,66 +71,40 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 		help = new JMenuItem("Help");
 		help.addActionListener(new HelpActionListener());
 		
-		documentation = new JMenuItem("Documentation");
-		documentation.addActionListener(new DocumentationActionListener());
-		
 		miPaStMenu.add(menuLoadFiles);
 		miPaStMenu.add(help);
-		miPaStMenu.add(documentation);
 		
+		return miPaStMenu;
 	}
 
-	
 	@Override
 	public void done() {
 		desktop.unregisterSubMenu("Plugins", miPaStMenu);
 	}
 
-	//Opens URL to help page of the plugin
-	class HelpActionListener implements ActionListener{
+	/**
+	 * Opens URL to help page of the plugin
+	 */
+	private class HelpActionListener implements ActionListener{
 		
 		public void helpURL() throws Exception{
-		Desktop helpBrowse= Desktop.getDesktop();
-		helpBrowse.browse(new URI("https://www.google.com"));}
+			Desktop helpBrowse= Desktop.getDesktop();
+			helpBrowse.browse(new URI("https://www.google.com"));
+		}
 		
 		public void actionPerformed(ActionEvent e){
-		try {
-			helpURL();
-		} catch (Exception e1) {
-			
-			e1.printStackTrace();
+			try {
+				helpURL();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 		}
-		
-		
-		    
-		}
-		
 	}
-	
-	class DocumentationActionListener implements ActionListener{
-		
-		public void documentationURL() throws Exception{
-		Desktop documentationBrowse= Desktop.getDesktop();
-		documentationBrowse.browse(new URI("https://www.google.com"));}
-		
-		public void actionPerformed(ActionEvent e){
-		try {
-			documentationURL();
-		} catch (Exception e1) {
-			
-			e1.printStackTrace();
-		}
-		
-		
-		    
-		}
-		
-	
-		}
-		
-	
-		
-	class menuLoadFilesActionListener implements ActionListener{
+
+	/**
+	 * Opens file import dialog
+	 */
+	private class menuLoadFilesActionListener implements ActionListener{
 		public void actionPerformed(ActionEvent e){
 			DatasetLoadingScreen wizard = new DatasetLoadingScreen(desktop);
 			wizard.showModalDialog(desktop.getSwingEngine().getFrame());
@@ -108,7 +112,6 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 	}
 	
 	
-// Bundle Activator Starts the plugin withit PathVisio
 	@Override
 	public void start(BundleContext context) throws Exception {
 		context.registerService(Plugin.class.getName(), this, null);
@@ -119,6 +122,4 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 	public void stop(BundleContext context) throws Exception {
 		this.done();
 	}
-
-
 }

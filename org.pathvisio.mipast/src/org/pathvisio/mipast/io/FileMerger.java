@@ -27,15 +27,18 @@ public class FileMerger {
 	public  Map<String, String> fileMerger(List<String> array, String type, String del) throws java.io.FileNotFoundException{
 		
 		for (int i=0; i<array.size();i++){
-			if (i==0){
-			line= array.get(i);
-			rowElements=line.split(del);
-			System.out.print(rowElements);}
-			for (int j= 0; j<rowElements.length;j++){
-			dm.addProperty(rowElements[j], null);
-			dm.addProperty(type, null);
-			dm.addProperty(systemcode, null);}
-			keySet= dm.keySet();
+			if (i==0) {
+				line= array.get(i);
+				rowElements=line.split(del);
+				System.out.print(rowElements);
+			}
+			
+			for (int j= 0; j < rowElements.length;j++){
+				dm.addProperty(rowElements[j], null);
+				dm.addProperty(type, null);
+				dm.addProperty(systemcode, null);
+			}
+			keySet= dm.getProperties().keySet();
 			keys = (String[]) keySet.toArray();
 			if(i>0){
 				
