@@ -1292,10 +1292,12 @@ public class DatasetLoadingScreen extends Wizard {
 					pk.setTaskName("Merging data expression files");
 					
 					FileMerger fm= new FileMerger();
-					fm.fileMerger(miRNAData, "miRNA", miRNADel);
+					fm.createMap(miRNAData, "miRNA", miRNADel);
+					fm.createMap(geneData, "gene", geneDel);
 					// TODO: add file merger here
 					
 					pk.finished();
+					
 					return mergedFile;
 				}
 

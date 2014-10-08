@@ -36,26 +36,33 @@ public class FileMerger {
 	DataRow dm = new DataRow("merge");
 	
 	
-	public  Map<String, String> fileMerger(List<String> array, String type, String del) throws java.io.FileNotFoundException{
+	public  Map<String, String> createMap(List<String> array, String type, String del) throws java.io.FileNotFoundException{
 		
 		for (int i=0; i<array.size();i++){
 			if (i==0) {
 				line= array.get(i);
-				rowElements=line.split(del);
-				System.out.print(rowElements);
+				
+				rowElements=line.split("\t");
+				for(int j=0; j<rowElements.length;j++){
+					
+						dm.addProperty(rowElements[j], null);
+						dm.addProperty(type, null);
+						dm.addProperty(systemcode, null);
+						dm.printMap();
+			
+			
 			}
 			
-			for (int j= 0; j < rowElements.length;j++){
-				dm.addProperty(rowElements[j], null);
-				dm.addProperty(type, null);
-				dm.addProperty(systemcode, null);
-			}
 			keySet= dm.getProperties().keySet();
 			keys = (String[]) keySet.toArray();
-			if(i>0){
+			
+			if (i<0){
 				
 				line = array.get(i);
+				System.out.print(line);
+				
 				rowElements=line.split(del);
+				
 				for (int j=0; j<rowElements.length;j++){
 					
 					dm.addProperty(keys[j], rowElements[j]);
@@ -65,13 +72,13 @@ public class FileMerger {
 			
 		}
 		
-		dm.printMap();
-		return dm.getProperties();
+		
+		return dm.dataRow("merge");
 
 		
 	}	
 		
-		
+	}	
 	
 }
 		
