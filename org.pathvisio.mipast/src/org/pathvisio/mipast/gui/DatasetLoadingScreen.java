@@ -21,7 +21,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -58,7 +57,6 @@ import org.pathvisio.gui.DataSourceModel;
 import org.pathvisio.gui.util.PermissiveComboBox;
 import org.pathvisio.mipast.io.ColumnTableModel;
 import org.pathvisio.mipast.io.FileMerger;
-import org.pathvisio.mipast.io.MiPaStFileReader;
 import org.pathvisio.mipast.io.PreviewTableModel;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -87,28 +85,24 @@ public class DatasetLoadingScreen extends Wizard {
 	private ColumnPage2 cpd2 = new ColumnPage2();
 	private FileMergePage fmp = new FileMergePage();
 	private File mergedFile;
-	
-	public DatasetLoadingScreen (PvDesktop pvDesktop) {
-		getDialog().setTitle ("MiPaSt import wizard");
 
-       registerWizardPanel(fpd);
-       registerWizardPanel(ipd);
-       registerWizardPanel(ipd2);
-       registerWizardPanel(cpd);
-       registerWizardPanel(cpd2);
-       registerWizardPanel(fmp);
-       
-       setCurrentPanel(FileLoaderPage.IDENTIFIER);
+	public DatasetLoadingScreen(PvDesktop pvDesktop) {
+		getDialog().setTitle("MiPaSt import wizard");
+
+		registerWizardPanel(fpd);
+		registerWizardPanel(ipd);
+		registerWizardPanel(ipd2);
+		registerWizardPanel(cpd);
+		registerWizardPanel(cpd2);
+		registerWizardPanel(fmp);
+
+		setCurrentPanel(FileLoaderPage.IDENTIFIER);
 	}
-	
-	private JTextField miRNAText;
-	private JTextField geneText;
+
 	private File miRNAFile;
 	private File geneFile;
 	
 	private JLabel informationLabel;
-	private List<String> miRNAData;
-	private List<String> geneData;
 
 	private String miRNADel;
 	private String geneDel;
@@ -120,8 +114,9 @@ public class DatasetLoadingScreen extends Wizard {
 		private JCheckBox geneBox;
 		private boolean miRNAFileLoaded = false;
 		private boolean geneFileLoaded = false;
-		private JButton miRNABrowse;
 		private JButton geneBrowse;
+		private JTextField miRNAText;
+		private JTextField geneText;
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {}
@@ -141,7 +136,7 @@ public class DatasetLoadingScreen extends Wizard {
 			// miRNA
 			miRNAText = new JTextField();
 			JLabel miRNALabel = new JLabel("miRNA Dataset");
-			miRNABrowse = new JButton("Browse");
+			JButton miRNABrowse = new JButton("Browse");
 			builder.add(miRNALabel, cc.xy(1, 4));
 			builder.add(miRNAText, cc.xywh(2, 4, 3, 1));
 			builder.add(miRNABrowse, cc.xy(6, 4));
@@ -173,21 +168,14 @@ public class DatasetLoadingScreen extends Wizard {
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
 						try {
 							miRNAFile = fc.getSelectedFile();
-							miRNAData = MiPaStFileReader.readFile(miRNAFile);
-							if(miRNAData.size() > 0) {
-								miRNAText.setText(miRNAFile.getAbsolutePath());
-								System.out.println(miRNAData.size());
+							miRNAText.setText(miRNAFile.getAbsolutePath());
 				
-								miRNAFileLoaded = true;
-								miRNAImportInformation.setTxtFile(miRNAFile);
-								if(geneBox.isSelected() && geneFileLoaded) {
-									getWizard().setNextFinishButtonEnabled(true);
-								} else if (!geneBox.isSelected()) {
-									getWizard().setNextFinishButtonEnabled(true);
-								}
-							} else {
-								// TODO: warning
-								miRNAFile = null;
+							miRNAFileLoaded = true;
+							miRNAImportInformation.setTxtFile(miRNAFile);
+							if(geneBox.isSelected() && geneFileLoaded) {
+								getWizard().setNextFinishButtonEnabled(true);
+							} else if (!geneBox.isSelected()) {
+								getWizard().setNextFinishButtonEnabled(true);
 							}
 						} catch (IOException e2) {
 							// TODO Auto-generated catch block
@@ -198,7 +186,6 @@ public class DatasetLoadingScreen extends Wizard {
 			});
 			
 			geneBrowse.addActionListener(new ActionListener() {
-				
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					JFileChooser fc = new JFileChooser();
@@ -206,18 +193,12 @@ public class DatasetLoadingScreen extends Wizard {
 					int returnVal = fc.showDialog(null, "Open Transcriptomics datasetfile");
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
 						geneFile = fc.getSelectedFile();
-						try {
-							geneData = MiPaStFileReader.readFile(geneFile);
-							if(geneData.size() > 0) {								
-								geneText.setText(geneFile.getAbsolutePath());
-								System.out.println(geneData.size());
-					
-								geneFileLoaded = true;
-								
-								geneImportInformation.setTxtFile(miRNAFile);
-								if(geneFileLoaded && miRNAFileLoaded) {
-									getWizard().setNextFinishButtonEnabled(true);
-								}
+						try {							
+							geneText.setText(geneFile.getAbsolutePath());
+							geneFileLoaded = true;
+							geneImportInformation.setTxtFile(miRNAFile);
+							if(miRNAFileLoaded) {
+								getWizard().setNextFinishButtonEnabled(true);
 							}
 						} catch (IOException e2) {
 							// TODO Auto-generated catch block
@@ -228,14 +209,12 @@ public class DatasetLoadingScreen extends Wizard {
 			});
 				
 			geneBox.addActionListener(new ActionListener() {
-
 				@Override
 				public void actionPerformed(ActionEvent ae) {
 					geneBrowse.setEnabled(geneBox.isSelected());
 					geneText.setEnabled(geneBox.isSelected());
 					if(!geneBox.isSelected()) {
 						geneFile = null;
-						geneData = null;
 						geneText.setText("");
 						geneFileLoaded = false;
 						if(miRNAFileLoaded) {
@@ -412,8 +391,8 @@ public class DatasetLoadingScreen extends Wizard {
 
 	    private JComboBox cbColId;
 	    private JComboBox cbColSyscode;
-	    private JRadioButton rbFixedNo;
-	    private JRadioButton rbFixedYes;
+	    private JRadioButton rbSysCodeCol;
+	    private JRadioButton rbDatabase;
 	    private JComboBox cbDataSource;
 	    private DataSourceModel miRNADataSource;
 	    private boolean dataSourceSelected = false;
@@ -437,7 +416,6 @@ public class DatasetLoadingScreen extends Wizard {
 		    		"p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, fill:[100dlu,min]:grow");
 
 		    PanelBuilder builder = new PanelBuilder(layout);
-
 		    CellConstraints cc = new CellConstraints();
 		    
 		    // id column
@@ -448,21 +426,21 @@ public class DatasetLoadingScreen extends Wizard {
 		    // sys code button group
 		    ButtonGroup bgSyscodeCol = new ButtonGroup();
 		    
-		    // fixed system code
+		    // not fixed system code
 		    miRNADataSource = new DataSourceModel();
 			String[] types = {"protein","gene","probe"};
 			miRNADataSource.setTypeFilter(types);
-			rbFixedNo = new JRadioButton("Select database:");
-			bgSyscodeCol.add(rbFixedNo);
-			builder.add(rbFixedNo, cc.xy(2, 3));
+			rbDatabase = new JRadioButton("Select database:");
+			bgSyscodeCol.add(rbDatabase);
+			builder.add(rbDatabase, cc.xy(2, 3));
 			cbDataSource = new PermissiveComboBox(miRNADataSource);
 			builder.add(cbDataSource, cc.xy(4, 3));
 			
 			// system code column
-			rbFixedYes = new JRadioButton("Select system code column:");
-			bgSyscodeCol.add(rbFixedYes);
+			rbSysCodeCol = new JRadioButton("Select system code column:");
+			bgSyscodeCol.add(rbSysCodeCol);
 			cbColSyscode = new JComboBox();
-			builder.add(rbFixedYes, cc.xy(2, 5));
+			builder.add(rbSysCodeCol, cc.xy(2, 5));
 			builder.add(cbColSyscode, cc.xy(4, 5));
 
 			ctm = new ColumnTableModel(miRNAImportInformation);
@@ -485,13 +463,13 @@ public class DatasetLoadingScreen extends Wizard {
 
 			ActionListener rbAction = new ActionListener() {
 				public void actionPerformed (ActionEvent ae) {
-					boolean result = (ae.getSource() == rbFixedYes);
+					boolean result = (ae.getSource() == rbDatabase);
 					miRNAImportInformation.setSyscodeFixed(result);
 			    	columnPageRefresh();
 				}
 			};
-			rbFixedYes.addActionListener(rbAction);
-			rbFixedNo.addActionListener(rbAction);
+			rbDatabase.addActionListener(rbAction);
+			rbSysCodeCol.addActionListener(rbAction);
 
 			miRNADataSource.addListDataListener(new ListDataListener() {
 				public void contentsChanged(ListDataEvent arg0) {
@@ -625,11 +603,11 @@ public class DatasetLoadingScreen extends Wizard {
 
 	    private void columnPageRefresh()  {
 	    	if (miRNAImportInformation.isSyscodeFixed()) {
-				rbFixedYes.setSelected (true);
+				rbDatabase.setSelected (true);
 				cbColSyscode.setEnabled (true);
 				cbDataSource.setEnabled (false);
 			} else {
-				rbFixedNo.setSelected (true);
+				rbSysCodeCol.setSelected (true);
 				cbColSyscode.setEnabled (false);
 				cbDataSource.setEnabled (true);
 
@@ -715,8 +693,8 @@ public class DatasetLoadingScreen extends Wizard {
 
 	    @Override
 	    public void aboutToHidePanel() {
-	    	miRNAImportInformation.setSyscodeFixed(rbFixedYes.isSelected());
-	    	if (rbFixedYes.isSelected()) {
+	    	miRNAImportInformation.setSyscodeFixed(rbDatabase.isSelected());
+	    	if (rbDatabase.isSelected()) {
 		    	miRNAImportInformation.setDataSource(miRNADataSource.getSelectedDataSource());
 	    	}
 	    }
@@ -1278,8 +1256,10 @@ public class DatasetLoadingScreen extends Wizard {
 				@Override protected File doInBackground() throws Exception {
 					pk.setTaskName("Merging data expression files");
 					
-					FileMerger fm= new FileMerger();
-					fm.fileMerger(miRNAData, "miRNA", miRNADel);
+					FileMerger fm = new FileMerger();
+					fm.createCombinedFile(miRNAImportInformation, geneImportInformation);
+					
+//					fm.fileMerger(miRNAData, "miRNA", miRNADel);
 					// TODO: add file merger here
 					
 					pk.finished();
