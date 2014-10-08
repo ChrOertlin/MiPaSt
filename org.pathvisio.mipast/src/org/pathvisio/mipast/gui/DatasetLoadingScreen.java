@@ -88,8 +88,7 @@ public class DatasetLoadingScreen extends Wizard {
 	private FileMergePage fmp= new FileMergePage();
 	private File mergedFile;
 	
-	public DatasetLoadingScreen (PvDesktop pvDesktop)
-	{
+	public DatasetLoadingScreen (PvDesktop pvDesktop) {
 		getDialog().setTitle ("MiPaSt import wizard");
 
        registerWizardPanel(fpd);
@@ -100,24 +99,6 @@ public class DatasetLoadingScreen extends Wizard {
        registerWizardPanel(fmp);
        
         setCurrentPanel(FileLoaderPage.IDENTIFIER);
-	}
-	
-	public String getGeneDataSourceName() {
-		return geneDataSourceName;
-	}
-
-	
-
-	public String getmiRNADataSourceName() {
-		return miRNADataSourceName;
-	}
-
-	public String getmiRNADel(){
-		return miRNADel;
-	}
-
-	public String getgeneDel(){
-		return geneDel;
 	}
 	
 	private JTextField miRNAText;
@@ -140,11 +121,9 @@ public class DatasetLoadingScreen extends Wizard {
 	private String miRNADataSourceName;
 	private String geneDataSourceName;
 	
-	
-	
 	private class FileLoaderPage extends WizardPanelDescriptor implements ActionListener {
 		public static final String IDENTIFIER = "FILE_PAGE";
-		 private boolean dataLoaded = false;
+		private boolean dataLoaded = false;
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
@@ -185,10 +164,7 @@ public class DatasetLoadingScreen extends Wizard {
 			mainPanel.add(geneLabel, cc.xy(1, 7));
 			mainPanel.add(geneText, cc.xywh(2, 7,3,1));
 			mainPanel.add(geneBrowse, cc.xy(6, 7));
-			
 
-
-			
 			miRNABrowse.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
@@ -207,20 +183,14 @@ public class DatasetLoadingScreen extends Wizard {
 								miRNAFileLoaded=true;
 								dataLoaded=true;
 								miRNAFileName= miRNAFile.getName();
-								
-								
-								checkLoaded();
-								
-								
-								
-								
+
+								checkLoaded();					
 							}
 						} catch (IOException e2) {
 							// TODO Auto-generated catch block
 							e2.printStackTrace();
 						}
 					}
-				
 				}
 			});
 			
@@ -244,98 +214,78 @@ public class DatasetLoadingScreen extends Wizard {
 								geneFileName= geneFile.getName();
 								
 								checkLoaded();
-								
 							}
 						} catch (IOException e2) {
 							// TODO Auto-generated catch block
 							e2.printStackTrace();
 						}
-						
-						
 					}
 				}
 			});
-			
-			
-			
-			geneBox.addActionListener(new ActionListener(){
+				
+			geneBox.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent ae) {
 					refreshPage();
-					
-					
-				
 				}
-			
-			
-					
-				});
-			
-				
-			
-		
+			});
+
 			return mainPanel;
 		}
 		
-		public void refreshPage(){
-			if (checkBox== false){
-				checkBox =true;
+		public void refreshPage() {
+			if (checkBox== false) {
+				checkBox = true;
 				dataLoaded = false;
 				getWizard().setNextFinishButtonEnabled(dataLoaded);
 				geneBrowse.setEnabled(checkBox);
-				geneText.setEnabled(checkBox);}
-			
-			else{checkBox =false;
-			dataLoaded = true;
-			getWizard().setNextFinishButtonEnabled(dataLoaded);
-			geneBrowse.setEnabled(checkBox);
-			geneText.setEnabled(checkBox);}
+				geneText.setEnabled(checkBox);
+			} else {
+				checkBox =false;
+				dataLoaded = true;
+				getWizard().setNextFinishButtonEnabled(dataLoaded);
+				geneBrowse.setEnabled(checkBox);
+				geneText.setEnabled(checkBox);
+			}
 		}
+		
 		public void checkLoaded() throws IOException{
-			if (miRNAFileLoaded == true && geneFileLoaded != true){
+			if (miRNAFileLoaded == true && geneFileLoaded != true) {
 				miRNAImportInformation.setTxtFile(miRNAFile);
 				
 			}
-			if (miRNAFileLoaded ==true && geneFileLoaded == true){
+			if (miRNAFileLoaded == true && geneFileLoaded == true) {
 				miRNAImportInformation.setTxtFile(miRNAFile);
 				geneImportInformation.setTxtFile(geneFile);
-				
-				
 			}
 			getWizard().setNextFinishButtonEnabled(dataLoaded);
 		}
 		
 		
-		public void aboutToDisplayPanel()
-		{
+		public void aboutToDisplayPanel() {
 			getWizard().setNextFinishButtonEnabled(dataLoaded);
 			getWizard().setPageTitle ("Choose file locations");
 		}
 
-	    public FileLoaderPage()
-	    {
+	    public FileLoaderPage() {
 	        super(IDENTIFIER);
 	    }
 
-	    public Object getNextPanelDescriptor()
-	    {
+	    public Object getNextPanelDescriptor() {
 	        return "miRNA_INFORMATIONPAGE_PAGE";//HeaderPage.IDENTIFIER;
 	    }
 
-	    public Object getBackPanelDescriptor()
-	    {
+	    public Object getBackPanelDescriptor() {
 	        return null;
 	    }
 	}
 	
-	
-	
-	/** Set information for the miRNA expression data file*/
+	/**
+	 * Set information for the miRNA expression data file
+	 */
 	private class FilesInformationPage extends WizardPanelDescriptor implements ActionListener {
 		public static final String IDENTIFIER = "miRNA_INFORMATIONPAGE_PAGE";
-		
-		
 		
 		private JRadioButton seperatorTab;
 		private JRadioButton seperatorComma;
@@ -348,15 +298,10 @@ public class DatasetLoadingScreen extends Wizard {
 		
 		public FilesInformationPage() {
 			super(IDENTIFIER);
-			// TODO Auto-generated constructor stub
-			
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void actionPerformed(ActionEvent arg0) {}
 
 		@Override
 		protected Component createContents() {
@@ -403,103 +348,76 @@ public class DatasetLoadingScreen extends Wizard {
 
 			txtOther.addActionListener(new ActionListener () {
 
-				public void actionPerformed(ActionEvent arg0)
-				{
+				public void actionPerformed(ActionEvent arg0) {
 					miRNAImportInformation.setDelimiter (txtOther.getText());
 					miRNAImportInformation.guessSettings();
 					prevTable.refresh();
 					seperatorOther.setSelected (true);
 				}
+			});
 
-
-			})
-			;
-
-			seperatorComma.addActionListener(new ActionListener()
-			{
-				public void actionPerformed (ActionEvent ae)
-				{
+			seperatorComma.addActionListener(new ActionListener() {
+				public void actionPerformed (ActionEvent ae) {
 					miRNAImportInformation.setDelimiter(",");
 					prevTable.refresh();
 				}
-
 			});
-			seperatorTab.addActionListener(new ActionListener()
-			{
-				public void actionPerformed (ActionEvent ae)
-				{
+			seperatorTab.addActionListener(new ActionListener() {
+				public void actionPerformed (ActionEvent ae) {
 					miRNAImportInformation.setDelimiter("\t");
 					prevTable.refresh();
 				}
-
 			});
-			seperatorSemi.addActionListener(new ActionListener()
-			{
-				public void actionPerformed (ActionEvent ae)
-				{
+			seperatorSemi.addActionListener(new ActionListener() {
+				public void actionPerformed (ActionEvent ae) {
 					miRNAImportInformation.setDelimiter(";");
 					prevTable.refresh();
 				}
 			});
-			seperatorSpace.addActionListener(new ActionListener()
-			{
-				public void actionPerformed (ActionEvent ae)
-				{
+			seperatorSpace.addActionListener(new ActionListener() {
+				public void actionPerformed (ActionEvent ae) {
 					miRNAImportInformation.setDelimiter(" ");
 					prevTable.refresh();
 				}
-
 			});
 
 			return builder.getPanel();
-			
 		}
-		public void aboutToDisplayPanel()
-		{
+		
+		public void aboutToDisplayPanel() {
 	        ///getWizard().setNextFinishButtonEnabled(dataLoaded);
 			
 			getWizard().setPageTitle ("Choose data delimiter for miRNA file:");
 
 	    	prevTable.refresh(); //<- doesn't work somehow
 	    	String del = miRNAImportInformation.getDelimiter();
-	    	if (del.equals ("\t"))
-	    	{
+	    	if (del.equals ("\t")) {
 	    		seperatorTab.setSelected(true);
 	    		miRNADel= "\t";
-	    	}
-	    	else if (del.equals (","))
-			{
+	    	} else if (del.equals (",")) {
 	    		seperatorComma.setSelected(true);
-			}
-	    	else if (del.equals (";"))
-			{
+			} else if (del.equals (";")) {
 	    		seperatorSemi.setSelected(true);
-			}
-	    	else if (del.equals (" "))
-			{
+			} else if (del.equals (" ")) {
 	    		seperatorSpace.setSelected(true);
-			}
-	    	else
-	    	{
+			} else {
 	    		seperatorOther.setSelected (true);
 	    	}
 	    }
-	
+
+		public Object getNextPanelDescriptor() {
+	        return "miRNA_COLUMN_PAGE";
+		}
 		
-		public Object getNextPanelDescriptor()
-	    {
-	        return "miRNA_COLUMN_PAGE";}
-		public Object getBackPanelDescriptor()
-	    {
+		public Object getBackPanelDescriptor() {
 	        return "FILE_PAGE";
-	        
 	    }
 	}
 	
-	/** Set Column information for the miRNA expression data*/
-	
-	private class ColumnPage extends WizardPanelDescriptor
-	{
+	/**
+	 * Set Column information for the miRNA expression data
+	 */
+	private class ColumnPage extends WizardPanelDescriptor {
 	    public static final String IDENTIFIER = "miRNA_COLUMN_PAGE";
 
 	    private ColumnTableModel ctm;
@@ -983,61 +901,47 @@ public class DatasetLoadingScreen extends Wizard {
 					prevTable.refresh();
 				}
 			});
-			seperatorSpace.addActionListener(new ActionListener()
-			{
-				public void actionPerformed (ActionEvent ae)
-				{
+			seperatorSpace.addActionListener(new ActionListener() {
+				public void actionPerformed (ActionEvent ae) {
 					geneImportInformation.setDelimiter(" ");
 					prevTable.refresh();
 				}
-
 			});
 
 			return builder.getPanel();
-			
 		}
-		public void aboutToDisplayPanel()
-		{
+		
+		public void aboutToDisplayPanel() {
 	        ///getWizard().setNextFinishButtonEnabled(dataLoaded);
 			
 			getWizard().setPageTitle ("Choose data delimiter for genes file");
 
 	    	prevTable.refresh(); //<- doesn't work somehow
 	    	String del = geneImportInformation.getDelimiter();
-	    	if (del.equals ("\t"))
-	    	{
+	    	if (del.equals ("\t")) {
 	    		seperatorTab.setSelected(true);
-	    	}
-	    	else if (del.equals (","))
-			{
+	    	} else if (del.equals (",")) {
 	    		seperatorComma.setSelected(true);
-			}
-	    	else if (del.equals (";"))
-			{
+			} else if (del.equals (";")) {
 	    		seperatorSemi.setSelected(true);
-			}
-	    	else if (del.equals (" "))
-			{
+			} else if (del.equals (" ")) {
 	    		seperatorSpace.setSelected(true);
-			}
-	    	else
-	    	{
+			} else {
 	    		seperatorOther.setSelected (true);
 	    	}
 	    }
 	
 		
-		public Object getNextPanelDescriptor()
-	    {
-	        return "gene_COLUMN_PAGE";}
-		public Object getBackPanelDescriptor()
-	    {
+		public Object getNextPanelDescriptor() {
+	        return "gene_COLUMN_PAGE";
+	    }
+		
+		public Object getBackPanelDescriptor() {
 	        return "miRNA_COLUMN_PAGE";
 	    }
 	}
 	
-	private class ColumnPage2 extends WizardPanelDescriptor
-	{
+	private class ColumnPage2 extends WizardPanelDescriptor {
 	    public static final String IDENTIFIER = "gene_COLUMN_PAGE";
 
 	    private ColumnTableModel ctm;
@@ -1051,24 +955,20 @@ public class DatasetLoadingScreen extends Wizard {
 	    private DataSourceModel geneDataSource;
 	    private boolean dataSourceSelected = false;
 
-	    public ColumnPage2()
-	    {
+	    public ColumnPage2() {
 	        super(IDENTIFIER);
 	    }
 
-	    public Object getNextPanelDescriptor()
-	    {
+	    public Object getNextPanelDescriptor() {
 	        return "FILE_MERGE_PAGE";
 	    }
 
-	    public Object getBackPanelDescriptor()
-	    {
+	    public Object getBackPanelDescriptor() {
 	        return "gene_INFORMATIONPAGE_PAGE";
 	    }
 
 	    @Override
-		protected JPanel createContents()
-		{
+		protected JPanel createContents() {
 		    FormLayout layout = new FormLayout (
 		    		"pref, 7dlu, pref:grow",
 		    		"p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, fill:[100dlu,min]:grow");
@@ -1125,8 +1025,7 @@ public class DatasetLoadingScreen extends Wizard {
 			builder.add (scrTable, cc.xyw(1,11,3));
 
 			ActionListener rbAction = new ActionListener() {
-				public void actionPerformed (ActionEvent ae)
-				{
+				public void actionPerformed (ActionEvent ae) {
 					boolean result = (ae.getSource() == rbFixedYes);
 					geneImportInformation.setSyscodeFixed(result);
 			    	columnPageRefresh();
@@ -1135,10 +1034,8 @@ public class DatasetLoadingScreen extends Wizard {
 			rbFixedYes.addActionListener(rbAction);
 			rbFixedNo.addActionListener(rbAction);
 
-			geneDataSource.addListDataListener(new ListDataListener()
-			{
-				public void contentsChanged(ListDataEvent arg0)
-				{
+			geneDataSource.addListDataListener(new ListDataListener() {
+				public void contentsChanged(ListDataEvent arg0) {
 					geneImportInformation.setDataSource(geneDataSource.getSelectedDataSource());
 					//geneDataSourceName=geneDataSource.getSelectedDataSource().toString();
 					dataSourceSelected=true;
@@ -1151,15 +1048,13 @@ public class DatasetLoadingScreen extends Wizard {
 			});
 
 			cbColSyscode.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent ae)
-				{
+				public void actionPerformed(ActionEvent ae) {
 					geneImportInformation.setSysodeColumn(cbColSyscode.getSelectedIndex());
 					columnPageRefresh();
 				}
 			});
 			cbColId.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent ae)
-				{
+				public void actionPerformed(ActionEvent ae) {
 					geneImportInformation.setIdColumn(cbColId.getSelectedIndex());
 			    	columnPageRefresh();
 				}
@@ -1167,45 +1062,38 @@ public class DatasetLoadingScreen extends Wizard {
 			return builder.getPanel();
 		}
 
-	    private class ColumnPopupListener extends MouseAdapter
-	    {
-	    	@Override public void mousePressed (MouseEvent e)
-			{
+	    private class ColumnPopupListener extends MouseAdapter {
+	    	@Override public void mousePressed (MouseEvent e) {
 				showPopup(e);
 			}
 
-			@Override public void mouseReleased (MouseEvent e)
-			{
+			@Override public void mouseReleased (MouseEvent e) {
 				showPopup(e);
 			}
 
 			int clickedCol;
 
-			private void showPopup(MouseEvent e)
-			{
-				if (e.isPopupTrigger())
-				{
+			private void showPopup(MouseEvent e) {
+				if (e.isPopupTrigger()) {
 					JPopupMenu popup;
 					popup = new JPopupMenu();
 					clickedCol = tblColumn.columnAtPoint(e.getPoint());
-					if (clickedCol != geneImportInformation.getSyscodeColumn())
+					if (clickedCol != geneImportInformation.getSyscodeColumn()) {
 						popup.add(new SyscodeColAction());
-					if (clickedCol != geneImportInformation.getIdColumn())
+					}
+					if (clickedCol != geneImportInformation.getIdColumn()) {
 						popup.add(new IdColAction());
-					popup.show(e.getComponent(),
-							e.getX(), e.getY());
+					}
+					popup.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
 
-			private class SyscodeColAction extends AbstractAction
-			{
-				public SyscodeColAction()
-				{
+			private class SyscodeColAction extends AbstractAction {
+				public SyscodeColAction() {
 					putValue(Action.NAME, "SystemCode column");
 				}
 
-				public void actionPerformed(ActionEvent arg0)
-				{
+				public void actionPerformed(ActionEvent arg0) {
 					// if id and code column are about to be the same, swap them
 					if (clickedCol == geneImportInformation.getIdColumn())
 						geneImportInformation.setIdColumn(geneImportInformation.getSyscodeColumn());
@@ -1214,42 +1102,35 @@ public class DatasetLoadingScreen extends Wizard {
 				}
 			}
 
-			private class IdColAction extends AbstractAction
-			{
-				public IdColAction()
-				{
+			private class IdColAction extends AbstractAction {
+				public IdColAction() {
 					putValue(Action.NAME, "Identifier column");
 				}
 
-				public void actionPerformed(ActionEvent arg0)
-				{
+				public void actionPerformed(ActionEvent arg0) {
 					// if id and code column are about to be the same, swap them
-					if (clickedCol == geneImportInformation.getSyscodeColumn())
+					if (clickedCol == geneImportInformation.getSyscodeColumn()) {
 						geneImportInformation.setSysodeColumn(geneImportInformation.getIdColumn());
+					}
 					geneImportInformation.setIdColumn(clickedCol);
 					columnPageRefresh();
 				}
 			}
 	    }
 
-	    private class RowPopupListener extends MouseAdapter
-	    {
-	    	@Override public void mousePressed (MouseEvent e)
-			{
+	    private class RowPopupListener extends MouseAdapter {
+	    	@Override public void mousePressed (MouseEvent e) {
 				showPopup(e);
 			}
 
-			@Override public void mouseReleased (MouseEvent e)
-			{
+			@Override public void mouseReleased (MouseEvent e) {
 				showPopup(e);
 			}
 
 			int clickedRow;
 
-			private void showPopup(MouseEvent e)
-			{
-				if (e.isPopupTrigger())
-				{
+			private void showPopup(MouseEvent e) {
+				if (e.isPopupTrigger()) {
 					JPopupMenu popup;
 					popup = new JPopupMenu();
 					clickedRow = tblColumn.rowAtPoint(e.getPoint());
@@ -1260,53 +1141,41 @@ public class DatasetLoadingScreen extends Wizard {
 				}
 			}
 
-			private class DataStartAction extends AbstractAction
-			{
-				public DataStartAction()
-				{
+			private class DataStartAction extends AbstractAction {
+				public DataStartAction() {
 					putValue(Action.NAME, "First data row");
 				}
 
-				public void actionPerformed(ActionEvent arg0)
-				{
+				public void actionPerformed(ActionEvent arg0) {
 					geneImportInformation.setFirstDataRow(clickedRow);
 					columnPageRefresh();
 				}
 			}
 
-			private class HeaderStartAction extends AbstractAction
-			{
-				public HeaderStartAction()
-				{
+			private class HeaderStartAction extends AbstractAction {
+				public HeaderStartAction() {
 					putValue(Action.NAME, "First header row");
 				}
 
-				public void actionPerformed(ActionEvent arg0)
-				{
+				public void actionPerformed(ActionEvent arg0) {
 					geneImportInformation.setFirstHeaderRow(clickedRow);
 					columnPageRefresh();
 				}
 			}
-
 	    }
 
-	    private void columnPageRefresh()
-	    {
+	    private void columnPageRefresh() {
 	    	String error = null;
-			if (geneImportInformation.isSyscodeFixed())
-			{
+			if (geneImportInformation.isSyscodeFixed()) {
 				rbFixedYes.setSelected (true);
 				cbColSyscode.setEnabled (true);
 				cbDataSource.setEnabled (false);
-			}
-			else
-			{
+			} else {
 				rbFixedNo.setSelected (true);
 				cbColSyscode.setEnabled (false);
 				cbDataSource.setEnabled (true);
 
-				if (geneImportInformation.getIdColumn() == geneImportInformation.getSyscodeColumn())
-	    		{
+				if (geneImportInformation.getIdColumn() == geneImportInformation.getSyscodeColumn()) {
 	    			error = "System code column and Id column can't be the same";
 	    		}
 			}
@@ -1317,8 +1186,7 @@ public class DatasetLoadingScreen extends Wizard {
 	    	ctm.refresh();
 	    }
 
-	    private void refreshComboBoxes()
-	    {
+	    private void refreshComboBoxes() {
 	    	geneDataSource.setSelectedItem(geneImportInformation.getDataSource());
 			cbColId.setSelectedIndex(geneImportInformation.getIdColumn());
 			cbColSyscode.setSelectedIndex(geneImportInformation.getSyscodeColumn());
@@ -1329,10 +1197,8 @@ public class DatasetLoadingScreen extends Wizard {
 	     * column index integer as value,
 	     * but will display the column name String
 	     */
-	    private class ColumnNameRenderer extends JLabel implements ListCellRenderer
-	    {
-			public ColumnNameRenderer()
-			{
+	    private class ColumnNameRenderer extends JLabel implements ListCellRenderer {
+			public ColumnNameRenderer() {
 				setOpaque(true);
 				setHorizontalAlignment(CENTER);
 				setVerticalAlignment(CENTER);
@@ -1348,14 +1214,12 @@ public class DatasetLoadingScreen extends Wizard {
 			                        Object value,
 			                        int index,
 			                        boolean isSelected,
-			                        boolean cellHasFocus)
-			{
+			                        boolean cellHasFocus) {
 				//Get the selected index. (The index param isn't
 				//always valid, so just use the value.)
 				int selectedIndex = ((Integer)value).intValue();
 
-				if (isSelected)
-				{
+				if (isSelected) {
 					setBackground(list.getSelectionBackground());
 					setForeground(list.getSelectionForeground());
 				} else {
@@ -1372,8 +1236,7 @@ public class DatasetLoadingScreen extends Wizard {
 			}
 		}
 
-	    public void aboutToDisplayPanel()
-	    {
+	    public void aboutToDisplayPanel() {
 	    	// create an array of size getSampleMaxNumCols()
 	    	Integer[] cn;
 	    	int max = geneImportInformation.getSampleMaxNumCols();
@@ -1391,41 +1254,34 @@ public class DatasetLoadingScreen extends Wizard {
 	    	ctm.refresh();
 	    }
 	    
-	  
-	    
-	    public void enableNext(){
-	    	if (dataSourceSelected == false){
+	    public void enableNext() {
+	    	if (dataSourceSelected == false) {
 	    		getWizard().setNextFinishButtonEnabled(dataSourceSelected);
-	    	}
-	    	else{
+	    	} else {
 	    		getWizard().setNextFinishButtonEnabled(dataSourceSelected);
 	    	}
 	    }
+	    
 	    @Override
-	    public void aboutToHidePanel()
-	    {
+	    public void aboutToHidePanel() {
 	    	geneImportInformation.setSyscodeFixed(rbFixedYes.isSelected());
-	    	if (rbFixedYes.isSelected())
-	    	{
+	    	if (rbFixedYes.isSelected()) {
 		    	geneImportInformation.setDataSource(geneDataSource.getSelectedDataSource());
 	    	}
 	    }
 	}
 	
-	private class FileMergePage extends WizardPanelDescriptor implements ProgressListener
-	{
+	private class FileMergePage extends WizardPanelDescriptor implements ProgressListener {
 		public static final String IDENTIFIER = "FILE_MERGE_PAGE";
 		public FileMergePage() {
 			super(IDENTIFIER);
 			
 		}
-		public Object getNextPanelDescriptor()
-	    {
+		public Object getNextPanelDescriptor() {
 	        return null;
 	    }
 
-	    public Object getBackPanelDescriptor()
-	    {
+	    public Object getBackPanelDescriptor() {
 	        return "gene_COLUMN_PAGE";
 	    }
 
@@ -1435,8 +1291,7 @@ public class DatasetLoadingScreen extends Wizard {
 	    private JLabel lblTask;
 		@Override
 		public void progressEvent(ProgressEvent e) {
-			switch(e.getType())
-			{
+			switch(e.getType()) {
 				case ProgressEvent.FINISHED:
 					progressSent.setValue(pk.getTotalWork());
 				case ProgressEvent.TASK_NAME_CHANGED:
@@ -1477,18 +1332,15 @@ public class DatasetLoadingScreen extends Wizard {
 			
 		}
 		
-		public void setProgressValue(int i)
-	    {
+		public void setProgressValue(int i) {
 	        progressSent.setValue(i);
 	    }
 
-	    public void setProgressText(String msg)
-	    {
+	    public void setProgressText(String msg) {
 	        progressText.setText(msg);
 	    }
 
-	    public void aboutToDisplayPanel()
-	    {
+	    public void aboutToDisplayPanel() {
 			getWizard().setPageTitle ("Perform import");
 	        setProgressValue(0);
 	        setProgressText("");
@@ -1497,38 +1349,42 @@ public class DatasetLoadingScreen extends Wizard {
 	        getWizard().setBackButtonEnabled(false);
 	    }
 	    
-	    public void displayingPanel()
-	    {
+	    public void displayingPanel() {
 			SwingWorker<File, File> sw = new SwingWorker<File, File>() {
 				@Override protected File doInBackground() throws Exception {
 					pk.setTaskName("Merging data expression files");
 					
 					FileMerger fm= new FileMerger();
 					fm.fileMerger(miRNAData, "miRNA", miRNADel);
-					/** ADD FILEMERGER HERE!!!!!!!!!!!!!!!!!
-					 * 
-					 * 
-					 * 
-					 * 
-					 * 
-					 * 
-					 * 
-					 * */
+					// TODO: add file merger here
 					
-					 {
-						pk.finished();
-					}
+					pk.finished();
 					return mergedFile;
 				}
 
-				@Override public void done()
-				{
+				@Override public void done() {
 					getWizard().setNextFinishButtonEnabled(true);
 					getWizard().setBackButtonEnabled(true);
 				}
 			};
 			sw.execute();
 	    }
+	}
+	
+	public String getGeneDataSourceName() {
+		return geneDataSourceName;
+	}
+
+	public String getmiRNADataSourceName() {
+		return miRNADataSourceName;
+	}
+
+	public String getmiRNADel(){
+		return miRNADel;
+	}
+
+	public String getgeneDel(){
+		return geneDel;
 	}
 }
 	

@@ -22,35 +22,30 @@ import org.pathvisio.gexplugin.ImportInformation;
 
 
 /**
- * for table used in the header page of the GexImportWizard.
+ * for table used in the header page of the import wizard.
+ * adapted from PathVisio gex plugin
  */
-public class PreviewTableModel extends AbstractTableModel
-{
+public class PreviewTableModel extends AbstractTableModel {
 
 	private ImportInformation info;
 
-	public PreviewTableModel (ImportInformation info)
-	{
+	public PreviewTableModel (ImportInformation info) {
 		this.info = info;
 	}
 
-	public void refresh()
-	{
+	public void refresh() {
 		fireTableStructureChanged();
 	}
 
-	public int getColumnCount()
-	{
+	public int getColumnCount() {
 		return info.getSampleMaxNumCols();
 	}
 
-	public int getRowCount()
-	{
+	public int getRowCount() {
 		return info.getSampleNumRows();
 	}
 
-	public Object getValueAt(int row, int col)
-	{
+	public Object getValueAt(int row, int col) {
 		return info.getSampleData(row, col);
 	}
 }

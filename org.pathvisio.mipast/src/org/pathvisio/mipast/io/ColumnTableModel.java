@@ -23,7 +23,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import org.pathvisio.gexplugin.ImportInformation;
-import org.pathvisio.mipast.io.ColumnTableModel.HighlightedCellRenderer;
 import org.pathvisio.gexplugin.ImportInformation.ColumnType;
 
 /**
@@ -31,14 +30,12 @@ import org.pathvisio.gexplugin.ImportInformation.ColumnType;
  * It displays a sample of the data to be imported, with the cells colored depending on
  * their type. e.g. an identifier is Green, a system code is Red and a header is yellow.
  */
-public class ColumnTableModel extends AbstractTableModel
-{
-	public static class HighlightedCellRenderer extends DefaultTableCellRenderer
-	{
+public class ColumnTableModel extends AbstractTableModel {
+	
+	public static class HighlightedCellRenderer extends DefaultTableCellRenderer {
 		ImportInformation info;
 
-		public HighlightedCellRenderer(ImportInformation info)
-	    {
+		public HighlightedCellRenderer(ImportInformation info) {
 	    	super();
 	    	this.info = info;
 	        setOpaque(true); //MUST do this for background to show up.
@@ -46,15 +43,13 @@ public class ColumnTableModel extends AbstractTableModel
 
 	    @Override
 	    public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column)
-	    {
+                boolean isSelected, boolean hasFocus, int row, int column) {
 	    	setBackground(getTypeColor(row, column));
 	    	return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 		}
 
 	    @Override
-	    public void setValue (Object value)
-	    {
+	    public void setValue (Object value) {
 			setText (value.toString());
 	    }
 
@@ -63,15 +58,11 @@ public class ColumnTableModel extends AbstractTableModel
 	    private static final Color LIGHT_YELLOW = new Color (255, 255, 192);
 	    private static final Color LIGHT_MAGENTA = new Color (192, 255, 255);
 
-		private Color getTypeColor (int row, int col)
-		{
+		private Color getTypeColor (int row, int col) {
 			Color result = Color.LIGHT_GRAY; // nothing
-			if (info.isHeaderRow(row))
-			{
+			if (info.isHeaderRow(row)) {
 				result = LIGHT_YELLOW;
-			}
-			else if (info.isDataRow(row))
-			{
+			} else if (info.isDataRow(row)) {
 				ColumnType type = info.getColumnType(col);
 				switch (type)
 				{
@@ -88,40 +79,33 @@ public class ColumnTableModel extends AbstractTableModel
 
 	private ImportInformation info;
 
-	public ColumnTableModel (ImportInformation info)
-	{
+	public ColumnTableModel (ImportInformation info) {
 		this.info = info;
 	}
 
-	public void refresh()
-	{
+	public void refresh() {
 		fireTableStructureChanged();
 	}
 
-	public TableCellRenderer getTableCellRenderer()
-	{
+	public TableCellRenderer getTableCellRenderer() {
 		return new HighlightedCellRenderer(info);
 	}
 
-	public int getColumnCount()
-	{
+	public int getColumnCount() {
 		return info.getSampleMaxNumCols();
 	}
 
-	public int getRowCount()
-	{
+	public int getRowCount() {
 		return info.getSampleNumRows();
 	}
 
-	public Object getValueAt(int row, int col)
-	{
+	public Object getValueAt(int row, int col) {
 		return info.getSampleData(row, col);
 	}
 
 	public java.awt.Component getTableCellRendererComponent(
 			javax.swing.JTable arg0, Object arg1, boolean arg2, boolean arg3,
 			int arg4, int arg5) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }
