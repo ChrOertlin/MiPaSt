@@ -79,13 +79,13 @@ import com.nexes.wizard.WizardPanelDescriptor;
 public class DatasetLoadingScreen extends Wizard {
 	
 	private ImportInformation miRNAImportInformation = new ImportInformation();
-	private ImportInformation geneImportInformation= new ImportInformation();
+	private ImportInformation geneImportInformation = new ImportInformation();
 	private FileLoaderPage fpd = new FileLoaderPage();
 	private FilesInformationPage ipd = new FilesInformationPage();
 	private FilesInformationPage2 ipd2 = new FilesInformationPage2();
-	private ColumnPage cpd=new ColumnPage();
-	private ColumnPage2 cpd2= new ColumnPage2();
-	private FileMergePage fmp= new FileMergePage();
+	private ColumnPage cpd = new ColumnPage();
+	private ColumnPage2 cpd2 = new ColumnPage2();
+	private FileMergePage fmp = new FileMergePage();
 	private File mergedFile;
 	
 	public DatasetLoadingScreen (PvDesktop pvDesktop) {
@@ -98,24 +98,18 @@ public class DatasetLoadingScreen extends Wizard {
        registerWizardPanel(cpd2);
        registerWizardPanel(fmp);
        
-        setCurrentPanel(FileLoaderPage.IDENTIFIER);
+       setCurrentPanel(FileLoaderPage.IDENTIFIER);
 	}
 	
 	private JTextField miRNAText;
 	private JTextField geneText;
 	private File miRNAFile;
 	private File geneFile;
-	public static String miRNAFileName;
-	public static String geneFileName;
+	
 	private JLabel informationLabel;
 	private List<String> miRNAData;
 	private List<String> geneData;
-	private JButton miRNABrowse;
-	private JButton geneBrowse;
-	private boolean miRNAFileLoaded = false;
-	private boolean geneFileLoaded = false;
-	private boolean checkBox=false;
-	
+
 	private String miRNADel;
 	private String geneDel;
 	private String miRNADataSourceName;
@@ -123,47 +117,51 @@ public class DatasetLoadingScreen extends Wizard {
 	
 	private class FileLoaderPage extends WizardPanelDescriptor implements ActionListener {
 		public static final String IDENTIFIER = "FILE_PAGE";
-		private boolean dataLoaded = false;
+		private JCheckBox geneBox;
+		private boolean miRNAFileLoaded = false;
+		private boolean geneFileLoaded = false;
+		private JButton miRNABrowse;
+		private JButton geneBrowse;
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void actionPerformed(ActionEvent arg0) {}
 
 		@Override
 		protected Component createContents() {
 			CellConstraints cc= new CellConstraints();	
-			JPanel mainPanel= new JPanel();
-			
-			mainPanel.setLayout(new FormLayout("pref,50dlu,pref,50dlu,50dlu,pref,default","pref,4dlu,pref,4dlu,pref,4dlu,pref,4dlu,pref,150dlu,pref,4dlu"));
+			FormLayout layout = new FormLayout("pref,50dlu,pref,50dlu,50dlu,pref,default",
+					"8dlu, pref,15dlu,pref,15dlu,pref,4dlu,pref,4dlu,pref,150dlu,pref,4dlu");
+			PanelBuilder builder = new PanelBuilder(layout);
 			
 			JLabel screenLabel = new JLabel("Load your datasets");
-			mainPanel.add(screenLabel, cc.xy(1,1));
+			builder.add(screenLabel, cc.xy(1, 2));
 			
-			miRNABrowse = new JButton("browse");
-			geneBrowse = new JButton("Browse");
-			
+			builder.addSeparator("", cc.xyw(1, 3, 6));
+
 			// miRNA
 			miRNAText = new JTextField();
 			JLabel miRNALabel = new JLabel("miRNA Dataset");
+			miRNABrowse = new JButton("Browse");
+			builder.add(miRNALabel, cc.xy(1, 4));
+			builder.add(miRNAText, cc.xywh(2, 4, 3, 1));
+			builder.add(miRNABrowse, cc.xy(6, 4));
 			
-			mainPanel.add(miRNALabel, cc.xy(1, 3));
-			mainPanel.add(miRNAText, cc.xywh(2, 3,3,1));
-			mainPanel.add(miRNABrowse, cc.xy(6, 3));
+			builder.addSeparator("", cc.xyw(1, 5, 6));
 			
 			// gene
-			JLabel geneLabel= new JLabel("Transcriptomics Dataset");
-			JCheckBox geneBox= new JCheckBox("Transcriptomics available");
-			geneBrowse.setEnabled(checkBox);
+			JLabel geneLabel = new JLabel("Transcriptomics Dataset");
+			geneBox = new JCheckBox("Transcriptomics available");
+			
+			geneBrowse = new JButton("Browse");
+			geneBrowse.setEnabled(geneBox.isSelected());
 			geneText = new JTextField();
-			geneText.setEnabled(checkBox);
+			geneText.setEnabled(geneBox.isSelected());
 			
-			mainPanel.add(geneBox,cc.xy(1, 5));
+			builder.add(geneBox,cc.xy(1, 6));
 			
-			mainPanel.add(geneLabel, cc.xy(1, 7));
-			mainPanel.add(geneText, cc.xywh(2, 7,3,1));
-			mainPanel.add(geneBrowse, cc.xy(6, 7));
+			builder.add(geneLabel, cc.xy(1, 8));
+			builder.add(geneText, cc.xywh(2, 8,3,1));
+			builder.add(geneBrowse, cc.xy(6, 8));
 
 			miRNABrowse.addActionListener(new ActionListener() {
 				@Override
@@ -173,18 +171,23 @@ public class DatasetLoadingScreen extends Wizard {
 					fc.addChoosableFileFilter(new SimpleFileFilter("Data files", "*.txt|*.csv", true));
 					int returnVal = fc.showDialog(null, "Open miRNA Datasetfile");
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						miRNAFile = fc.getSelectedFile();
-						miRNAText.setText(miRNAFile.getAbsolutePath());
-						
 						try {
+							miRNAFile = fc.getSelectedFile();
 							miRNAData = MiPaStFileReader.readFile(miRNAFile);
 							if(miRNAData.size() > 0) {
+								miRNAText.setText(miRNAFile.getAbsolutePath());
 								System.out.println(miRNAData.size());
-								miRNAFileLoaded=true;
-								dataLoaded=true;
-								miRNAFileName= miRNAFile.getName();
-
-								checkLoaded();					
+				
+								miRNAFileLoaded = true;
+								miRNAImportInformation.setTxtFile(miRNAFile);
+								if(geneBox.isSelected() && geneFileLoaded) {
+									getWizard().setNextFinishButtonEnabled(true);
+								} else if (!geneBox.isSelected()) {
+									getWizard().setNextFinishButtonEnabled(true);
+								}
+							} else {
+								// TODO: warning
+								miRNAFile = null;
 							}
 						} catch (IOException e2) {
 							// TODO Auto-generated catch block
@@ -198,22 +201,23 @@ public class DatasetLoadingScreen extends Wizard {
 				
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					
 					JFileChooser fc = new JFileChooser();
 					fc.addChoosableFileFilter(new SimpleFileFilter("Data files", "*.txt|*.csv", true));
 					int returnVal = fc.showDialog(null, "Open Transcriptomics datasetfile");
 					if (returnVal == JFileChooser.APPROVE_OPTION) {
 						geneFile = fc.getSelectedFile();
-						
 						try {
 							geneData = MiPaStFileReader.readFile(geneFile);
-							if(geneData.size() > 0) {
-								geneFileLoaded=true;
-								dataLoaded=true;
+							if(geneData.size() > 0) {								
 								geneText.setText(geneFile.getAbsolutePath());
-								geneFileName= geneFile.getName();
+								System.out.println(geneData.size());
+					
+								geneFileLoaded = true;
 								
-								checkLoaded();
+								geneImportInformation.setTxtFile(miRNAFile);
+								if(geneFileLoaded && miRNAFileLoaded) {
+									getWizard().setNextFinishButtonEnabled(true);
+								}
 							}
 						} catch (IOException e2) {
 							// TODO Auto-generated catch block
@@ -227,45 +231,32 @@ public class DatasetLoadingScreen extends Wizard {
 
 				@Override
 				public void actionPerformed(ActionEvent ae) {
-					refreshPage();
+					geneBrowse.setEnabled(geneBox.isSelected());
+					geneText.setEnabled(geneBox.isSelected());
+					if(!geneBox.isSelected()) {
+						geneFile = null;
+						geneData = null;
+						geneText.setText("");
+						geneFileLoaded = false;
+						if(miRNAFileLoaded) {
+							getWizard().setNextFinishButtonEnabled(true);
+						}
+					} else {
+						getWizard().setNextFinishButtonEnabled(false);
+					}
 				}
 			});
 
-			return mainPanel;
+			return builder.getPanel();
 		}
-		
-		public void refreshPage() {
-			if (checkBox== false) {
-				checkBox = true;
-				dataLoaded = false;
-				getWizard().setNextFinishButtonEnabled(dataLoaded);
-				geneBrowse.setEnabled(checkBox);
-				geneText.setEnabled(checkBox);
-			} else {
-				checkBox =false;
-				dataLoaded = true;
-				getWizard().setNextFinishButtonEnabled(dataLoaded);
-				geneBrowse.setEnabled(checkBox);
-				geneText.setEnabled(checkBox);
-			}
-		}
-		
-		public void checkLoaded() throws IOException{
-			if (miRNAFileLoaded == true && geneFileLoaded != true) {
-				miRNAImportInformation.setTxtFile(miRNAFile);
-				
-			}
-			if (miRNAFileLoaded == true && geneFileLoaded == true) {
-				miRNAImportInformation.setTxtFile(miRNAFile);
-				geneImportInformation.setTxtFile(geneFile);
-			}
-			getWizard().setNextFinishButtonEnabled(dataLoaded);
-		}
-		
-		
+
 		public void aboutToDisplayPanel() {
-			getWizard().setNextFinishButtonEnabled(dataLoaded);
 			getWizard().setPageTitle ("Choose file locations");
+			if(miRNAFileLoaded && ((geneBox.isSelected() && geneFileLoaded) || !geneBox.isSelected())) {
+				getWizard().setNextFinishButtonEnabled(true);
+			} else {
+				getWizard().setNextFinishButtonEnabled(false);
+			}
 		}
 
 	    public FileLoaderPage() {
@@ -313,10 +304,7 @@ public class DatasetLoadingScreen extends Wizard {
 		    builder.setDefaultDialogBorder();
 
 		    CellConstraints cc = new CellConstraints();
-		    
-		    informationLabel = new JLabel(DatasetLoadingScreen.miRNAFileName);
-		    System.out.println(DatasetLoadingScreen.miRNAFileName);
-		    
+		    		    
 			seperatorTab = new JRadioButton ("tab");
 			seperatorComma = new JRadioButton ("comma");
 			seperatorSemi = new JRadioButton ("semicolon");
@@ -329,7 +317,6 @@ public class DatasetLoadingScreen extends Wizard {
 			bgSeparator.add (seperatorSpace);
 			bgSeparator.add (seperatorOther);
 
-			builder.add(informationLabel, cc.xy(1, 1));
 			builder.add (seperatorTab, cc.xy(1,3));
 			builder.add (seperatorComma, cc.xy(1,5));
 			builder.add (seperatorSemi, cc.xy(1,7));
@@ -436,11 +423,7 @@ public class DatasetLoadingScreen extends Wizard {
 	    }
 
 	    public Object getNextPanelDescriptor() {
-	    	if (checkBox == true) {
-	    		return "gene_INFORMATIONPAGE_PAGE";
-	    	} else {
-	    		return null;
-	    	}
+	    	return "gene_INFORMATIONPAGE_PAGE";
 	    }
 
 	    public Object getBackPanelDescriptor() {
@@ -450,26 +433,37 @@ public class DatasetLoadingScreen extends Wizard {
 	    @Override
 		protected JPanel createContents() {
 		    FormLayout layout = new FormLayout (
-		    		"pref, 7dlu, pref:grow",
+		    		"5dlu, pref, 7dlu, pref:grow",
 		    		"p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, fill:[100dlu,min]:grow");
 
 		    PanelBuilder builder = new PanelBuilder(layout);
 
 		    CellConstraints cc = new CellConstraints();
-
-			rbFixedNo = new JRadioButton("Select Database");
-			rbFixedYes = new JRadioButton("Select Systemcode Column");
-			ButtonGroup bgSyscodeCol = new ButtonGroup ();
-			bgSyscodeCol.add (rbFixedNo);
-			bgSyscodeCol.add (rbFixedYes);
-
-			cbColId = new JComboBox();
-			cbColSyscode = new JComboBox();
-
-			miRNADataSource = new DataSourceModel();
-			String[] types = {"metabolite","protein","gene","interaction","probe"};
+		    
+		    // id column
+		    builder.addLabel ("ID column:", cc.xy(2,1));
+		    cbColId = new JComboBox();
+		    builder.add (cbColId, cc.xy(4,1));
+		    
+		    // sys code button group
+		    ButtonGroup bgSyscodeCol = new ButtonGroup();
+		    
+		    // fixed system code
+		    miRNADataSource = new DataSourceModel();
+			String[] types = {"protein","gene","probe"};
 			miRNADataSource.setTypeFilter(types);
+			rbFixedNo = new JRadioButton("Select database:");
+			bgSyscodeCol.add(rbFixedNo);
+			builder.add(rbFixedNo, cc.xy(2, 3));
 			cbDataSource = new PermissiveComboBox(miRNADataSource);
+			builder.add(cbDataSource, cc.xy(4, 3));
+			
+			// system code column
+			rbFixedYes = new JRadioButton("Select system code column:");
+			bgSyscodeCol.add(rbFixedYes);
+			cbColSyscode = new JComboBox();
+			builder.add(rbFixedYes, cc.xy(2, 5));
+			builder.add(cbColSyscode, cc.xy(4, 5));
 
 			ctm = new ColumnTableModel(miRNAImportInformation);
 			tblColumn = new JTable(ctm);
@@ -487,15 +481,7 @@ public class DatasetLoadingScreen extends Wizard {
 		    jv.setPreferredSize(rowHeader.getPreferredSize());
 		    scrTable.setRowHeader(jv);
 
-			builder.addLabel ("ID column:", cc.xy(1,1));
-			builder.add (cbColId, cc.xy(3,1));
-			builder.add (rbFixedYes, cc.xyw (1,7,3));
-			
-			builder.add (cbDataSource, cc.xy (3,5));
-			builder.add (rbFixedNo, cc.xyw(1,3,3));
-			builder.add (cbColSyscode, cc.xy(3,9));
-			
-			builder.add (scrTable, cc.xyw(1,11,3));
+			builder.add (scrTable, cc.xyw(1,11,4));
 
 			ActionListener rbAction = new ActionListener() {
 				public void actionPerformed (ActionEvent ae) {
@@ -511,7 +497,7 @@ public class DatasetLoadingScreen extends Wizard {
 				public void contentsChanged(ListDataEvent arg0) {
 					miRNAImportInformation.setDataSource(miRNADataSource.getSelectedDataSource());
 					//miRNADataSourceName=miRNADataSource.getSelectedDataSource().toString();
-					dataSourceSelected=true;
+					dataSourceSelected = true;
 					enableNext();
 				}
 
@@ -781,7 +767,7 @@ public class DatasetLoadingScreen extends Wizard {
 
 		    CellConstraints cc = new CellConstraints();
 		    
-		    informationLabel = new JLabel(geneFileName);
+		    informationLabel = new JLabel();
 			seperatorTab = new JRadioButton ("tab");
 			seperatorComma = new JRadioButton ("comma");
 			seperatorSemi = new JRadioButton ("semicolon");
@@ -855,6 +841,7 @@ public class DatasetLoadingScreen extends Wizard {
 		public void aboutToDisplayPanel() {
 	        ///getWizard().setNextFinishButtonEnabled(dataLoaded);
 			
+			informationLabel.setText(geneFile.getName());
 			getWizard().setPageTitle ("Choose data delimiter for genes file");
 
 	    	prevTable.refresh(); //<- doesn't work somehow

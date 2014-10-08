@@ -14,12 +14,9 @@
 
 package org.pathvisio.mipast.io;
 
-
-
 import javax.swing.table.AbstractTableModel;
 
 import org.pathvisio.gexplugin.ImportInformation;
-
 
 /**
  * for table used in the header page of the import wizard.
