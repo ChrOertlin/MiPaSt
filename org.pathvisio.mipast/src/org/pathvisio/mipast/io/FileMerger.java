@@ -14,13 +14,17 @@
 
 package org.pathvisio.mipast.io;
 
-import java.io.BufferedWriter;
+
 import java.io.File;
-import java.io.FileWriter;
+
 import java.io.IOException;
 
+import java.util.HashMap;
+import java.util.List;
+import org.pathvisio.mipast.mipastFileReader;
 import org.pathvisio.gexplugin.ImportInformation;
-import org.pathvisio.gexplugin.GexTxtImporter;
+import org.pathvisio.mipast.DataRow;
+
 import org.pathvisio.core.util.ProgressKeeper;
 import org.pathvisio.desktop.PvDesktop;
 
@@ -30,28 +34,66 @@ import org.pathvisio.desktop.PvDesktop;
  *
  */
 public class FileMerger {
+	File combinedFile= new File("combinedFiles.txt");
+	mipastFileReader fr= new mipastFileReader();
+	DataRow dr= new DataRow("combine");
 	
 	public void createCombinedFile(ImportInformation miRNA, ImportInformation gene,ProgressKeeper pk, PvDesktop desktop) throws IOException {
-		File combinedFile= new File("combinedFiles.txt");
-		FileWriter fw= new FileWriter(combinedFile);
-		BufferedWriter write = new BufferedWriter(fw);		
+		File miRNAFile = new File("miRNA");
+		File geneFile = new File("gene");
+		List<String> miRNALines;
+		List<String> geneLines;
+		String[] values;
 		
-		if(gene != null) {
-			GexTxtImporter.importFromTxt(miRNA, pk, 
-					desktop.getSwingEngine().getGdbManager().getCurrentGdb(), 
-					desktop.getGexManager());
-			
-		}
+		mipastFileReader fr= new mipastFileReader();
+		DataRow dr= new DataRow("combine");
+
+	
 		
-		else{
-			String aLine=null;
-			if(miRNA.getColNames()==gene.getColNames()){
+		miRNAFile =miRNA.getTxtFile();
+		
+	
+		geneFile = gene.getTxtFile();
+		miRNALines= fr.fileReader(miRNAFile);
+		
+		geneLines= fr.fileReader(geneFile);
+		
+		
+		addKeys(miRNA);
+		addKeys(gene);
+		addValues(miRNA,miRNALines);
+		addValues(gene,geneLines);
+		dr.getProperties();	
+		dr.printMap();
 				
-					
-				}
-			}
 			
-			
+		
+		
+		
+	}
+	
+
+	public void addKeys(ImportInformation info){
+		for(int i=0;i<info.getColNames().length;i++){
+			dr.addProperty(info.getColNames()[i], null);
 		}
 	}
+	
+	public void addValues(ImportInformation info ,List<String> lines){
+		String[] values;
+		for(int i=0;i<lines.size();i++){
+			values= lines.get(i).split(info.getDelimiter());
+			for (int j=0;j< values.length;j++){
+				
+				System.out.println(values[j]);
+				
+				dr.addProperty(info.getColNames()[i], values[j]);
+				}
+			}
+	}
 }
+		
+
+	
+
+
