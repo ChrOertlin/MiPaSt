@@ -439,19 +439,22 @@ public class DatasetLoadingScreen extends Wizard {
 		    miRNADataSource = new DataSourceModel();
 			String[] types = {"protein","gene","probe"};
 			miRNADataSource.setTypeFilter(types);
+
 			
 			cbDataSource = new PermissiveComboBox(miRNADataSource);
-			rbSyscodeCol = new JRadioButton("Select system code column:");
-			bgSyscodeCol.add(rbSyscodeCol);
-			cbSyscodeCol = new JComboBox();
-			builder.add(cbSyscodeCol, cc.xy(4, 3));
-			builder.add(rbSyscodeCol, cc.xy(2, 3));
 			
 			// system code column
 			rbDatabaseAll = new JRadioButton("Select database for all Rows:");
 			bgSyscodeCol.add(rbDatabaseAll);
-			builder.add(rbDatabaseAll, cc.xy(2, 5));
-			builder.add(cbDataSource, cc.xy(4, 5));
+			builder.add(rbDatabaseAll, cc.xy(2, 3));
+			builder.add(cbDataSource, cc.xy(4, 3));
+		
+			rbSyscodeCol = new JRadioButton("Select system code column:");
+			cbSyscodeCol = new JComboBox();
+			bgSyscodeCol.add(rbSyscodeCol);
+			builder.add(cbSyscodeCol, cc.xy(4, 5));
+			builder.add(rbSyscodeCol, cc.xy(2, 5));
+			
 			
 
 			ctm = new ColumnTableModel(miRNAImportInformation);
@@ -586,7 +589,7 @@ public class DatasetLoadingScreen extends Wizard {
 		}
 
 	    public void aboutToDisplayPanel() {
-	    	miRNAImportInformation.setSyscodeFixed(false);
+	    	miRNAImportInformation.setSyscodeFixed(true);
 	    	getWizard().setNextFinishButtonEnabled(false);
 	    	
 	    	// create an array of size getSampleMaxNumCols()
@@ -803,17 +806,18 @@ public class DatasetLoadingScreen extends Wizard {
 			geneDataSource.setTypeFilter(types);
 			
 			cbDataSource = new PermissiveComboBox(geneDataSource);
+			rbDatabaseAll = new JRadioButton("Select database for all Rows:");
+			bgSyscodeCol.add(rbDatabaseAll);
+			builder.add(rbDatabaseAll, cc.xy(2, 3));
+			builder.add(cbDataSource, cc.xy(4, 3));
+			
+			// system code column
 			rbSyscodeCol = new JRadioButton("Select system code column:");
 			bgSyscodeCol.add(rbSyscodeCol);
 			cbSyscodeCol = new JComboBox();
-			builder.add(cbSyscodeCol, cc.xy(4, 3));
-			builder.add(rbSyscodeCol, cc.xy(2, 3));
+			builder.add(cbSyscodeCol, cc.xy(4, 5));
+			builder.add(rbSyscodeCol, cc.xy(2, 5));
 			
-			// system code column
-			rbDatabaseAll = new JRadioButton("Select database for all Rows:");
-			bgSyscodeCol.add(rbDatabaseAll);
-			builder.add(rbDatabaseAll, cc.xy(2, 5));
-			builder.add(cbDataSource, cc.xy(4, 5));
 			
 
 			ctm = new ColumnTableModel(geneImportInformation);
@@ -948,7 +952,7 @@ public class DatasetLoadingScreen extends Wizard {
 		}
 
 	    public void aboutToDisplayPanel() {
-	    	geneImportInformation.setSyscodeFixed(false);
+	    	geneImportInformation.setSyscodeFixed(true);
 	    	getWizard().setNextFinishButtonEnabled(false);
 	    	
 	    	// create an array of size getSampleMaxNumCols()
