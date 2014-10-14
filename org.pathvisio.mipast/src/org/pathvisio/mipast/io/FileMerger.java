@@ -37,6 +37,10 @@ public class FileMerger {
 
 	mipastFileReader fr = new mipastFileReader();
 
+	/**
+	 * Creates the combined file, if two files are given to the plugin, and
+	 * shows the progress of the file import
+	 */
 	public void createCombinedFile(ImportInformation miRNA,
 			ImportInformation gene, ProgressKeeper pk, PvDesktop desktop)
 			throws IOException {
@@ -56,6 +60,13 @@ public class FileMerger {
 
 	}
 
+	/**
+	 * Creates the combined header of the two input files
+	 * 
+	 * @param miRNA
+	 * @param gene
+	 * @return
+	 */
 	public List<String> createCombinedHeader(ImportInformation miRNA,
 			ImportInformation gene) {
 
@@ -65,52 +76,78 @@ public class FileMerger {
 
 		for (int i = 0; i < miRNA.getColNames().length; i++) {
 			if (!combinedHeader.contains(miRNA.getColNames()[i])
+					&& miRNA.getColNames()[i] != "Column E"
 					&& i != miRNA.getIdColumn()) {
 				combinedHeader.add(miRNA.getColNames()[i]);
+				System.out.print(miRNA.getColNames()[i]);
 			}
 		}
 
 		for (int i = 0; i < gene.getColNames().length; i++) {
 			if (!combinedHeader.contains(gene.getColNames()[i])
+					&& gene.getColNames()[i] != "Column E"
 					&& i != gene.getIdColumn()) {
 				combinedHeader.add(gene.getColNames()[i]);
+				System.out.print(gene.getColNames()[i]);
 			}
 
 		}
+		combinedHeader.remove(combinedHeader.indexOf("Column E"));
 		combinedHeader.add("type");
+		System.out.print(combinedHeader);
 		return combinedHeader;
 	}
 
+	/**
+	 * Retrieves data rows from the expression data files
+	 * 
+	 * @param miRNA
+	 * @param miRNALines
+	 * @param gene
+	 * @param geneLines
+	 * @throws IOException
+	 */
 	public void getDataRows(ImportInformation miRNA, List<String> miRNALines,
 			ImportInformation gene, List<String> geneLines) throws IOException {
 		String[] miRNAValues = null;
 		String[] geneValues = null;
-
 		List<String> combinedHeader = new ArrayList<String>();
 		combinedHeader = createCombinedHeader(miRNA, gene);
 		List<String> miRNAData = new ArrayList<String>();
 		List<String> geneData = new ArrayList<String>();
 
+		File combinedFile = new File("combinedTxt.txt");
+		writeToFile(combinedFile, combinedHeader);
+
 		for (int i = 1; i < miRNALines.size(); i++) {
 			miRNAValues = miRNALines.get(i).split(miRNA.getDelimiter());
 			miRNAData = fillDataRows(miRNAValues, combinedHeader, miRNA,
 					"miRNA");
-
+			writeToFile(combinedFile, miRNAData);
 		}
 
 		for (int j = 1; j < geneLines.size(); j++) {
 			geneValues = geneLines.get(j).split(gene.getDelimiter());
 			geneData = fillDataRows(geneValues, combinedHeader, gene, "gene");
-
+			writeToFile(combinedFile, geneData);
 		}
 
 	}
 
+	/**
+	 * Sorts the datarows to the right place along the combined header, so that
+	 * every value is written into the right column
+	 * 
+	 * @param dataArray
+	 * @param combinedHeader
+	 * @param info
+	 * @param type
+	 * @return
+	 */
 	public List<String> fillDataRows(String[] dataArray,
 			List<String> combinedHeader, ImportInformation info, String type) {
 		List<String> data = new ArrayList<String>(combinedHeader.size());
 
-		int valuePosition;
 		boolean systemCodeAdded;
 
 		for (int k = 0; k < dataArray.length; k++) {
@@ -136,15 +173,29 @@ public class FileMerger {
 			if (combinedHeader.contains(info.getColNames()[k])
 					&& k != info.getIdColumn()
 					&& combinedHeader.get(k) != "type") {
-				valuePosition = combinedHeader.indexOf(info.getColNames()[k]);
+
 				data.add(combinedHeader.indexOf(info.getColNames()[k]),
 						dataArray[k]);
-			} else {
-				data.add("");
 			}
 
+			if (k == dataArray.length - 1) {
+				data.add(combinedHeader.indexOf("type"), type);
+			} else {
+				data.add(" ");
+			}
 		}
 
 		return data;
+	}
+
+	public void writeToFile(File file, List<String> array) throws IOException {
+		FileWriter fstream = new FileWriter(file, true);
+		BufferedWriter fbw = new BufferedWriter(fstream);
+		for (int i = 0; i < array.size(); i++) {
+
+			fbw.write(array.get(i) + "\t");
+		}
+		fbw.newLine();
+		fbw.close();
 	}
 }
