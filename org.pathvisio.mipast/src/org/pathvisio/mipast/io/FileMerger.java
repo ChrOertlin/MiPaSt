@@ -159,10 +159,11 @@ public class FileMerger {
 	 */
 	public List<String> fillDataRows(String[] dataArray,
 			List<String> combinedHeader, ImportInformation info, String type) {
-		List<String> data = new ArrayList<String>(combinedHeader.size());
+		List<String> data = new ArrayList<String>(dataArray.length);
 
 		boolean systemCodeAdded;
-
+		System.out.print(dataArray.length);
+		System.out.print(combinedHeader.size());
 		for (int k = 0; k < dataArray.length; k++) {
 			systemCodeAdded = false;
 
@@ -194,7 +195,7 @@ public class FileMerger {
 			if (k == dataArray.length - 1) {
 				data.add(combinedHeader.indexOf("type"), type);
 			} else if(!combinedHeader.get(k).isEmpty()){
-				data.add("n/A");
+				data.add("");
 			}
 		}
 

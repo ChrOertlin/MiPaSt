@@ -651,7 +651,7 @@ public class DatasetLoadingScreen extends Wizard {
 	}
 
 	/**
-	 * Set the information for the gene expression file
+	 * Set the data delimiter for the gene expression file.
 	 */
 	private class FilesInformationPage2 extends WizardPanelDescriptor implements
 			ActionListener {
@@ -787,6 +787,12 @@ public class DatasetLoadingScreen extends Wizard {
 		}
 	}
 
+	/**
+	 * Columnpage2 is used to specificy the database or the systemCode column for the gene expression data. 
+	 * @author ChrOertlin
+	 *
+	 */
+	
 	private class ColumnPage2 extends WizardPanelDescriptor {
 		public static final String IDENTIFIER = "gene_COLUMN_PAGE";
 
@@ -929,9 +935,7 @@ public class DatasetLoadingScreen extends Wizard {
 				}
 			}
 
-			// getWizard().setNextFinishButtonEnabled(error == null);
-			// getWizard().setErrorMessage(error == null ? "" : error);
-
+			
 			ctm.refresh();
 		}
 
@@ -1015,7 +1019,12 @@ public class DatasetLoadingScreen extends Wizard {
 			}
 		}
 	}
-
+/**
+ * Filemerger page used to merge the two different expression data files and import them into PathVisio. 
+ * In case of one expression data file, import starts directly.
+ * @author ChrOertlin
+ *
+ */
 	private class FileMergePage extends WizardPanelDescriptor implements
 			ProgressListener {
 		public static final String IDENTIFIER = "FILE_MERGE_PAGE";
