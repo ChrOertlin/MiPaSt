@@ -17,17 +17,12 @@ package org.pathvisio.mipast.io;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
-import org.pathvisio.mipast.mipastFileReader;
-import org.pathvisio.gexplugin.GexTxtImporter;
-import org.pathvisio.gexplugin.ImportInformation;
 
-import org.pathvisio.core.util.ProgressKeeper;
-import org.pathvisio.desktop.PvDesktop;
+import org.pathvisio.gexplugin.ImportInformation;
+import org.pathvisio.mipast.MiPaStFileReader;
 
 /**
  * 
@@ -35,9 +30,6 @@ import org.pathvisio.desktop.PvDesktop;
  * 
  */
 public class FileMerger {
-
-	mipastFileReader fr = new mipastFileReader();
-	
 	
 	/**
 	 * Creates the combined file, if two files are given to the plugin, and
@@ -54,7 +46,7 @@ public class FileMerger {
 			List<String> miRNALines;
 			List<String> geneLines;
 
-			mipastFileReader fr = new mipastFileReader();
+			MiPaStFileReader fr = new MiPaStFileReader();
 
 			miRNAFile = miRNA.getTxtFile();
 			geneFile = gene.getTxtFile();

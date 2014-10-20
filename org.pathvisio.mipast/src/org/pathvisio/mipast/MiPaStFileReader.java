@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
-public class mipastFileReader {
+public class MiPaStFileReader {
 	ArrayList<String> Lines;
 	public ArrayList<String> fileReader(File file) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(file));
