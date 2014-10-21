@@ -70,7 +70,7 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.nexes.wizard.Wizard;
 import com.nexes.wizard.WizardPanelDescriptor;
-
+import org.pathvisio.rip.dialog.*;
 
 
 
@@ -93,6 +93,7 @@ public class DatasetLoadingScreen extends Wizard {
 	private MiRNAColumnPage cpd = new MiRNAColumnPage();
 	private GeneColumnPage cpd2 = new GeneColumnPage();
 	private FileMergePage fmp = new FileMergePage();
+	private RipInfoPage ripi= new RipInfoPage();
 	
 
 	private final PvDesktop standaloneEngine;
@@ -107,6 +108,7 @@ public class DatasetLoadingScreen extends Wizard {
 		registerWizardPanel(cpd);
 		registerWizardPanel(cpd2);
 		registerWizardPanel(fmp);
+		registerWizardPanel(ripi);
 
 		setCurrentPanel(FileLoaderPage.IDENTIFIER);
 	}
@@ -1204,6 +1206,34 @@ public class DatasetLoadingScreen extends Wizard {
 			}
 
 		}
+	}
+	
+	private class RipInfoPage extends WizardPanelDescriptor{
+		private static final String IDENTIFIER = "RIP_INFO_PAGE";
+		
+		public RipInfoPage() {
+			super(IDENTIFIER);
+		
+		}
+
+		@Override
+		protected Component createContents() {
+			FormLayout layout = new FormLayout("pref",
+					"pref");
+
+			PanelBuilder builder = new PanelBuilder(layout);
+			CellConstraints cc = new CellConstraints();
+			
+			JLabel ripInfo = new JLabel("Step 2: Load interaction file(s); press Next");
+			builder.add(ripInfo, cc.xy(1, 1));
+			return builder.getPanel();
+		}
+
+		public void aboutToDisplayPanel() {
+			getWizard().setNextFinishButtonEnabled(false);
+			getWizard().setBackButtonEnabled(false);
+		}
+		
 	}
 
 }

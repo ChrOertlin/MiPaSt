@@ -21,16 +21,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-
 import org.pathvisio.gexplugin.GexTxtImporter;
 import org.pathvisio.gexplugin.ImportInformation;
-
-
 
 import org.pathvisio.gexplugin.ImportInformation;
 import org.pathvisio.mipast.MiPaStFileReader;
@@ -42,9 +37,8 @@ import org.pathvisio.mipast.MiPaStFileReader;
  */
 public class FileMerger {
 
-
 	MiPaStFileReader fr = new MiPaStFileReader();
-	boolean sharedHeader=false;
+	boolean sharedHeader = false;
 
 	/**
 	 * Creates the combined file, if two files are given to the plugin, and
@@ -61,10 +55,7 @@ public class FileMerger {
 		List<String> miRNALines;
 		List<String> geneLines;
 
-
 		MiPaStFileReader fr = new MiPaStFileReader();
-
-
 
 		miRNAFile = miRNA.getTxtFile();
 		geneFile = gene.getTxtFile();
@@ -94,25 +85,23 @@ public class FileMerger {
 
 		for (int i = 0; i < miRNA.getColNames().length; i++) {
 			if (!combinedHeader.contains(miRNA.getColNames()[i])
-					&& miRNA.getColNames()[i] != "Column E"
-					&& i != miRNA.getIdColumn()) {
+
+			&& i != miRNA.getIdColumn()) {
 				combinedHeader.add(miRNA.getColNames()[i]);
 
 			}
 		}
 
-		checkDuplicateHeaders(gene,combinedHeader);
-		
+		checkDuplicateHeaders(gene, combinedHeader);
+
 		for (int i = 0; i < gene.getColNames().length; i++) {
 			if (!combinedHeader.contains(gene.getColNames()[i])
-					&& gene.getColNames()[i] != "Column E"
-					&& i != gene.getIdColumn()) {
+
+			&& i != gene.getIdColumn()) {
 				combinedHeader.add(gene.getColNames()[i]);
 
 			}
 		}
-
-		combinedHeader.remove(combinedHeader.indexOf("Column E"));
 
 		combinedHeader.add("type");
 		for (int i = 0; i < combinedHeader.size(); i++) {
@@ -149,7 +138,7 @@ public class FileMerger {
 			miRNAValues = miRNALines.get(i).split(miRNA.getDelimiter());
 			miRNAData = fillDataRows(miRNAValues, combinedHeader, miRNA,
 					"miRNA");
-			
+
 			writeToFile(miRNAData, fbw);
 		}
 
@@ -213,7 +202,7 @@ public class FileMerger {
 				data.add("");
 			}
 		}
-		
+
 		return data;
 	}
 
@@ -227,19 +216,20 @@ public class FileMerger {
 		fbw.newLine();
 
 	}
-	
-	public void checkDuplicateHeaders(ImportInformation info, List<String>combinedHeader){
-		
-		for (int i=0;i<info.getColNames().length;i++){
-			if(combinedHeader.contains(info.getColNames()[i])){
-				sharedHeader=true;
-				
+
+	public void checkDuplicateHeaders(ImportInformation info,
+			List<String> combinedHeader) {
+
+		for (int i = 0; i < info.getColNames().length; i++) {
+			if (combinedHeader.contains(info.getColNames()[i])) {
+				sharedHeader = true;
+
 			}
-			
+
 		}
 	}
-	
-	public boolean getSharedHeader(){
+
+	public boolean getSharedHeader() {
 		return sharedHeader;
 	}
 }
