@@ -2,7 +2,7 @@
 <project name="org.pathvisio.mipast" default="jar" basedir=".">
   
   <!-- change property pathvisio directory to local pathvisio directory-->
-  <property name="pathvisio.dir" value="../../trunk/"/>
+  <property name="pathvisio.dir" value="/home/bigcat/Desktop/pathvisio"/>
 	
   <property name="base.name" value="org.pathvisio.mipast"/>
   <property name="jar.name" value="${base.name}.jar"/>

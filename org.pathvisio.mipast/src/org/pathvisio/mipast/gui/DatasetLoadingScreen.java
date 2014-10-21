@@ -46,16 +46,15 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import org.bridgedb.gui.SimpleFileFilter;
-import org.bridgedb.rdb.construct.DBConnector;
+
 import org.pathvisio.core.debug.Logger;
-import org.pathvisio.core.preferences.GlobalPreference;
-import org.pathvisio.core.preferences.PreferenceManager;
+
 import org.pathvisio.core.util.ProgressKeeper;
 import org.pathvisio.core.util.ProgressKeeper.ProgressEvent;
 import org.pathvisio.core.util.ProgressKeeper.ProgressListener;
-import org.pathvisio.data.DataException;
+
 import org.pathvisio.desktop.PvDesktop;
-import org.pathvisio.desktop.data.DBConnectorSwing;
+
 import org.pathvisio.desktop.util.RowNumberHeader;
 import org.pathvisio.gexplugin.GexTxtImporter;
 import org.pathvisio.gexplugin.ImportInformation;
@@ -72,6 +71,9 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.nexes.wizard.Wizard;
 import com.nexes.wizard.WizardPanelDescriptor;
 
+
+
+
 /**
  * 
  * @author ChrOertlin
@@ -86,11 +88,12 @@ public class DatasetLoadingScreen extends Wizard {
 	private ImportInformation geneImportInformation = new ImportInformation();
 	private ImportInformation combinedImportInformation = new ImportInformation();
 	private FileLoaderPage fpd = new FileLoaderPage();
-	private FilesInformationPage ipd = new FilesInformationPage();
-	private FilesInformationPage2 ipd2 = new FilesInformationPage2();
-	private ColumnPage cpd = new ColumnPage();
-	private ColumnPage2 cpd2 = new ColumnPage2();
+	private MiRNAFilesInformationPage ipd = new MiRNAFilesInformationPage();
+	private GeneFilesInformationPage ipd2 = new GeneFilesInformationPage();
+	private MiRNAColumnPage cpd = new MiRNAColumnPage();
+	private GeneColumnPage cpd2 = new GeneColumnPage();
 	private FileMergePage fmp = new FileMergePage();
+	
 
 	private final PvDesktop standaloneEngine;
 
@@ -283,7 +286,7 @@ public class DatasetLoadingScreen extends Wizard {
 	/**
 	 * Set information for the miRNA expression data file
 	 */
-	private class FilesInformationPage extends WizardPanelDescriptor implements
+	private class MiRNAFilesInformationPage extends WizardPanelDescriptor implements
 			ActionListener {
 		public static final String IDENTIFIER = "miRNA_INFORMATIONPAGE_PAGE";
 
@@ -296,7 +299,7 @@ public class DatasetLoadingScreen extends Wizard {
 		private PreviewTableModel prevTable;
 		private JTable tblPreview;
 
-		public FilesInformationPage() {
+		public MiRNAFilesInformationPage() {
 			super(IDENTIFIER);
 		}
 
@@ -415,7 +418,7 @@ public class DatasetLoadingScreen extends Wizard {
 	/**
 	 * Set Column information for the miRNA expression data
 	 */
-	private class ColumnPage extends WizardPanelDescriptor {
+	private class MiRNAColumnPage extends WizardPanelDescriptor {
 		public static final String IDENTIFIER = "miRNA_COLUMN_PAGE";
 
 		private ColumnTableModel ctm;
@@ -428,7 +431,7 @@ public class DatasetLoadingScreen extends Wizard {
 		private JComboBox cbDataSource;
 		private DataSourceModel miRNADataSource;
 
-		public ColumnPage() {
+		public MiRNAColumnPage() {
 			super(IDENTIFIER);
 		}
 
@@ -653,7 +656,7 @@ public class DatasetLoadingScreen extends Wizard {
 	/**
 	 * Set the data delimiter for the gene expression file.
 	 */
-	private class FilesInformationPage2 extends WizardPanelDescriptor implements
+	private class GeneFilesInformationPage extends WizardPanelDescriptor implements
 			ActionListener {
 		public static final String IDENTIFIER = "gene_INFORMATIONPAGE_PAGE";
 
@@ -666,7 +669,7 @@ public class DatasetLoadingScreen extends Wizard {
 		private PreviewTableModel prevTable;
 		private JTable tblPreview;
 
-		public FilesInformationPage2() {
+		public GeneFilesInformationPage() {
 			super(IDENTIFIER);
 			// TODO Auto-generated constructor stub
 		}
@@ -793,7 +796,7 @@ public class DatasetLoadingScreen extends Wizard {
 	 *
 	 */
 	
-	private class ColumnPage2 extends WizardPanelDescriptor {
+	private class GeneColumnPage extends WizardPanelDescriptor {
 		public static final String IDENTIFIER = "gene_COLUMN_PAGE";
 
 		private ColumnTableModel ctm;
@@ -807,7 +810,7 @@ public class DatasetLoadingScreen extends Wizard {
 		private DataSourceModel geneDataSource;
 		private boolean dataSourceSelected = false;
 
-		public ColumnPage2() {
+		public GeneColumnPage() {
 			super(IDENTIFIER);
 		}
 
