@@ -70,8 +70,13 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.nexes.wizard.Wizard;
 import com.nexes.wizard.WizardPanelDescriptor;
-import org.pathvisio.rip.dialog.*;
 
+
+
+import org.pathvisio.rip.dialog.LoadFileWizard;
+import org.pathvisio.rip.dialog.ColumnPage;
+import org.pathvisio.rip.dialog.FilePage;
+import org.pathvisio.rip.dialog.ImportPage;
 
 
 /**
@@ -83,7 +88,8 @@ import org.pathvisio.rip.dialog.*;
  * 
  */
 public class DatasetLoadingScreen extends Wizard {
-
+	
+	
 	private ImportInformation miRNAImportInformation = new ImportInformation();
 	private ImportInformation geneImportInformation = new ImportInformation();
 	private ImportInformation combinedImportInformation = new ImportInformation();
@@ -93,15 +99,24 @@ public class DatasetLoadingScreen extends Wizard {
 	private MiRNAColumnPage cpd = new MiRNAColumnPage();
 	private GeneColumnPage cpd2 = new GeneColumnPage();
 	private FileMergePage fmp = new FileMergePage();
-	private RipInfoPage ripi= new RipInfoPage();
-	
+	private RipInfoPage ripi = new RipInfoPage();
+	private LoadFileWizard wizard = new LoadFileWizard(null);
+	private FilePage ripf;
+	private RipColumnPage ripc= new RipColumnPage();
+	private ImportPage ripim;
 
 	private final PvDesktop standaloneEngine;
 
 	public DatasetLoadingScreen(PvDesktop pvDesktop) {
 		this.standaloneEngine = pvDesktop;
+		//ripf= new FilePage(wizard,pvDesktop);
+		
+		//ripim= new ImportPage(wizard,pvDesktop);
+		
 		getDialog().setTitle("MiPaSt import wizard");
-
+		//registerWizardPanel(ripf);
+		//registerWizardPanel(ripc);
+		//registerWizardPanel(ripim);
 		registerWizardPanel(fpd);
 		registerWizardPanel(ipd);
 		registerWizardPanel(ipd2);
@@ -109,7 +124,8 @@ public class DatasetLoadingScreen extends Wizard {
 		registerWizardPanel(cpd2);
 		registerWizardPanel(fmp);
 		registerWizardPanel(ripi);
-
+	
+		
 		setCurrentPanel(FileLoaderPage.IDENTIFIER);
 	}
 
@@ -183,9 +199,8 @@ public class DatasetLoadingScreen extends Wizard {
 							miRNAText.setText(miRNAFile.getAbsolutePath());
 
 							miRNAFileLoaded = true;
-							/* Gexmanager.. */
+
 							miRNAImportInformation.setTxtFile(miRNAFile);
-							
 
 							if (geneBox.isSelected() && geneFileLoaded) {
 								getWizard().setNextFinishButtonEnabled(true);
@@ -218,7 +233,7 @@ public class DatasetLoadingScreen extends Wizard {
 								getWizard().setNextFinishButtonEnabled(true);
 							}
 						} catch (IOException e2) {
-							// TODO Auto-generated catch block
+						
 							e2.printStackTrace();
 						}
 					}
@@ -247,7 +262,8 @@ public class DatasetLoadingScreen extends Wizard {
 		}
 
 		public void aboutToDisplayPanel() {
-			if (!standaloneEngine.getSwingEngine().getGdbManager().isConnected()) {
+			if (!standaloneEngine.getSwingEngine().getGdbManager()
+					.isConnected()) {
 				databaseLoaded();
 
 			}
@@ -288,8 +304,8 @@ public class DatasetLoadingScreen extends Wizard {
 	/**
 	 * Set information for the miRNA expression data file
 	 */
-	private class MiRNAFilesInformationPage extends WizardPanelDescriptor implements
-			ActionListener {
+	private class MiRNAFilesInformationPage extends WizardPanelDescriptor
+			implements ActionListener {
 		public static final String IDENTIFIER = "miRNA_INFORMATIONPAGE_PAGE";
 
 		private JRadioButton seperatorTab;
@@ -469,7 +485,7 @@ public class DatasetLoadingScreen extends Wizard {
 			// not fixed system code
 
 			miRNADataSource = new DataSourceModel();
-			String[] types = {"protein", "gene","probe" };
+			String[] types = { "protein", "gene", "probe" };
 			miRNADataSource.setTypeFilter(types);
 
 			cbDataSource = new PermissiveComboBox(miRNADataSource);
@@ -658,8 +674,8 @@ public class DatasetLoadingScreen extends Wizard {
 	/**
 	 * Set the data delimiter for the gene expression file.
 	 */
-	private class GeneFilesInformationPage extends WizardPanelDescriptor implements
-			ActionListener {
+	private class GeneFilesInformationPage extends WizardPanelDescriptor
+			implements ActionListener {
 		public static final String IDENTIFIER = "gene_INFORMATIONPAGE_PAGE";
 
 		private JRadioButton seperatorTab;
@@ -793,11 +809,13 @@ public class DatasetLoadingScreen extends Wizard {
 	}
 
 	/**
-	 * Columnpage2 is used to specificy the database or the systemCode column for the gene expression data. 
+	 * Columnpage2 is used to specificy the database or the systemCode column
+	 * for the gene expression data.
+	 * 
 	 * @author ChrOertlin
-	 *
+	 * 
 	 */
-	
+
 	private class GeneColumnPage extends WizardPanelDescriptor {
 		public static final String IDENTIFIER = "gene_COLUMN_PAGE";
 
@@ -940,7 +958,6 @@ public class DatasetLoadingScreen extends Wizard {
 				}
 			}
 
-			
 			ctm.refresh();
 		}
 
@@ -1024,12 +1041,15 @@ public class DatasetLoadingScreen extends Wizard {
 			}
 		}
 	}
-/**
- * Filemerger page used to merge the two different expression data files and import them into PathVisio. 
- * In case of one expression data file, import starts directly.
- * @author ChrOertlin
- *
- */
+
+	/**
+	 * Filemerger page used to merge the two different expression data files and
+	 * import them into PathVisio. In case of one expression data file, import
+	 * starts directly.
+	 * 
+	 * @author ChrOertlin
+	 * 
+	 */
 	private class FileMergePage extends WizardPanelDescriptor implements
 			ProgressListener {
 		public static final String IDENTIFIER = "FILE_MERGE_PAGE";
@@ -1040,7 +1060,7 @@ public class DatasetLoadingScreen extends Wizard {
 		}
 
 		public Object getNextPanelDescriptor() {
-			return null;
+			return "RIP_INFO_PAGE";
 		}
 
 		public Object getBackPanelDescriptor() {
@@ -1108,33 +1128,44 @@ public class DatasetLoadingScreen extends Wizard {
 							combinedImportInformation.setTxtFile(fm
 									.createCombinedFile(miRNAImportInformation,
 											geneImportInformation));
-							if (combinedImportInformation.getTxtFile() != null) {
-								pk.report("Expression data files sucesscully merged.\n" +
-										"Combined file created:\n" +
-										fm.createCombinedFile(
+							if (combinedImportInformation.getTxtFile() != null
+									&& fm.getSharedHeader()) {
+								pk.report("Expression data files sucesscully merged.\n"
+										+ "Combined file created:\n"
+										+ fm.createCombinedFile(
 												miRNAImportInformation,
 												geneImportInformation)
 												.getAbsolutePath());
-								
+							} else {
+								pk.report("Expression data files sucesscully merged.\n"
+										+ "Combined file created:\n"
+										+ fm.createCombinedFile(
+												miRNAImportInformation,
+												geneImportInformation)
+												.getAbsolutePath()
+										+ "\n"
+										+ "No shared headers found, no shared visualization possible! \n");
 							}
-							
+
 							combinedImportInformation.setDelimiter("/t");
 							combinedImportInformation.setIdColumn(0);
 							combinedImportInformation.setSyscodeFixed(true);
 							combinedImportInformation.setSysodeColumn(1);
-							
+
 							standaloneEngine.getGexManager().setCurrentGex(
-									combinedImportInformation.getTxtFile().getName(),true);
-						
-							combinedImportInformation.setGexName(combinedImportInformation.getTxtFile().getAbsolutePath());
+									combinedImportInformation.getTxtFile()
+											.getName(), true);
+
+							combinedImportInformation
+									.setGexName(combinedImportInformation
+											.getTxtFile().getAbsolutePath());
 							pk.setTaskName("Importing expression dataset file(s)");
-							
+
 							GexTxtImporter.importFromTxt(
-									combinedImportInformation, pk, standaloneEngine
-											.getSwingEngine().getGdbManager()
-											.getCurrentGdb(),
+									combinedImportInformation, pk,
+									standaloneEngine.getSwingEngine()
+											.getGdbManager().getCurrentGdb(),
 									standaloneEngine.getGexManager());
-							
 
 						} catch (Exception e) {
 							Logger.log.error("During import", e);
@@ -1152,15 +1183,17 @@ public class DatasetLoadingScreen extends Wizard {
 					} else {
 
 						try {
-							
-								standaloneEngine.getGexManager().setCurrentGex(
-										miRNAFile.getName(), true);
+
+							standaloneEngine.getGexManager().setCurrentGex(
+									miRNAFile.getName(), true);
 							pk.setTaskName("Importing expression dataset file(s)");
-							miRNAImportInformation.setGexName(miRNAImportInformation.getTxtFile().getAbsolutePath());
+							miRNAImportInformation
+									.setGexName(miRNAImportInformation
+											.getTxtFile().getAbsolutePath());
 							GexTxtImporter.importFromTxt(
-									miRNAImportInformation, pk, standaloneEngine
-											.getSwingEngine().getGdbManager()
-											.getCurrentGdb(),
+									miRNAImportInformation, pk,
+									standaloneEngine.getSwingEngine()
+											.getGdbManager().getCurrentGdb(),
 									standaloneEngine.getGexManager());
 							System.out.print("tried");
 
@@ -1207,33 +1240,46 @@ public class DatasetLoadingScreen extends Wizard {
 
 		}
 	}
-	
-	private class RipInfoPage extends WizardPanelDescriptor{
+
+	private class RipInfoPage extends WizardPanelDescriptor {
 		private static final String IDENTIFIER = "RIP_INFO_PAGE";
-		
+
 		public RipInfoPage() {
 			super(IDENTIFIER);
-		
+
+		}
+		public Object getNextPanelDescriptor() {
+			return ColumnPage.IDENTIFIER;
+		}
+
+		public Object getBackPanelDescriptor() {
+			return "FILE_MERGE_PAGE";
 		}
 
 		@Override
 		protected Component createContents() {
-			FormLayout layout = new FormLayout("pref",
-					"pref");
+			FormLayout layout = new FormLayout("pref", "pref");
 
 			PanelBuilder builder = new PanelBuilder(layout);
 			CellConstraints cc = new CellConstraints();
-			
-			JLabel ripInfo = new JLabel("Step 2: Load interaction file(s); press Next");
+
+			JLabel ripInfo = new JLabel(
+					"Step 2: Load interaction file(s); press Next");
 			builder.add(ripInfo, cc.xy(1, 1));
 			return builder.getPanel();
 		}
 
 		public void aboutToDisplayPanel() {
-			getWizard().setNextFinishButtonEnabled(false);
-			getWizard().setBackButtonEnabled(false);
+		
+			getWizard().setNextFinishButtonEnabled(true);
+			getWizard().setBackButtonEnabled(true);
 		}
+
+	}
+	private class RipColumnPage{
+		
 		
 	}
+
 
 }
