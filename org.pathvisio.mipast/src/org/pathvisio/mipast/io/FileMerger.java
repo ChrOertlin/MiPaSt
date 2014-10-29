@@ -39,7 +39,7 @@ public class FileMerger {
 
 	MiPaStFileReader fr = new MiPaStFileReader();
 	boolean sharedHeader = false;
-
+	File combinedFile = new File("combinedTxt.txt");
 	/**
 	 * Creates the combined file, if two files are given to the plugin, and
 	 * return a combinedFile which can be accessed for importinformation
@@ -49,7 +49,7 @@ public class FileMerger {
 	public File createCombinedFile(ImportInformation miRNA,
 			ImportInformation gene) throws IOException {
 
-		File combinedFile = new File("combinedTxt.txt");
+		
 		File miRNAFile = new File("miRNA");
 		File geneFile = new File("gene");
 		List<String> miRNALines;
@@ -231,5 +231,8 @@ public class FileMerger {
 
 	public boolean getSharedHeader() {
 		return sharedHeader;
+	}
+	public File getCombinedFile(){
+		return combinedFile;
 	}
 }

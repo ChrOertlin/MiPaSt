@@ -139,8 +139,9 @@ public class DatasetLoadingScreen extends Wizard {
 	private RipImportPage ripim = new RipImportPage();
 	private RipImportInformation importInformation = new RipImportInformation();
 	private StatisticsInfoPage stati = new StatisticsInfoPage();
-	private StatisticsCriterionPage statc = new StatisticsCriterionPage();
+	//private StatisticsCriterionPage statc = new StatisticsCriterionPage();
 	private LoadFileWizard wizard = new LoadFileWizard();
+	private boolean startStat = false;
 
 	private final PvDesktop standaloneEngine;
 
@@ -685,8 +686,7 @@ public class DatasetLoadingScreen extends Wizard {
 				public void actionPerformed(ActionEvent ae) {
 					miRNAImportInformation.setSysodeColumn(cbSyscodeCol
 							.getSelectedIndex());
-					System.out.println(miRNAImportInformation
-							.getSyscodeColumn());
+					
 					columnPageRefresh();
 				}
 			});
@@ -1273,6 +1273,9 @@ public class DatasetLoadingScreen extends Wizard {
 												miRNAImportInformation,
 												geneImportInformation)
 												.getAbsolutePath());
+								
+								
+								
 							} else {
 								pk.report("Expression data files sucesscully merged.\n"
 										+ "Combined file created:\n"
@@ -1282,20 +1285,17 @@ public class DatasetLoadingScreen extends Wizard {
 												.getAbsolutePath()
 										+ "\n"
 										+ "No shared headers found, no shared visualization possible! \n");
+
+								
 							}
-
-							combinedImportInformation.setDelimiter("/t");
-							combinedImportInformation.setIdColumn(0);
-							combinedImportInformation.setSyscodeFixed(true);
-							combinedImportInformation.setSysodeColumn(1);
-
 							standaloneEngine.getGexManager().setCurrentGex(
-									combinedImportInformation.getTxtFile()
-											.getName(), true);
-
+									fm.getCombinedFile().getName(), true);
 							combinedImportInformation
-									.setGexName(combinedImportInformation
-											.getTxtFile().getAbsolutePath());
+							.setGexName(combinedImportInformation
+										.getTxtFile().getAbsolutePath());
+
+
+							
 							pk.setTaskName("Importing expression dataset file(s)");
 
 							GexTxtImporter.importFromTxt(
@@ -2664,42 +2664,59 @@ public class DatasetLoadingScreen extends Wizard {
 		}
 
 		public void aboutToDisplayPanel() {
-
+			startStat= true;
 			getWizard().setNextFinishButtonEnabled(true);
 			getWizard().setBackButtonEnabled(true);
+		}
+		public void aboutToHidePanel(){
+			initStat();
 		}
 
 	}
 	
-	private class StatisticsCriterionPage extends WizardPanelDescriptor{
-		private final static String IDENTIFIER= "STAT_CRITERION_PAGE";
-		StatisticsPlugin critpanel = new StatisticsPlugin();
-		
-		public StatisticsCriterionPage(){
-			super(IDENTIFIER);
-		}
-
-		@Override
-		protected Component createContents() {
-			FormLayout layout = new FormLayout (
-					"4dlu, pref:grow, 4dlu, pref, 4dlu",
-					"4dlu, fill:[pref,250dlu], 4dlu, pref, 4dlu, pref, 4dlu, pref, 4dlu, pref, 4dlu, fill:min:grow");
-
-			PanelBuilder builder = new PanelBuilder(layout);
-			CellConstraints cc = new CellConstraints();
-		
-			
-			
-			
-			return builder.getPanel();
-		}
-		
-		public void aboutToDisplayPanel(){
-			
-		}
-		
-		
+	
+	public void initStat(){
+		if(startStat){
+		StatisticsPlugin statPlug = new StatisticsPlugin();
+		statPlug.init(standaloneEngine);}
 		
 	}
+
+//	private class StatisticsCriterionPage extends WizardPanelDescriptor {
+//		private final static String IDENTIFIER = "STAT_CRITERION_PAGE";
+//	
+//
+//		public StatisticsCriterionPage() {
+//			super(IDENTIFIER);
+//		}
+//
+//		@Override
+//		protected Component createContents() {
+//			FormLayout layout = new FormLayout(
+//					"4dlu, pref:grow, 4dlu, pref, 4dlu",
+//					"4dlu, fill:[pref,250dlu], 4dlu, pref, 4dlu, pref, 4dlu, pref, 4dlu, pref, 4dlu, fill:min:grow");
+//			PanelBuilder builder = new PanelBuilder(layout);
+//			CellConstraints cc = new CellConstraints();
+//
+//			return builder.getPanel();
+//
+//		}
+//
+//		public void aboutToDisplayPanel() {
+//			 initStat();
+//		}
+//
+//		 public void initStat(){
+//		
+//		 }
+//
+//		public Object getNextPanelDescriptor() {
+//			return null;
+//		}
+//
+//		public Object getBackPanelDescriptor() {
+//			return "STAT_INFO_PAGE";
+//		}
+//	}
 
 }
