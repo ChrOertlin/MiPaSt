@@ -8,6 +8,13 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 
+/** 
+ * Basic file reader to read the chosen data files line by line and store them as an array of lines.
+ * 
+ * @author ChrOertlin
+ *
+ */
+
 public class MiPaStFileReader {
 	ArrayList<String> Lines;
 	public ArrayList<String> fileReader(File file) throws IOException{

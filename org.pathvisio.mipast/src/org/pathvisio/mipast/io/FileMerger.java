@@ -24,6 +24,8 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.pathvisio.core.preferences.GlobalPreference;
+import org.pathvisio.core.preferences.PreferenceManager;
 import org.pathvisio.gexplugin.GexTxtImporter;
 import org.pathvisio.gexplugin.ImportInformation;
 
@@ -39,7 +41,10 @@ public class FileMerger {
 
 	MiPaStFileReader fr = new MiPaStFileReader();
 	boolean sharedHeader = false;
-	File combinedFile = new File("combinedTxt.txt");
+	File combinedFile = new File(PreferenceManager.getCurrent().get(
+			GlobalPreference.DIR_LAST_USED_PGEX) +"/combinedTxt.txt");
+	
+	
 	/**
 	 * Creates the combined file, if two files are given to the plugin, and
 	 * return a combinedFile which can be accessed for importinformation
@@ -69,11 +74,9 @@ public class FileMerger {
 	}
 
 	/**
-	 * Creates the combined header of the two input files
+	 * Creates the combined header of the two input files, if two headers are the same only one
+	 * of the headers is taken into the combined header.
 	 * 
-	 * @param miRNA
-	 * @param gene
-	 * @return
 	 */
 	public List<String> createCombinedHeader(ImportInformation miRNA,
 			ImportInformation gene) {
@@ -114,13 +117,9 @@ public class FileMerger {
 	}
 
 	/**
-	 * Retrieves data rows from the expression data files
-	 * 
-	 * @param miRNA
-	 * @param miRNALines
-	 * @param gene
-	 * @param geneLines
-	 * @throws IOException
+	 * Retrieves data rows from the expression data files and writes them to the 
+	 * combined file. If there are values that fall under a shared header they will be written below the 
+	 * shared header. If there is no value for a header then the column will be left blank.
 	 */
 	public void getDataRows(ImportInformation miRNA, List<String> miRNALines,
 			ImportInformation gene, List<String> geneLines, BufferedWriter fbw)
@@ -151,14 +150,9 @@ public class FileMerger {
 	}
 
 	/**
-	 * Sorts the datarows to the right place along the combined header, so that
-	 * every value is written into the right column
+	 * Sorts the data rows to the right place along the combined header, so that
+	 * every value is written into the right column.
 	 * 
-	 * @param dataArray
-	 * @param combinedHeader
-	 * @param info
-	 * @param type
-	 * @return
 	 */
 	public List<String> fillDataRows(String[] dataArray,
 			List<String> combinedHeader, ImportInformation info, String type) {
@@ -217,6 +211,13 @@ public class FileMerger {
 
 	}
 
+	/**
+	 * checkDuplicateHeaders look in both files and checks if there are headers
+	 * that exist in both files. If so, sharedHeader will be true. This check is needed to report back
+	 * to make sure that a later visualization will be possible. If there are no shared columns it will not be 
+	 * possible to shows interactions.
+	 * 
+	 */
 	public void checkDuplicateHeaders(ImportInformation info,
 			List<String> combinedHeader) {
 
@@ -229,6 +230,10 @@ public class FileMerger {
 		}
 	}
 
+	/**
+	 * Setters and getters 
+	 *
+	 */
 	public boolean getSharedHeader() {
 		return sharedHeader;
 	}

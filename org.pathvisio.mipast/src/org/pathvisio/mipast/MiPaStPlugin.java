@@ -24,75 +24,100 @@ import javax.swing.JMenuItem;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.plugin.Plugin;
-import org.pathvisio.mipast.gui.DatasetLoadingScreen;
+
+import org.pathvisio.mipast.gui.MiPaStWizard;
+import org.pathvisio.rip.RegIntPlugin;
 
 /**
  * 
  * @author ChrOertlin
  * @author mkutmon
  * 
- * This class implements the PathVisio plugin 
- * interface and also registeres the plugin
- * with the OSGi registry.
- * The MiPaSt menu is added when initialized by
- * the PvDesktop
- *
+ *         This class implements the PathVisio plugin interface and also
+ *         registeres the plugin with the OSGi registry. The MiPaSt menu is
+ *         added when initialized by the PvDesktop
+ * 
  */
 public class MiPaStPlugin implements BundleActivator, Plugin {
-	
+
 	private JMenu miPaStMenu;
 	private PvDesktop desktop;
 	private JMenuItem menuLoadFiles;
 	private JMenuItem help;
-	
+	private BundleContext context;
+	private RegIntPlugin plugin;
+
 	/**
-	 * init gets called by PvDesktop to
-	 * initialize the plugin
+	 * init gets called by PvDesktop to initialize the plugin
 	 */
 	@Override
 	public void init(PvDesktop desktop) {
 		this.desktop = desktop;
+		try {
+			plugin = getRIPlugin();
+		} catch (InvalidSyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		JMenu menu = createMiPaStMenu();
 		desktop.registerSubMenu("Plugins", menu);
 	}
 
+	
 	/**
-	 * creates MiPaSt Menu that is added in
-	 * the PathVisio 'Plugins' menu
+	 * creates MiPaSt Menu that is added in the PathVisio 'Plugins' menu
 	 */
-	public JMenu createMiPaStMenu(){
+	public JMenu createMiPaStMenu() {
 		miPaStMenu = new JMenu("MiPaStMenu");
-		
+
 		menuLoadFiles = new JMenuItem("Load dataset files");
 		menuLoadFiles.addActionListener(new menuLoadFilesActionListener());
-		
+
 		help = new JMenuItem("Help");
 		help.addActionListener(new HelpActionListener());
-		
+
 		miPaStMenu.add(menuLoadFiles);
 		miPaStMenu.add(help);
-		
+
 		return miPaStMenu;
 	}
 
 	@Override
 	public void done() {
 		desktop.unregisterSubMenu("Plugins", miPaStMenu);
+
 	}
 
+	public RegIntPlugin getRIPlugin() throws InvalidSyntaxException {
+		ServiceReference[] refs = context.getServiceReferences(
+				Plugin.class.getName(), null);
+		if (refs != null) {
+			for (int i = 0; i < refs.length; i++) {
+				Plugin plugin = (Plugin) context.getService(refs[i]);
+				if (plugin instanceof RegIntPlugin) {
+					return (RegIntPlugin) plugin;
+				}
+			}
+		}
+		return null;
+	}
+
+	
 	/**
 	 * Opens URL to help page of the plugin
 	 */
-	private class HelpActionListener implements ActionListener{
-		
-		public void helpURL() throws Exception{
-			Desktop helpBrowse= Desktop.getDesktop();
+	private class HelpActionListener implements ActionListener {
+
+		public void helpURL() throws Exception {
+			Desktop helpBrowse = Desktop.getDesktop();
 			helpBrowse.browse(new URI("https://www.google.com"));
 		}
-		
-		public void actionPerformed(ActionEvent e){
+
+		public void actionPerformed(ActionEvent e) {
 			try {
 				helpURL();
 			} catch (Exception e1) {
@@ -104,18 +129,17 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 	/**
 	 * Opens file import dialog
 	 */
-	private class menuLoadFilesActionListener implements ActionListener{
-		public void actionPerformed(ActionEvent e){
-			DatasetLoadingScreen wizard = new DatasetLoadingScreen(desktop);
+	private class menuLoadFilesActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			MiPaStWizard wizard = new MiPaStWizard(desktop, plugin);
 			wizard.showModalDialog(desktop.getSwingEngine().getFrame());
 		}
 	}
-	
-	
+
 	@Override
 	public void start(BundleContext context) throws Exception {
 		context.registerService(Plugin.class.getName(), this, null);
-		
+		this.context = context;
 	}
 
 	@Override
