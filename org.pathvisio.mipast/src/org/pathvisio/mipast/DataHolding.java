@@ -5,6 +5,14 @@ import java.io.File;
 import org.pathvisio.gexplugin.ImportInformation;
 import org.pathvisio.mipast.util.RipImportInformation;
 
+/**
+ * Class that holds all the data objects for the MiPaSt plugin.
+ * For every data object there are getters and setters.
+ * 
+ * @author ChrOertlin
+ *
+ */
+
 public class DataHolding {
 	private static ImportInformation miRNAImportInformation = new ImportInformation();
 	private static ImportInformation geneImportInformation = new ImportInformation();

@@ -4,7 +4,9 @@ import java.awt.Component;
 
 import javax.swing.JLabel;
 
+import org.pathvisio.rip.dialog.ColumnPage;
 import org.pathvisio.rip.dialog.FilePage;
+import org.pathvisio.rip.dialog.ImportPage;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -12,7 +14,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.nexes.wizard.WizardPanelDescriptor;
 
 class RipInfoPage extends WizardPanelDescriptor {
-	private static final String IDENTIFIER = "RIP_INFO_PAGE";
+	static final String IDENTIFIER = "RIP_INFO_PAGE";
 
 	public RipInfoPage() {
 		super(IDENTIFIER);
@@ -20,7 +22,7 @@ class RipInfoPage extends WizardPanelDescriptor {
 	}
 
 	public Object getNextPanelDescriptor() {
-		return FilePage.IDENTIFIER;
+		return RipFileLoaderPage.IDENTIFIER;
 	}
 
 	public Object getBackPanelDescriptor() {
