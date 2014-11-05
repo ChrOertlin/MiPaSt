@@ -39,7 +39,7 @@ public class MiPaStWizard extends Wizard {
 	RipFileLoaderPage rfdp;
 	ColumnPage cpd;
 	ImportPage ipd;
-	
+	CriterionPage scp;
 	
 	
 	public MiPaStWizard(PvDesktop desktop, RegIntPlugin plugin){
@@ -55,9 +55,10 @@ public class MiPaStWizard extends Wizard {
 		gcp = new GeneColumnPage();
 		fmp = new FileMergePage(desktop);
 		rip = new RipInfoPage();
+		scp= new CriterionPage();
 		
 		// Regulatory interaction plugin wizard pages
-		//fdp= new FilePage(plugin);
+		
 		rfdp = new RipFileLoaderPage(plugin);
 		cpd = new ColumnPage(plugin);
 		ipd = new ImportPage(plugin);
@@ -70,13 +71,15 @@ public class MiPaStWizard extends Wizard {
 		registerWizardPanel(gcp);
 		registerWizardPanel(fmp);
 		registerWizardPanel(rip);
-		//registerWizardPanel(fdp);
+		
 		registerWizardPanel(rfdp);
 		registerWizardPanel(cpd);
 		registerWizardPanel(ipd);
 		
+		registerWizardPanel(scp);
 		
-		setCurrentPanel(StartInfoPage.IDENTIFIER);
+		
+		setCurrentPanel(CriterionPage.IDENTIFIER);
 		
 	}
 	

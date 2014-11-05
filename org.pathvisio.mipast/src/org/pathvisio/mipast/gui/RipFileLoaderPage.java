@@ -20,7 +20,7 @@ import org.bridgedb.gui.SimpleFileFilter;
 
 import org.pathvisio.rip.RegIntPlugin;
 import org.pathvisio.rip.dialog.ColumnPage;
-import org.pathvisio.rip.util.ImportInformation;
+import org.pathvisio.rip.util.RipImportInformation;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -38,7 +38,7 @@ public class RipFileLoaderPage extends WizardPanelDescriptor implements
 
 	private JButton btnInput;
 	private boolean txtFileComplete = false;
-	private List<ImportInformation> impInfoList = new ArrayList<ImportInformation>();
+	private List<RipImportInformation> impInfoList = new ArrayList<RipImportInformation>();
 
 	public RipFileLoaderPage(RegIntPlugin plugin) {
 		super(IDENTIFIER);
@@ -59,7 +59,7 @@ public class RipFileLoaderPage extends WizardPanelDescriptor implements
 			if (result == JFileChooser.APPROVE_OPTION) {
 				File[] files = jfc.getSelectedFiles();
 				for (File f : files) {
-					ImportInformation importInformation = new ImportInformation();
+					RipImportInformation importInformation = new RipImportInformation();
 					try {
 						importInformation.setTxtFile(f);
 						importInformation.setDelimiter("\t");
@@ -156,7 +156,7 @@ public class RipFileLoaderPage extends WizardPanelDescriptor implements
 
 	public void aboutToHidePanel()
 	{
-		for (ImportInformation impInfo : impInfoList) {
+		for (RipImportInformation impInfo : impInfoList) {
 			impInfo.guessSettings();
 		}
 		plugin.setImportInformationList(impInfoList);
