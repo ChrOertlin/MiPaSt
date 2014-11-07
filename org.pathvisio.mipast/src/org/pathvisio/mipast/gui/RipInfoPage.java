@@ -22,7 +22,7 @@ class RipInfoPage extends WizardPanelDescriptor {
 	}
 
 	public Object getNextPanelDescriptor() {
-		return RipFileLoaderPage.IDENTIFIER;
+		return CriterionPage.IDENTIFIER;
 	}
 
 	public Object getBackPanelDescriptor() {

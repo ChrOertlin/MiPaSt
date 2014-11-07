@@ -55,7 +55,7 @@ public class MiPaStWizard extends Wizard {
 		gcp = new GeneColumnPage();
 		fmp = new FileMergePage(desktop);
 		rip = new RipInfoPage();
-		scp= new CriterionPage();
+		scp= new CriterionPage(desktop);
 		
 		// Regulatory interaction plugin wizard pages
 		
@@ -79,7 +79,7 @@ public class MiPaStWizard extends Wizard {
 		registerWizardPanel(scp);
 		
 		
-		setCurrentPanel(CriterionPage.IDENTIFIER);
+		setCurrentPanel(StartInfoPage.IDENTIFIER);
 		
 	}
 	
