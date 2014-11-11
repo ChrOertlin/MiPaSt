@@ -20,7 +20,45 @@ public class DataHolding {
 	private static File miRNAFile;
 	private static File geneFile;
 	private RipImportInformation importInformation = new RipImportInformation();
+	private static boolean mipastActive = false;
 	
+	private static String miRNAUpCrit;
+	private static String geneUpCrit;
+	private static String miRNADownCrit;
+	private static String geneDownCrit;
+	
+	
+	public static String getMiRNAUpCrit() {
+		return miRNAUpCrit;
+	}
+	public static void setMiRNAUpCrit(String miRNAUpCrit) {
+		DataHolding.miRNAUpCrit = miRNAUpCrit;
+	}
+	public static String getGeneUpCrit() {
+		return geneUpCrit;
+	}
+	public static void setGeneUpCrit(String geneUpCrit) {
+		DataHolding.geneUpCrit = geneUpCrit;
+	}
+	public static String getMiRNADownCrit() {
+		return miRNADownCrit;
+	}
+	public static void setMiRNADownCrit(String miRNADownCrit) {
+		DataHolding.miRNADownCrit = miRNADownCrit;
+	}
+	public static String getGeneDownCrit() {
+		return geneDownCrit;
+	}
+	public static void setGeneDownCrit(String geneDownCrit) {
+		DataHolding.geneDownCrit = geneDownCrit;
+	}
+
+	public boolean isMipastActive() {
+		return mipastActive;
+	}
+	public static void setMipastActive(boolean mipastActive) {
+		DataHolding.mipastActive = mipastActive;
+	}
 	public RipImportInformation getImportInformation() {
 		return importInformation;
 	}

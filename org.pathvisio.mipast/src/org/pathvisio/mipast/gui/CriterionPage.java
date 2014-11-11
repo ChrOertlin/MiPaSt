@@ -11,6 +11,8 @@ import java.net.URI;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -26,6 +28,7 @@ import org.pathvisio.desktop.gex.GexManager;
 import org.pathvisio.desktop.util.TextFieldUtils;
 import org.pathvisio.desktop.visualization.Criterion;
 import org.pathvisio.gui.SwingEngine;
+import org.pathvisio.mipast.DataHolding;
 import org.pathvisio.statistics.StatisticsPlugin;
 import org.pathvisio.statistics.StatisticsPlugin.StatisticsDlg;
 
@@ -37,11 +40,9 @@ import com.nexes.wizard.WizardPanelDescriptor;
 public class CriterionPage extends WizardPanelDescriptor implements
 		ActionListener {
 
+	private ExpressionDialog ed = new ExpressionDialog();
 	private PvDesktop desktop;
 	private SwingEngine swingEngine;
-	
-
-
 
 	private Criterion myCriterion = new Criterion();
 	private List<String> sampleNames;
@@ -77,6 +78,10 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	private JButton geneDownButton;
 
 	private JButton infoBtn;
+	private JLabel lblError;
+
+	private JTextField setExpr;
+	private JButton exprOk;
 
 	public CriterionPage(PvDesktop desktop) {
 		super(IDENTIFIER);
@@ -127,7 +132,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		CellConstraints cc = new CellConstraints();
 		FormLayout layout = new FormLayout(
 				"pref,15dlu,pref,15dlu,pref,15dlu,pref,15dlu,pref,15dlu, pref, 15dlu, pref, default",
-				"pref,10dlu, pref,8dlu,pref,20dlu,pref,20dlu,pref,10dlu,pref,8dlu,pref,8dlu,pref");
+				"pref,10dlu, pref,8dlu,pref,20dlu,pref,20dlu,pref,10dlu,pref,8dlu,pref,8dlu,pref, 8dlu,pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 
 		builder.addSeparator("", cc.xyw(1, 2, 10));
@@ -179,7 +184,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 	public void aboutToDisplayPanel() {
 		getWizard().setPageTitle("Set Expression criteria");
-		
+
 	}
 
 	public Criterion getCriterion() {
@@ -187,7 +192,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	}
 
 	private void updateCriterion(JTextField txtExpr, List<String> sampleNames,
-			JLabel lblError) {
+			JLabel errorLbl) {
 		String error = myCriterion
 				.setExpression(txtExpr.getText(), sampleNames);
 		if (error != null) {
@@ -196,22 +201,23 @@ public class CriterionPage extends WizardPanelDescriptor implements
 			lblError.setText("OK");
 		}
 	}
-	
-	public  List<String> getSampleNames(){
+
+	public List<String> getSampleNames() {
 		GexManager gm = desktop.getGexManager();
 		try {
 			sampleNames = gm.getCurrentGex().getSampleNames();
-			} catch (DataException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
+		} catch (DataException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
 		return sampleNames;
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
+
 		String action = e.getActionCommand();
+
 		if (ACTION_INFO.equals(action)) {
 			try {
 				helpURL();
@@ -221,102 +227,19 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		}
 
 		else if (ACTION_MIRNA_UP.equals(action)) {
-			Frame exprFrame = desktop.getFrame();
-			FormLayout layout = new FormLayout (
-					"4dlu, min:grow, 4dlu, min:grow, 4dlu",
-					"4dlu, pref, 4dlu, pref, 4dlu, [50dlu,min]:grow, 4dlu, pref, 4dlu");
-			layout.setColumnGroups(new int[][]{{2,4}});
-			
-			JPanel critPanel = new JPanel(layout);
-			CellConstraints cc = new CellConstraints();
-			critPanel.add (new JLabel ("Expression: "), cc.xy(2,2));
-			sampleNames= getSampleNames();
-			miRNAUpExpr.getDocument().addDocumentListener(new DocumentListener()
-			{
-				public void changedUpdate(DocumentEvent e)
-				{
-					updateCriterion(miRNAUpExpr,sampleNames ,miRNALbl);
-				}
-
-				public void insertUpdate(DocumentEvent e)
-				{
-					updateCriterion(miRNAUpExpr,sampleNames ,miRNALbl);
-				}
-
-				public void removeUpdate(DocumentEvent e)
-				{
-					updateCriterion(miRNAUpExpr,sampleNames ,miRNALbl);
-				}
-			});
-
-			
-
-			final JList lstOperators = new JList(Criterion.TOKENS);
-			critPanel.add (new JScrollPane (lstOperators), cc.xy (2,6));
-
-			lstOperators.addMouseListener(new MouseAdapter()
-			{
-				public void mouseClicked(MouseEvent me)
-				{
-					int selectedIndex = lstOperators.getSelectedIndex();
-					if (selectedIndex >= 0)
-					{
-						String toInsert = Criterion.TOKENS[selectedIndex];
-						TextFieldUtils.insertAtCursorWithSpace(miRNAUpExpr, toInsert);
-					}
-					// after clicking on the list, move focus back to text field so
-					// user can continue typing
-					miRNAUpExpr.requestFocusInWindow();
-					// on Mac L&F, requesting focus leads to selecting the whole field
-					// move caret a bit to work around. Last char is a space anyway.
-					miRNAUpExpr.setCaretPosition(miRNAUpExpr.getDocument().getLength() - 1);
-				}
-			} );
-
-			final JList lstSamples = new JList(sampleNames.toArray());
-
-			lstSamples.addMouseListener(new MouseAdapter()
-			{
-				public void mouseClicked(MouseEvent me)
-				{
-					int selectedIndex = lstSamples.getSelectedIndex();
-					if (selectedIndex >= 0)
-					{
-						String toInsert = "[" + sampleNames.get(selectedIndex) + "]";
-						TextFieldUtils.insertAtCursorWithSpace(miRNAUpExpr, toInsert);
-					}
-					// after clicking on the list, move focus back to text field so
-					// user can continue typing
-					miRNAUpExpr.requestFocusInWindow();
-					// on Mac L&F, requesting focus leads to selecting the whole field
-					// move caret a bit to work around. Last char is a space anyway.
-					miRNAUpExpr.setCaretPosition(miRNAUpExpr.getDocument().getLength() - 1);
-				}
-			} );
-
-			critPanel.add (new JScrollPane (lstSamples), cc.xy (4,6));
-			
-			
-			miRNAUpExpr.requestFocus();
-			
-			exprFrame.add(critPanel);
-			exprFrame.pack();
-			exprFrame.setVisible(true);
-			exprFrame.setSize(300,300);
-			
+			ed.ExpressionDialog(miRNAUpExpr);
 		}
-	
 
 		else if (ACTION_GENE_UP.equals(action)) {
-
+			ed.ExpressionDialog(geneUpExpr);
 		}
 
 		else if (ACTION_MIRNA_DOWN.equals(action)) {
-
+			ed.ExpressionDialog(miRNADownExpr);
 		}
 
 		else if (ACTION_GENE_DOWN.equals(action)) {
-
+			ed.ExpressionDialog(geneDownExpr);
 		}
 
 	}
@@ -326,4 +249,139 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		helpBrowse.browse(new URI("https://www.google.com"));
 	}
 
+	private class ExpressionDialog implements ActionListener {
+		final static String ACTION_OK = "expressionOk";
+		private JTextField expressionTextField;
+		JDialog exprFrame;
+		
+		
+		public void ExpressionDialog(JTextField expressionTextField) {
+			this.expressionTextField = expressionTextField;
+			exprFrame = new JDialog(desktop.getFrame(), true);
+			exprFrame.setTitle("Expression");
+			setExpr = new JTextField(40);
+			lblError = new JLabel();
+			exprOk = new JButton("Ok");
+
+			FormLayout layout = new FormLayout(
+					"4dlu, min:grow, 4dlu, min:grow, 4dlu",
+					"4dlu,pref,4dlu, pref, 4dlu, pref, 4dlu, [50dlu,min]:grow, 4dlu, pref, 4dlu,pref, 8dlu,pref,8dlu ");
+			layout.setColumnGroups(new int[][] { { 2, 4 } });
+
+			JPanel critPanel = new JPanel(layout);
+			CellConstraints cc = new CellConstraints();
+			critPanel.add(new JLabel("Expression"), cc.xy(2, 2));
+			critPanel.add(setExpr, cc.xy(2, 4));
+			critPanel.add(lblError, cc.xy(2, 12));
+			critPanel.add(exprOk, cc.xy(2,14 ));
+			sampleNames = getSampleNames();
+
+			setExpr.getDocument().addDocumentListener(new DocumentListener() {
+				public void changedUpdate(DocumentEvent e) {
+					updateCriterion(setExpr, sampleNames, lblError);
+				}
+
+				public void insertUpdate(DocumentEvent e) {
+					updateCriterion(setExpr, sampleNames, lblError);
+				}
+
+				public void removeUpdate(DocumentEvent e) {
+					updateCriterion(setExpr, sampleNames, lblError);
+				}
+			});
+
+			final JList lstOperators = new JList(Criterion.TOKENS);
+			critPanel.add(new JScrollPane(lstOperators), cc.xy(2, 6));
+
+			lstOperators.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent me) {
+					int selectedIndex = lstOperators.getSelectedIndex();
+					if (selectedIndex >= 0) {
+						String toInsert = Criterion.TOKENS[selectedIndex];
+						TextFieldUtils.insertAtCursorWithSpace(setExpr,
+								toInsert);
+					}
+					// after clicking on the list, move focus back to text field
+					// so
+					// user can continue typing
+					setExpr.requestFocusInWindow();
+					// on Mac L&F, requesting focus leads to selecting the whole
+					// field
+					// move caret a bit to work around. Last char is a space
+					// anyway.
+					setExpr.setCaretPosition(setExpr.getDocument().getLength() - 1);
+				}
+			});
+
+			final JList lstSamples = new JList(sampleNames.toArray());
+
+			lstSamples.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent me) {
+					int selectedIndex = lstSamples.getSelectedIndex();
+					if (selectedIndex >= 0) {
+						String toInsert = "[" + sampleNames.get(selectedIndex)
+								+ "]";
+						TextFieldUtils.insertAtCursorWithSpace(setExpr,
+								toInsert);
+					}
+					// after clicking on the list, move focus back to text field
+					// so
+					// user can continue typing
+					setExpr.requestFocusInWindow();
+					// on Mac L&F, requesting focus leads to selecting the whole
+					// field
+					// move caret a bit to work around. Last char is a space
+					// anyway.
+					setExpr.setCaretPosition(setExpr.getDocument().getLength() - 1);
+				}
+			});
+
+			critPanel.add(new JScrollPane(lstSamples), cc.xy(4, 6));
+
+			setExpr.requestFocus();
+
+			exprOk.addActionListener(this);
+			exprOk.setActionCommand(ACTION_OK);
+
+			exprFrame.add(critPanel);
+			exprFrame.pack();
+			exprFrame.getComponentListeners();
+			exprFrame.setSize(500, 500);
+			exprFrame.requestFocus();
+			exprFrame.setVisible(true);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String action = e.getActionCommand();
+
+			if (ACTION_OK.equals(action)) {
+				expressionTextField.setText(getExpression());
+				
+				if(expressionTextField.equals(miRNAUpExpr)){
+					DataHolding.setMiRNAUpCrit(expressionTextField.getText());
+				}
+				if(expressionTextField.equals(geneUpExpr)){
+					DataHolding.setGeneUpCrit(expressionTextField.getText());
+				}
+				if(expressionTextField.equals(miRNAUpExpr)){
+					DataHolding.setMiRNADownCrit(expressionTextField.getText());
+				}
+				if(expressionTextField.equals(miRNAUpExpr)){
+					DataHolding.setGeneDownCrit(expressionTextField.getText());
+				}
+				
+				
+				
+				
+				exprFrame.dispose();
+			}
+
+		}
+
+		public String getExpression() {
+			return setExpr.getText();
+		}
+
+	}
 }

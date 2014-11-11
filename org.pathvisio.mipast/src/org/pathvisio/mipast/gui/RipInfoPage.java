@@ -18,11 +18,10 @@ class RipInfoPage extends WizardPanelDescriptor {
 
 	public RipInfoPage() {
 		super(IDENTIFIER);
-
 	}
 
 	public Object getNextPanelDescriptor() {
-		return CriterionPage.IDENTIFIER;
+		return RipFileLoaderPage.IDENTIFIER;
 	}
 
 	public Object getBackPanelDescriptor() {

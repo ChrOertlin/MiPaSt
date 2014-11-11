@@ -1,32 +1,34 @@
 package org.pathvisio.mipast.gui;
 
+
+
 import java.awt.Component;
 
 import javax.swing.JLabel;
 
-import org.pathvisio.mipast.DataHolding;
 import org.pathvisio.rip.dialog.FilePage;
+import org.pathvisio.rip.dialog.ImportPage;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.nexes.wizard.WizardPanelDescriptor;
 
-class StartInfoPage extends WizardPanelDescriptor {
+class StatInfoPage extends WizardPanelDescriptor {
 	
-	static final String IDENTIFIER = "START_INFO_PAGE";
+	static final String IDENTIFIER = "STAT_INFO_PAGE";
 
-	public StartInfoPage() {
+	public StatInfoPage() {
 		super(IDENTIFIER);
 
 	}
 
 	public Object getNextPanelDescriptor() {
-		return FileLoaderPage.IDENTIFIER;
+		return CriterionPage.IDENTIFIER;
 	}
 
 	public Object getBackPanelDescriptor() {
-		return null;
+		return ImportPage.IDENTIFIER;
 	}
 
 	@Override
@@ -37,10 +39,10 @@ class StartInfoPage extends WizardPanelDescriptor {
 		PanelBuilder builder = new PanelBuilder(layout);
 		CellConstraints cc = new CellConstraints();
 
-		JLabel ripInfo = new JLabel(
-				"Step 1: Load interaction miRNA and Transcriptomics file(s); press next for the import wizard");
+		JLabel statInfo = new JLabel(
+				"Step 3: Set expression criteria and perform statistics");
 		builder.addSeparator("", cc.xyw(1, 1, 2));
-		builder.add(ripInfo, cc.xy(1, 3));
+		builder.add(statInfo, cc.xy(1, 3));
 		builder.addSeparator("", cc.xyw(1, 5, 2));
 		return builder.getPanel();
 
@@ -50,9 +52,9 @@ class StartInfoPage extends WizardPanelDescriptor {
 		getWizard().setNextFinishButtonEnabled(true);
 		getWizard().setBackButtonEnabled(true);
 
-		getWizard().setPageTitle("MiPaSt plugin");
-		DataHolding.setMipastActive(true);
+		getWizard().setPageTitle("Expression criteria and statistics");
 
 	}
 
 }
+
