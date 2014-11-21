@@ -1,3 +1,17 @@
+//Copyright 2014 BiGCaT
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
 package org.pathvisio.mipast.gui;
 
 import java.awt.Component;
@@ -26,6 +40,16 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.nexes.wizard.WizardPanelDescriptor;
+
+/**
+ * 
+ * The RipFileLoaderPage is used to load the interaction files for the regulatory interaction plugin.
+ * The import can handle multiple files at once. Furthermore, this page links to the ColumnPage
+ * of the regulatory interaction plugin, linking both the regulatory interaction plugin and the mipast plugin together.
+ * 
+ * @author ChrOertlin
+ *
+ */
 
 public class RipFileLoaderPage extends WizardPanelDescriptor implements
 		ActionListener {
@@ -171,7 +195,7 @@ public class RipFileLoaderPage extends WizardPanelDescriptor implements
 	    
 
 	    public Object getNextPanelDescriptor() {
-	        return ColumnPage.IDENTIFIER;
+	        return RipColumnPage.IDENTIFIER;
 	    }
 
 	    public Object getBackPanelDescriptor()

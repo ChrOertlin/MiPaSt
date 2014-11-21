@@ -1,7 +1,22 @@
+//Copyright 2014 BiGCaT
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
 package org.pathvisio.mipast;
 
 import java.io.File;
+import java.util.Set;
 
+import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.gexplugin.ImportInformation;
 import org.pathvisio.mipast.util.RipImportInformation;
 
@@ -14,6 +29,14 @@ import org.pathvisio.mipast.util.RipImportInformation;
  */
 
 public class DataHolding {
+	
+	private PvDesktop desktop;
+	
+	public DataHolding(PvDesktop desktop){
+		this.desktop=desktop;
+	}
+	
+	
 	private static ImportInformation miRNAImportInformation = new ImportInformation();
 	private static ImportInformation geneImportInformation = new ImportInformation();
 	private static ImportInformation combinedImportInformation = new ImportInformation();
@@ -27,7 +50,53 @@ public class DataHolding {
 	private static String miRNADownCrit;
 	private static String geneDownCrit;
 	
+	private static Set<String> miRNAUpList;
+	private static Set<String> geneUpList;
+	private static Set<String> miRNADownList;
+	private static Set<String> geneDownList;
 	
+	public static Set<String> positiveGeneList;
+	
+	public static Set<String> allGenesList;
+	
+	
+	
+	public static Set<String> getAllGenesList() {
+		return allGenesList;
+	}
+	public static void setAllGenesList(Set<String> allGenesList) {
+		DataHolding.allGenesList = allGenesList;
+	}
+	public static Set<String> getPositiveGeneList() {
+		return positiveGeneList;
+	}
+	public static void setPositiveGeneList(Set<String> positiveGeneList) {
+		DataHolding.positiveGeneList = positiveGeneList;
+	}
+	public static Set<String> getMiRNAUpList() {
+		return miRNAUpList;
+	}
+	public static void setMiRNAUpList(Set<String> miRNAUpList) {
+		DataHolding.miRNAUpList = miRNAUpList;
+	}
+	public static Set<String> getGeneUpList() {
+		return geneUpList;
+	}
+	public static void setGeneUpList(Set<String> geneUpList) {
+		DataHolding.geneUpList = geneUpList;
+	}
+	public static Set<String> getMiRNADownList() {
+		return miRNADownList;
+	}
+	public static void setMiRNADownList(Set<String> miRNADownList) {
+		DataHolding.miRNADownList = miRNADownList;
+	}
+	public static Set<String> getGeneDownList() {
+		return geneDownList;
+	}
+	public static void setGeneDownList(Set<String> geneDownList) {
+		DataHolding.geneDownList = geneDownList;
+	}
 	public static String getMiRNAUpCrit() {
 		return miRNAUpCrit;
 	}

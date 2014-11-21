@@ -34,6 +34,9 @@ import org.pathvisio.mipast.MiPaStFileReader;
 
 /**
  * 
+ * The FilerMerger class combines two data expression files into one combined file that can 
+ * be further handled by PathVisio.
+ * 
  * @author ChrOertlin
  * 
  */

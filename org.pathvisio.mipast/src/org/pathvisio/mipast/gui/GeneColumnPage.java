@@ -1,3 +1,17 @@
+//Copyright 2014 BiGCaT
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
 package org.pathvisio.mipast.gui;
 
 import java.awt.Component;
@@ -28,6 +42,16 @@ import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.nexes.wizard.WizardPanelDescriptor;
+
+/**
+ * 
+ * The GeneColumnPage is used to specify the database source of the imported gene expression data. 
+ * However if the user has a column containing the systemcode, this column can be specified to retrieve
+ * the database information from that column.
+ * 
+ * @author ChrOertlin
+ *
+ */
 
 class GeneColumnPage extends WizardPanelDescriptor {
 	public static final String IDENTIFIER = "gene_COLUMN_PAGE";
@@ -136,7 +160,6 @@ class GeneColumnPage extends WizardPanelDescriptor {
 			public void actionPerformed(ActionEvent ae) {
 				DataHolding.getGeneImportInformation().setSysodeColumn(cbSyscodeCol
 						.getSelectedIndex());
-				System.out.println(DataHolding.getGeneImportInformation().getSyscodeColumn());
 				columnPageRefresh();
 			}
 		});

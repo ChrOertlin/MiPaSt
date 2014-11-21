@@ -1,5 +1,17 @@
 package org.pathvisio.mipast.gui;
-
+//Copyright 2014 BiGCaT
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,13 +28,22 @@ import org.bridgedb.gui.SimpleFileFilter;
 import org.pathvisio.core.preferences.GlobalPreference;
 import org.pathvisio.core.preferences.PreferenceManager;
 import org.pathvisio.desktop.PvDesktop;
-import org.pathvisio.gexplugin.ImportInformation;
 import org.pathvisio.mipast.DataHolding;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.nexes.wizard.WizardPanelDescriptor;
+
+/**
+ * 
+ * The FileLoaderPage let's the user load the miRNA and Gene expression data files that will be used
+ * for the analysis in this plugin further on.
+ * 
+ * @author ChrOertlin
+ *
+ */
+
 
 class FileLoaderPage extends WizardPanelDescriptor implements ActionListener {
 

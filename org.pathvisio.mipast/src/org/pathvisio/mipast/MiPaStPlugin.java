@@ -67,7 +67,6 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 		desktop.registerSubMenu("Plugins", menu);
 	}
 
-	
 	/**
 	 * creates MiPaSt Menu that is added in the PathVisio 'Plugins' menu
 	 */
@@ -106,7 +105,6 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 		return null;
 	}
 
-	
 	/**
 	 * Opens URL to help page of the plugin
 	 */

@@ -1,21 +1,35 @@
+//Copyright 2014 BiGCaT
+//
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
 package org.pathvisio.mipast.gui;
 
 import java.awt.Component;
 import java.awt.Desktop;
-import java.awt.Frame;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
+
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
+
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -29,13 +43,21 @@ import org.pathvisio.desktop.util.TextFieldUtils;
 import org.pathvisio.desktop.visualization.Criterion;
 import org.pathvisio.gui.SwingEngine;
 import org.pathvisio.mipast.DataHolding;
-import org.pathvisio.statistics.StatisticsPlugin;
-import org.pathvisio.statistics.StatisticsPlugin.StatisticsDlg;
+import org.pathvisio.mipast.io.PositiveGeneList;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.nexes.wizard.WizardPanelDescriptor;
+
+/**
+ * 
+ * The CriterionPage is used for the input of criteria that specify the up and/or downregulation of either
+ * or both the genes and miRNA. 
+ * 
+ * @author ChrOertlin
+ *
+ */
 
 public class CriterionPage extends WizardPanelDescriptor implements
 		ActionListener {
@@ -43,6 +65,8 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	private ExpressionDialog ed = new ExpressionDialog();
 	private PvDesktop desktop;
 	private SwingEngine swingEngine;
+
+	private boolean geneDataAvailable;
 
 	private Criterion myCriterion = new Criterion();
 	private List<String> sampleNames;
@@ -83,19 +107,20 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	private JTextField setExpr;
 	private JButton exprOk;
 
-	public CriterionPage(PvDesktop desktop) {
+	public CriterionPage(PvDesktop desktop, SwingEngine se) {
 		super(IDENTIFIER);
 		this.desktop = desktop;
+		this.swingEngine = se;
 	}
 
 	public Object getNextPanelDescriptor() {
 
-		return null;
+		return StatisticsPage.IDENTIFIER;
 	}
 
 	public Object getBackPanelDescriptor() {
 
-		return null;
+		return StatInfoPage.IDENTIFIER;
 
 	}
 
@@ -253,8 +278,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		final static String ACTION_OK = "expressionOk";
 		private JTextField expressionTextField;
 		JDialog exprFrame;
-		
-		
+
 		public void ExpressionDialog(JTextField expressionTextField) {
 			this.expressionTextField = expressionTextField;
 			exprFrame = new JDialog(desktop.getFrame(), true);
@@ -273,7 +297,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 			critPanel.add(new JLabel("Expression"), cc.xy(2, 2));
 			critPanel.add(setExpr, cc.xy(2, 4));
 			critPanel.add(lblError, cc.xy(2, 12));
-			critPanel.add(exprOk, cc.xy(2,14 ));
+			critPanel.add(exprOk, cc.xy(2, 14));
 			sampleNames = getSampleNames();
 
 			setExpr.getDocument().addDocumentListener(new DocumentListener() {
@@ -357,23 +381,20 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 			if (ACTION_OK.equals(action)) {
 				expressionTextField.setText(getExpression());
-				
-				if(expressionTextField.equals(miRNAUpExpr)){
+
+				if (expressionTextField.equals(miRNAUpExpr)) {
 					DataHolding.setMiRNAUpCrit(expressionTextField.getText());
 				}
-				if(expressionTextField.equals(geneUpExpr)){
+				if (expressionTextField.equals(geneUpExpr)) {
 					DataHolding.setGeneUpCrit(expressionTextField.getText());
 				}
-				if(expressionTextField.equals(miRNAUpExpr)){
+				if (expressionTextField.equals(miRNAUpExpr)) {
 					DataHolding.setMiRNADownCrit(expressionTextField.getText());
 				}
-				if(expressionTextField.equals(miRNAUpExpr)){
+				if (expressionTextField.equals(miRNAUpExpr)) {
 					DataHolding.setGeneDownCrit(expressionTextField.getText());
 				}
-				
-				
-				
-				
+
 				exprFrame.dispose();
 			}
 
@@ -384,4 +405,18 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		}
 
 	}
+
+	public void aboutToHidePanel() {
+		PositiveGeneList posLists = new PositiveGeneList(desktop, swingEngine);
+		posLists.retrieveCriteria();
+		try {
+			posLists.createXrefs();
+		} catch (IOException e) {
+			System.out.print("Error in PositiveGeneList.java");
+			e.printStackTrace();
+		}
+		posLists.retrieveFinalList();
+
+	}
+
 }
