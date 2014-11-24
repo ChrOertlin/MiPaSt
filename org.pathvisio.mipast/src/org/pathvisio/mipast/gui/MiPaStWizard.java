@@ -38,7 +38,7 @@ import com.nexes.wizard.Wizard;
 public class MiPaStWizard extends Wizard {
 
 	// Needed objects
-	private final PvDesktop standaloneEngine;
+	private final PvDesktop desktop;
 	private RegIntPlugin plugin;
 	private SwingEngine se;
 
@@ -61,10 +61,11 @@ public class MiPaStWizard extends Wizard {
 	StatisticsPage sp;
 
 	public MiPaStWizard(PvDesktop desktop, RegIntPlugin plugin) {
-		this.standaloneEngine = desktop;
+		this.desktop = desktop;
 		this.plugin = plugin;
 
-		DataHolding fm = new DataHolding(desktop);
+		
+		
 		
 		// MiPaSt wizard pages
 		sip = new StartInfoPage();
@@ -75,7 +76,7 @@ public class MiPaStWizard extends Wizard {
 		gcp = new GeneColumnPage();
 		fmp = new FileMergePage(desktop);
 		rip = new RipInfoPage();
-		scp = new CriterionPage(desktop, se);
+		scp = new CriterionPage(desktop, se,plugin);
 		sp = new StatisticsPage(desktop);
 		sti = new StatInfoPage();
 		// Regulatory interaction plugin wizard pages

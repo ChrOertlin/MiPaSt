@@ -16,29 +16,28 @@ package org.pathvisio.mipast.io;
 
 import java.io.BufferedReader;
 import java.io.File;
-
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.bridgedb.DataSource;
 import org.bridgedb.Xref;
 import org.pathvisio.core.preferences.GlobalPreference;
 import org.pathvisio.core.preferences.PreferenceManager;
 import org.pathvisio.core.util.ProgressKeeper;
-
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.visualization.Criterion;
 import org.pathvisio.gexplugin.ImportInformation;
 import org.pathvisio.gui.SwingEngine;
 import org.pathvisio.mipast.DataHolding;
+import org.pathvisio.mipast.util.MiPastZScoreCalculator;
+import org.pathvisio.mipast.util.MiPastZScoreCalculator.RefInfo;
 import org.pathvisio.mipast.util.WriteFiles;
 import org.pathvisio.rip.Interaction;
 import org.pathvisio.rip.RegIntPlugin;
-import org.pathvisio.statistics.ZScoreCalculator;
-import org.pathvisio.statistics.ZScoreCalculator.RefInfo;
+
+
 
 /**
  * This class initiates the ZScorecalculator to create the XrefInfo for all the
@@ -55,27 +54,32 @@ import org.pathvisio.statistics.ZScoreCalculator.RefInfo;
  * be used in the statistics later on.
  */
 public class PositiveGeneList {
-	
+
 	private PvDesktop desktop;
 	private SwingEngine se;
-	
-	public PositiveGeneList(PvDesktop desktop, SwingEngine se){
-		this.desktop= desktop;
+	private RegIntPlugin plugin;
+
+	public PositiveGeneList(PvDesktop desktop, SwingEngine se, RegIntPlugin plugin) {
+		this.desktop = desktop;
 		this.se = se;
+		this.plugin = plugin;
+
 	}
 
 	
-	private RegIntPlugin plugin = new RegIntPlugin();
-	private static Criterion miRNAUpCrit;
-	private static Criterion geneUpCrit;
-	private static Criterion miRNADownCrit;
-	private static Criterion geneDownCrit;
+	private static Criterion miRNAUpCrit = new Criterion();;
+	private static Criterion geneUpCrit = new Criterion();
+	private static Criterion miRNADownCrit = new Criterion();
+	private static Criterion geneDownCrit= new Criterion();
 	private ImportInformation importInformation;
 	private ProgressKeeper pk;
-	
+
 	private Map<Xref, List<Interaction>> interactions;
 	private File pwDir;
 
+
+	
+	
 	private Xref miRNAup;
 	private Xref miRNADown;
 	private Xref geneUp;
@@ -118,29 +122,20 @@ public class PositiveGeneList {
 
 	private WriteFiles wf = new WriteFiles();
 
-	private ZScoreCalculator zcMiU = new ZScoreCalculator(miRNAUpCrit, pwDir,
-			desktop.getGexManager().getCachedData(), 
-			desktop.getSwingEngine()
-			.getGdbManager().getCurrentGdb(), pk);
+	public void retrieveCriteria(Criterion crit, String string) {
 
-	private ZScoreCalculator zcGu = new ZScoreCalculator(miRNAUpCrit, pwDir,
-			desktop.getGexManager().getCachedData(), desktop.getSwingEngine()
-			.getGdbManager().getCurrentGdb(), pk);
+		if (string != ""){
+		crit.setExpression(string);}
+		
+		else{
+			
+		}
+		
 
-	private ZScoreCalculator zcMiD = new ZScoreCalculator(miRNAUpCrit, pwDir,
-			desktop.getGexManager().getCachedData(), desktop.getSwingEngine()
-			.getGdbManager().getCurrentGdb(), pk);
-	private ZScoreCalculator zcGd = new ZScoreCalculator(miRNAUpCrit, pwDir,
-			desktop.getGexManager().getCachedData(), desktop.getSwingEngine()
-			.getGdbManager().getCurrentGdb(), pk);
-
-	public void retrieveCriteria() {
-
-		miRNAUpCrit.setExpression(DataHolding.getMiRNAUpCrit());
-		geneUpCrit.setExpression(DataHolding.getGeneUpCrit());
-		miRNADownCrit.setExpression(DataHolding.getMiRNADownCrit());
-		geneDownCrit.setExpression(DataHolding.getGeneDownCrit());
-		interactions = plugin.getInteractions();
+	
+		
+		
+		
 	}
 
 	/**
@@ -154,41 +149,62 @@ public class PositiveGeneList {
 	 * 
 	 * @throws IOException
 	 */
-	public void createXrefs() throws IOException {
+	public void createXrefs(MiPastZScoreCalculator zcMiU,
+			MiPastZScoreCalculator zcGu, MiPastZScoreCalculator zcMiD,
+			MiPastZScoreCalculator zcGd) throws IOException {
+		
+		
+		
+		interactions = plugin.getInteractions();
+		importInformation = DataHolding.getCombinedImportInformation();
 
-		importInformation = DataHolding.getGeneImportInformation();
-
+		System.out.print(importInformation.getTxtFile());
+		
+		
 		BufferedReader in = new BufferedReader(new FileReader(
 				importInformation.getTxtFile()));
 		String line = new String();
-		for (int i = 0; i < importInformation.getFirstDataRow(); i++) {
+		for (int i = 0; i < importInformation.getDataRowsImported(); i++) {
 			in.readLine();
-		}
+		
 		while ((line = in.readLine()) != null) {
 			String[] str = line.split(importInformation.getDelimiter());
-			for (int i = 0; i < importInformation.getColNames().length; i++) {
-				if (str[i].contains("miRNA")) {
-
+			
+			for (int j = 0; j < importInformation.getDataRowsImported(); j++) {
+				System.out.print("last elem: " +str[importInformation.getColNames().length-1]+"\n");
+				
+				
+				if (str[importInformation.getColNames().length-1].contains("miRNA")) {
+					//System.out.print("String[i]: " + str[i] + "Xref miRNA" +"\n");
 					DataSource dsMiRNA = DataHolding
 							.getMiRNAImportInformation().getDataSource();
 					String miRNAString = str[0];
 					miRNAup = new Xref(miRNAString, dsMiRNA);
 					miRNADown = new Xref(miRNAString, dsMiRNA);
 
-				} else {
-
+				} if (str[importInformation.getColNames().length-1].contains("gene")){
+					//System.out.print("String[i]: " + str[i] + "Xref gene" + "\n");
 					DataSource dsGene = DataHolding.getGeneImportInformation()
 							.getDataSource();
 					String geneString = str[0];
 					geneUp = new Xref(geneString, dsGene);
 					geneDown = new Xref(geneString, dsGene);
 				}
+				else{
+					//System.out.print("String[i]: " + str[i] + "\n");
+				}
 			}
-			RefInfo miRNAUpRef = zcMiU.evaluateRef(miRNAup);
-			RefInfo geneUpRef = zcGu.evaluateRef(geneUp);
-			RefInfo miRNADownRef = zcMiD.evaluateRef(miRNADown);
-			RefInfo geneDownRef = zcGd.evaluateRef(geneDown);
+			
+			if(miRNAUpRef != null){
+			miRNAUpRef = new RefInfo(zcMiU.evaluateRef(miRNAup).getProbesMeasured(),zcMiU.evaluateRef(miRNAup).getProbesPositive());}
+			if(geneUpRef != null){
+			geneUpRef = new RefInfo(zcGu.evaluateRef(geneUp).getProbesMeasured() ,zcMiU.evaluateRef(geneUp).getProbesPositive());}
+			if(miRNADownRef != null){
+			miRNADownRef = new RefInfo(zcGu.evaluateRef(miRNADown).getProbesMeasured() ,zcMiU.evaluateRef(miRNADown).getProbesPositive());}
+			if(geneDownRef != null){
+			geneDownRef = new RefInfo(zcGu.evaluateRef(geneDown).getProbesMeasured() ,zcMiU.evaluateRef(geneDown).getProbesPositive());}
 
+		}
 		}
 		for (int i = 0; i < miRNAUpRef.getProbesPositive().size(); i++) {
 			if (interactions.containsKey(miRNAUpRef.getProbesPositive()

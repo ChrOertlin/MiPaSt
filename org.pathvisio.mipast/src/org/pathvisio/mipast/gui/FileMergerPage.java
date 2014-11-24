@@ -155,8 +155,8 @@ class FileMergePage extends WizardPanelDescriptor implements ProgressListener {
 									+ "No shared headers found, no shared visualization possible! \n");
 
 						}
-						standaloneEngine.getGexManager().setCurrentGex(
-								fm.getCombinedFile().getName(), true);
+//						standaloneEngine.getGexManager().setCurrentGex(
+//								fm.getCombinedFile().getName(), true);
 						DataHolding.getCombinedImportInformation().setGexName(
 								DataHolding.getCombinedImportInformation()
 										.getTxtFile().getAbsolutePath());
@@ -170,6 +170,7 @@ class FileMergePage extends WizardPanelDescriptor implements ProgressListener {
 								standaloneEngine.getSwingEngine()
 										.getGdbManager().getCurrentGdb(),
 								standaloneEngine.getGexManager());
+				
 
 					} catch (Exception e) {
 						Logger.log.error("During import", e);
@@ -187,8 +188,8 @@ class FileMergePage extends WizardPanelDescriptor implements ProgressListener {
 
 					try {
 
-						standaloneEngine.getGexManager().setCurrentGex(
-								DataHolding.getMiRNAFile().getName(), true);
+//						standaloneEngine.getGexManager().setCurrentGex(
+//								DataHolding.getMiRNAFile().getName(), true);
 						pk.setTaskName("Importing expression dataset file(s)");
 						DataHolding.getMiRNAImportInformation().setGexName(
 								DataHolding.getMiRNAImportInformation()
@@ -198,7 +199,7 @@ class FileMergePage extends WizardPanelDescriptor implements ProgressListener {
 								standaloneEngine.getSwingEngine()
 										.getGdbManager().getCurrentGdb(),
 								standaloneEngine.getGexManager());
-						System.out.print("tried");
+						
 
 					} catch (Exception e) {
 						Logger.log.error("During import", e);

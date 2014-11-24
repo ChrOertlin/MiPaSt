@@ -250,7 +250,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 
 		ZScoreWorker(File pwDir, IDMapper gdb, ProgressKeeper pk) {
 			this.pk = pk;
-			calculator = new MiPastZScoreCalculator(pwDir, gdb, pk);
+			calculator = new MiPastZScoreCalculator(null, pwDir, null, gdb, pk, null);
 			temp = new StatisticsTableModel();
 			temp.setColumns(new Column[] { Column.PATHWAY_NAME, Column.R,
 					Column.N, Column.TOTAL, Column.PCT, Column.ZSCORE,

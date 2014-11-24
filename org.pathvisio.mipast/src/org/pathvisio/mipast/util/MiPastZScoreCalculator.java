@@ -1,22 +1,5 @@
 package org.pathvisio.mipast.util;
 
-// PathVisio,
-// a tool for data visualization and analysis using Biological Pathways
-// Copyright 2006-2011 BiGCaT Bioinformatics
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,13 +20,31 @@ import org.pathvisio.data.IRow;
 import org.pathvisio.desktop.gex.CachedData;
 import org.pathvisio.desktop.visualization.Criterion;
 import org.pathvisio.desktop.visualization.Criterion.CriterionException;
-import org.pathvisio.mipast.DataHolding;
 import org.pathvisio.statistics.Column;
 import org.pathvisio.statistics.PathwayMap;
-import org.pathvisio.statistics.PathwayMap.PathwayInfo;
 import org.pathvisio.statistics.StatisticsPathwayResult;
 import org.pathvisio.statistics.StatisticsResult;
 import org.pathvisio.statistics.StatisticsTableModel;
+import org.pathvisio.statistics.PathwayMap.PathwayInfo;
+
+
+
+// PathVisio,
+// a tool for data visualization and analysis using Biological Pathways
+// Copyright 2006-2011 BiGCaT Bioinformatics
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 
 /**
  * Calculates statistics on a set of Pathways, either step by step with
@@ -58,23 +59,27 @@ public class MiPastZScoreCalculator {
 	private RefInfo refInfo;
 	
 	
-	public MiPastZScoreCalculator(File pwDir,
-			IDMapper gdb, ProgressKeeper pk) {
+	public MiPastZScoreCalculator(Criterion crit, File pwDir, CachedData gex,
+			IDMapper gdb, ProgressKeeper pk, RefInfo refInfo) {
 		if (pk != null) {
 			pk.setProgress(0);
 			pk.setTaskName("Analyzing data");
-		} 
+		}
 
 		result = new StatisticsResult();
-		
+		result.crit = crit;
 		result.stm = new StatisticsTableModel();
 		result.stm.setColumns(new Column[] { Column.PATHWAY_NAME, Column.R,
 				Column.N, Column.TOTAL, Column.PCT, Column.ZSCORE,
 				Column.PERMPVAL });
 		result.pwDir = pwDir;
-	
+		result.gex = gex;
 		result.gdb = gdb;
 		this.pk = pk;
+		this.refInfo= refInfo;
+		
+		
+		
 	}
 
 	/**
@@ -113,7 +118,7 @@ public class MiPastZScoreCalculator {
 	 * each measured probe can be positive or not.
 	 */
 	public static class RefInfo {
-		Set<String> probesMeasured;
+		final Set<String> probesMeasured;
 		final Set<String> probesPositive;
 
 		/**
@@ -124,7 +129,7 @@ public class MiPastZScoreCalculator {
 		 * @param aProbesPostive
 		 *            must be >= 0, and <= aProbesMeasured.
 		 */
-		RefInfo(Set<String> aProbesMeasured, Set<String> aProbesPositive) {
+		public RefInfo(Set<String> aProbesMeasured, Set<String> aProbesPositive) {
 			probesMeasured = aProbesMeasured;
 			probesPositive = aProbesPositive;
 			if (probesPositive.size() > probesMeasured.size())
@@ -137,20 +142,12 @@ public class MiPastZScoreCalculator {
 		public Set<String> getProbesMeasured() {
 			return probesMeasured;
 		}
-		
-		public Set<String> setProbesMeasured(Set<String> probes){
-			return this.probesMeasured = probes;
-		}
 
 		/**
 		 * Get the positive probes
 		 */
 		public Set<String> getProbesPositive() {
 			return probesPositive;
-		}
-		
-		public Set<String> setProbesPositive(Set<String> positive){
-			return this.probesMeasured = positive;
 		}
 
 		/**
@@ -187,37 +184,37 @@ public class MiPastZScoreCalculator {
 		}
 	}
 
-//	/**
-//	 * Checks if the given ref evaluates positive for the criterion
-//	 * 
-//	 * Assumes that ref has already been cached earlier in a call to
-//	 * result.gex.cacheData(...)
-//	 */
-//	public RefInfo evaluateRef(Xref srcRef) {
-//		Set<String> cGeneTotal = new HashSet<String>();
-//		Set<String> cGenePositive = new HashSet<String>();
-//
-//		List<? extends IRow> rows = result.gex.getData(srcRef);
-//
-//		if (rows != null) {
-//			for (IRow row : rows) {
-//				if (pk != null && pk.isCancelled())
-//					return null;
-//				// Use group (line number) to identify a measurement
-//				cGeneTotal.add(row.getGroup() + "");
-//				try {
-//					boolean eval = result.crit.evaluate(row.getByName());
-//					if (eval)
-//						cGenePositive.add(row.getGroup() + "");
-//				} catch (CriterionException e) {
-//					Logger.log.error("Unknown error during statistics", e);
-//				}
-//			}
-//
-//		}
-//
-//		return new RefInfo(cGeneTotal, cGenePositive);
-//	}
+	/**
+	 * Checks if the given ref evaluates positive for the criterion
+	 * 
+	 * Assumes that ref has already been cached earlier in a call to
+	 * result.gex.cacheData(...)
+	 */
+	public RefInfo evaluateRef(Xref srcRef) {
+		Set<String> cGeneTotal = new HashSet<String>();
+		Set<String> cGenePositive = new HashSet<String>();
+
+		List<? extends IRow> rows = result.gex.getData(srcRef);
+
+		if (rows != null) {
+			for (IRow row : rows) {
+				if (pk != null && pk.isCancelled())
+					return null;
+				// Use group (line number) to identify a measurement
+				cGeneTotal.add(row.getGroup() + "");
+				try {
+					boolean eval = result.crit.evaluate(row.getByName());
+					if (eval)
+						cGenePositive.add(row.getGroup() + "");
+				} catch (CriterionException e) {
+					Logger.log.error("Unknown error during statistics", e);
+				}
+			}
+
+		}
+
+		return new RefInfo(cGeneTotal, cGenePositive);
+	}
 
 	/**
 	 * Implementation of the Alternative method for calculating zscores. This
@@ -422,13 +419,13 @@ public class MiPastZScoreCalculator {
 		}
 	}
 
-	private void calculateDataMap() {
+	private void calculateDataMap(RefInfo refInfo) {
 		dataMap = new HashMap<Xref, RefInfo>();
 		// go over all datanodes in all pathways
 		for (Xref srcRef : pwyMap.getSrcRefs()) {
 			if (pk != null && pk.isCancelled())
 				return;
-			refInfo = new RefInfo(DataHolding.getAllGenesList(),DataHolding.getPositiveGeneList());
+			//RefInfo refInfo = evaluateRef(srcRef);
 			dataMap.put(srcRef, refInfo);
 		}
 	}
@@ -463,7 +460,7 @@ public class MiPastZScoreCalculator {
 			pk.setTaskName("Calculating expression data");
 			pk.setProgress(40);
 		}
-		calculateDataMap();
+		calculateDataMap(refInfo);
 
 		if (pk != null) {
 			if (pk.isCancelled())

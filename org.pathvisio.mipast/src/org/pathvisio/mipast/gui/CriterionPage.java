@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -36,6 +37,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.pathvisio.core.util.ProgressKeeper;
 import org.pathvisio.data.DataException;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.gex.GexManager;
@@ -44,6 +46,9 @@ import org.pathvisio.desktop.visualization.Criterion;
 import org.pathvisio.gui.SwingEngine;
 import org.pathvisio.mipast.DataHolding;
 import org.pathvisio.mipast.io.PositiveGeneList;
+import org.pathvisio.mipast.util.MiPastZScoreCalculator;
+import org.pathvisio.rip.RegIntPlugin;
+import org.pathvisio.statistics.ZScoreCalculator;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -65,6 +70,21 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	private ExpressionDialog ed = new ExpressionDialog();
 	private PvDesktop desktop;
 	private SwingEngine swingEngine;
+	private RegIntPlugin plugin;
+	
+	
+	private static Criterion miRNAUpCrit = new Criterion();
+	private static Criterion geneUpCrit = new Criterion();
+	private static Criterion miRNADownCrit = new Criterion();
+	private static Criterion geneDownCrit = new Criterion();
+	
+	private MiPastZScoreCalculator zcMiU;
+	private MiPastZScoreCalculator zcGu;
+	private MiPastZScoreCalculator zcMiD;
+	private MiPastZScoreCalculator zcGd;
+	
+	private ProgressKeeper pk;
+    private File pwDir;
 
 	private boolean geneDataAvailable;
 
@@ -106,12 +126,24 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 	private JTextField setExpr;
 	private JButton exprOk;
+	
+	
+	
 
-	public CriterionPage(PvDesktop desktop, SwingEngine se) {
+
+	public CriterionPage(PvDesktop desktop, SwingEngine se, RegIntPlugin plugin) {
 		super(IDENTIFIER);
 		this.desktop = desktop;
 		this.swingEngine = se;
+		this.plugin= plugin;
+		
+		
+		
+		
 	}
+	
+	
+	
 
 	public Object getNextPanelDescriptor() {
 
@@ -209,7 +241,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 	public void aboutToDisplayPanel() {
 		getWizard().setPageTitle("Set Expression criteria");
-
+		
 	}
 
 	public Criterion getCriterion() {
@@ -228,9 +260,9 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	}
 
 	public List<String> getSampleNames() {
-		GexManager gm = desktop.getGexManager();
+		
 		try {
-			sampleNames = gm.getCurrentGex().getSampleNames();
+			sampleNames = desktop.getGexManager().getCurrentGex().getSampleNames();
 		} catch (DataException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
@@ -384,15 +416,19 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 				if (expressionTextField.equals(miRNAUpExpr)) {
 					DataHolding.setMiRNAUpCrit(expressionTextField.getText());
+					
 				}
 				if (expressionTextField.equals(geneUpExpr)) {
 					DataHolding.setGeneUpCrit(expressionTextField.getText());
+					
 				}
-				if (expressionTextField.equals(miRNAUpExpr)) {
+				if (expressionTextField.equals(miRNADownExpr)) {
 					DataHolding.setMiRNADownCrit(expressionTextField.getText());
+					
 				}
-				if (expressionTextField.equals(miRNAUpExpr)) {
+				if (expressionTextField.equals(geneDownExpr)) {
 					DataHolding.setGeneDownCrit(expressionTextField.getText());
+			
 				}
 
 				exprFrame.dispose();
@@ -407,10 +443,38 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	}
 
 	public void aboutToHidePanel() {
-		PositiveGeneList posLists = new PositiveGeneList(desktop, swingEngine);
-		posLists.retrieveCriteria();
+		
+		DataHolding.setMiRNAUpCrit(miRNAUpExpr.getText());
+		DataHolding.setGeneUpCrit(geneUpExpr.getText());
+		DataHolding.setMiRNADownCrit(miRNADownExpr.getText());
+		DataHolding.setGeneDownCrit(geneDownExpr.getText());
+		
+		
+		
+		PositiveGeneList posLists = new PositiveGeneList(desktop, swingEngine, plugin);
+		posLists.retrieveCriteria(miRNAUpCrit, miRNAUpExpr.getText());
+		posLists.retrieveCriteria(miRNADownCrit, miRNADownExpr.getText());
+		posLists.retrieveCriteria(geneUpCrit, geneUpExpr.getText());
+		posLists.retrieveCriteria(geneDownCrit, geneDownExpr.getText());
+		
+		
+		zcMiU = new MiPastZScoreCalculator(
+				miRNAUpCrit, 
+				pwDir, 
+				desktop.getGexManager().getCachedData(),
+				null, 
+				null,null);
+
+		zcGu = new MiPastZScoreCalculator(geneUpCrit, pwDir,
+				desktop.getGexManager().getCachedData(), null, null,null);
+
+		zcMiD = new MiPastZScoreCalculator(miRNADownCrit, pwDir,
+				desktop.getGexManager().getCachedData(), null, null,null);
+		zcGd = new MiPastZScoreCalculator(geneDownCrit, pwDir,
+				desktop.getGexManager().getCachedData(), null, null,null);
+		
 		try {
-			posLists.createXrefs();
+			posLists.createXrefs( zcMiU, zcGu, zcMiD, zcGd);
 		} catch (IOException e) {
 			System.out.print("Error in PositiveGeneList.java");
 			e.printStackTrace();

@@ -98,6 +98,7 @@ public class DataHolding {
 		DataHolding.geneDownList = geneDownList;
 	}
 	public static String getMiRNAUpCrit() {
+		System.out.print(miRNAUpCrit);
 		return miRNAUpCrit;
 	}
 	public static void setMiRNAUpCrit(String miRNAUpCrit) {
