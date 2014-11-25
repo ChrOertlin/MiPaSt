@@ -21,6 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 
+import org.bridgedb.Xref;
 import org.pathvisio.core.debug.Logger;
 import org.pathvisio.core.util.ProgressKeeper;
 import org.pathvisio.core.util.ProgressKeeper.ProgressEvent;
@@ -48,13 +49,13 @@ import com.nexes.wizard.WizardPanelDescriptor;
 
 class FileMergePage extends WizardPanelDescriptor implements ProgressListener {
 
-	private PvDesktop standaloneEngine;
+	private PvDesktop desktop;
 	public static final String IDENTIFIER = "FILE_MERGE_PAGE";
 
 	public FileMergePage(PvDesktop desktop) {
 		super(IDENTIFIER);
-		this.standaloneEngine = desktop;
-
+		this.desktop = desktop;
+		
 	}
 
 	public Object getNextPanelDescriptor() {
@@ -149,14 +150,13 @@ class FileMergePage extends WizardPanelDescriptor implements ProgressListener {
 											DataHolding
 													.getMiRNAImportInformation(),
 											DataHolding
-													.getMiRNAImportInformation())
+													.getGeneImportInformation())
 											.getAbsolutePath()
 									+ "\n"
 									+ "No shared headers found, no shared visualization possible! \n");
 
 						}
-//						standaloneEngine.getGexManager().setCurrentGex(
-//								fm.getCombinedFile().getName(), true);
+			
 						DataHolding.getCombinedImportInformation().setGexName(
 								DataHolding.getCombinedImportInformation()
 										.getTxtFile().getAbsolutePath());
@@ -167,11 +167,19 @@ class FileMergePage extends WizardPanelDescriptor implements ProgressListener {
 						
 						GexTxtImporter.importFromTxt(
 								DataHolding.getCombinedImportInformation(), pk,
-								standaloneEngine.getSwingEngine()
+								desktop.getSwingEngine()
 										.getGdbManager().getCurrentGdb(),
-								standaloneEngine.getGexManager());
-				
+								desktop.getGexManager());
+						
+						
+						
+						
+						System.out.print("ds: " +DataHolding.getGeneImportInformation().getDataSource().getSystemCode()+"\n");
+						Xref test = new Xref("MIMAT0027618",DataHolding.getMiRNAImportInformation().getDataSource());
+						System.out.print("Gex: " +desktop.getGexManager().getCachedData().hasData(test)+ "\n");
 
+						
+						
 					} catch (Exception e) {
 						Logger.log.error("During import", e);
 						setProgressValue(0);
@@ -187,18 +195,20 @@ class FileMergePage extends WizardPanelDescriptor implements ProgressListener {
 				} else {
 
 					try {
-
-//						standaloneEngine.getGexManager().setCurrentGex(
-//								DataHolding.getMiRNAFile().getName(), true);
+						
 						pk.setTaskName("Importing expression dataset file(s)");
 						DataHolding.getMiRNAImportInformation().setGexName(
 								DataHolding.getMiRNAImportInformation()
 										.getTxtFile().getAbsolutePath());
 						GexTxtImporter.importFromTxt(
 								DataHolding.getMiRNAImportInformation(), pk,
-								standaloneEngine.getSwingEngine()
+								desktop.getSwingEngine()
 										.getGdbManager().getCurrentGdb(),
-								standaloneEngine.getGexManager());
+								desktop.getGexManager());
+						
+						System.out.print("ds: " +DataHolding.getMiRNAImportInformation().getDataSource().getSystemCode()+"\n");
+						Xref test = new Xref("MIMAT0027618",DataHolding.getMiRNAImportInformation().getDataSource());
+						System.out.print("Gex: " +desktop.getGexManager().getCachedData().hasData(test)+ "\n");
 						
 
 					} catch (Exception e) {

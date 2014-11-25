@@ -37,8 +37,6 @@ import org.pathvisio.mipast.util.WriteFiles;
 import org.pathvisio.rip.Interaction;
 import org.pathvisio.rip.RegIntPlugin;
 
-
-
 /**
  * This class initiates the ZScorecalculator to create the XrefInfo for all the
  * criteria the user entered. With these criteria Xref lists of miRNA and genes
@@ -59,27 +57,20 @@ public class PositiveGeneList {
 	private SwingEngine se;
 	private RegIntPlugin plugin;
 
-	public PositiveGeneList(PvDesktop desktop, SwingEngine se, RegIntPlugin plugin) {
+	public PositiveGeneList(PvDesktop desktop, SwingEngine se,
+			RegIntPlugin plugin) {
 		this.desktop = desktop;
 		this.se = se;
 		this.plugin = plugin;
 
 	}
 
-	
-	private static Criterion miRNAUpCrit = new Criterion();;
-	private static Criterion geneUpCrit = new Criterion();
-	private static Criterion miRNADownCrit = new Criterion();
-	private static Criterion geneDownCrit= new Criterion();
 	private ImportInformation importInformation;
 	private ProgressKeeper pk;
 
 	private Map<Xref, List<Interaction>> interactions;
 	private File pwDir;
 
-
-	
-	
 	private Xref miRNAup;
 	private Xref miRNADown;
 	private Xref geneUp;
@@ -122,21 +113,9 @@ public class PositiveGeneList {
 
 	private WriteFiles wf = new WriteFiles();
 
-	public void retrieveCriteria(Criterion crit, String string) {
 
-		if (string != ""){
-		crit.setExpression(string);}
-		
-		else{
-			
-		}
-		
 
 	
-		
-		
-		
-	}
 
 	/**
 	 * This method creates the Xref based upon the criteria given in the
@@ -152,60 +131,75 @@ public class PositiveGeneList {
 	public void createXrefs(MiPastZScoreCalculator zcMiU,
 			MiPastZScoreCalculator zcGu, MiPastZScoreCalculator zcMiD,
 			MiPastZScoreCalculator zcGd) throws IOException {
-		
-		
-		
+
 		interactions = plugin.getInteractions();
 		importInformation = DataHolding.getCombinedImportInformation();
 
-		System.out.print(importInformation.getTxtFile());
-		
-		
 		BufferedReader in = new BufferedReader(new FileReader(
 				importInformation.getTxtFile()));
 		String line = new String();
 		for (int i = 0; i < importInformation.getDataRowsImported(); i++) {
 			in.readLine();
-		
-		while ((line = in.readLine()) != null) {
-			String[] str = line.split(importInformation.getDelimiter());
-			
-			for (int j = 0; j < importInformation.getDataRowsImported(); j++) {
-				System.out.print("last elem: " +str[importInformation.getColNames().length-1]+"\n");
-				
-				
-				if (str[importInformation.getColNames().length-1].contains("miRNA")) {
-					//System.out.print("String[i]: " + str[i] + "Xref miRNA" +"\n");
-					DataSource dsMiRNA = DataHolding
-							.getMiRNAImportInformation().getDataSource();
-					String miRNAString = str[0];
-					miRNAup = new Xref(miRNAString, dsMiRNA);
-					miRNADown = new Xref(miRNAString, dsMiRNA);
 
-				} if (str[importInformation.getColNames().length-1].contains("gene")){
-					//System.out.print("String[i]: " + str[i] + "Xref gene" + "\n");
-					DataSource dsGene = DataHolding.getGeneImportInformation()
-							.getDataSource();
-					String geneString = str[0];
-					geneUp = new Xref(geneString, dsGene);
-					geneDown = new Xref(geneString, dsGene);
+			while ((line = in.readLine()) != null) {
+				String[] str = line.split(importInformation.getDelimiter());
+
+				for (int j = 0; j < importInformation.getDataRowsImported(); j++) {
+
+					if (str[importInformation.getColNames().length - 1]
+							.contains("miRNA")) {
+
+						DataSource dsMiRNA = DataHolding
+								.getMiRNAImportInformation().getDataSource();
+						String miRNAString = str[0];
+						miRNAup = new Xref(miRNAString, dsMiRNA);
+
+						miRNADown = new Xref(miRNAString, dsMiRNA);
+						if (miRNAup != null) {
+							miRNAUpRef = new RefInfo(zcMiU.evaluateRef(miRNAup)
+									.getProbesMeasured(), zcMiU.evaluateRef(
+									miRNAup).getProbesPositive());
+						}
+						if (miRNADown != null) {
+							miRNADownRef = new RefInfo(zcGu.evaluateRef(
+									miRNADown).getProbesMeasured(), zcMiU
+									.evaluateRef(miRNADown).getProbesPositive());
+						}
+					}
+					if (str[importInformation.getColNames().length - 1]
+							.contains("gene")) {
+
+						DataSource dsGene = DataHolding
+								.getGeneImportInformation().getDataSource();
+						String geneString = str[0];
+						geneUp = new Xref(geneString, dsGene);
+
+						geneDown = new Xref(geneString, dsGene);
+						if (geneUp != null) {
+							geneUpRef = new RefInfo(zcGu.evaluateRef(geneUp)
+									.getProbesMeasured(), zcMiU.evaluateRef(
+									geneUp).getProbesPositive());
+						}
+						if (geneDown != null) {
+							geneDownRef = new RefInfo(zcGu
+									.evaluateRef(geneDown).getProbesMeasured(),
+									zcMiU.evaluateRef(geneDown)
+											.getProbesPositive());
+						}
+					}
 				}
-				else{
-					//System.out.print("String[i]: " + str[i] + "\n");
-				}
+
 			}
-			
-			if(miRNAUpRef != null){
-			miRNAUpRef = new RefInfo(zcMiU.evaluateRef(miRNAup).getProbesMeasured(),zcMiU.evaluateRef(miRNAup).getProbesPositive());}
-			if(geneUpRef != null){
-			geneUpRef = new RefInfo(zcGu.evaluateRef(geneUp).getProbesMeasured() ,zcMiU.evaluateRef(geneUp).getProbesPositive());}
-			if(miRNADownRef != null){
-			miRNADownRef = new RefInfo(zcGu.evaluateRef(miRNADown).getProbesMeasured() ,zcMiU.evaluateRef(miRNADown).getProbesPositive());}
-			if(geneDownRef != null){
-			geneDownRef = new RefInfo(zcGu.evaluateRef(geneDown).getProbesMeasured() ,zcMiU.evaluateRef(geneDown).getProbesPositive());}
+		}
 
+		if (miRNAUpRef.getProbesPositive()== null) {
+			System.out.print("No positive probes" + "\n");
 		}
+
+		if (miRNAUpRef != null) {
+			System.out.print("Positive probes" + "\n");
 		}
+
 		for (int i = 0; i < miRNAUpRef.getProbesPositive().size(); i++) {
 			if (interactions.containsKey(miRNAUpRef.getProbesPositive()
 					.toArray()[i]) && miRNAUpRef != null) {
@@ -244,22 +238,11 @@ public class PositiveGeneList {
 		// Write the different lists to a file to check what miRNA and genes
 		// met the criteria and what met the criteria and had interactions.
 
-		wf.writeListToFile(miRNAUpRef.getProbesPositive(), miRNADownFile);
-		wf.writeListToFile(miRNAUpRef.getProbesPositive(), miRNAUpFile);
-		wf.writeListToFile(miRNAUpRef.getProbesPositive(), geneDownFile);
-		wf.writeListToFile(miRNAUpRef.getProbesPositive(), geneUpFile);
+		wf.writeListToFile(miRNADownRef.getProbesMeasured(), miRNADownFile);
+		wf.writeListToFile(miRNAUpRef.getProbesMeasured(), miRNAUpFile);
+		wf.writeListToFile(geneDownRef.getProbesMeasured(), geneDownFile);
+		wf.writeListToFile(geneUpRef.getProbesMeasured(), geneUpFile);
 
-		wf.writeListToFile(miRNAUpRef.getProbesPositive(), miRNADownIntFile);
-		wf.writeListToFile(miRNAUpRef.getProbesPositive(), miRNAUpIntFile);
-		wf.writeListToFile(miRNAUpRef.getProbesPositive(), geneDownIntFile);
-		wf.writeListToFile(miRNAUpRef.getProbesPositive(), geneUpIntFile);
-
-		for (int i = 0; i < DataHolding.getMiRNAUpList().size(); i++) {
-			System.out.print(DataHolding.getMiRNAUpList().toArray()[i]);
-		}
-		for (int i = 0; i < DataHolding.getGeneUpList().size(); i++) {
-			System.out.print(DataHolding.getGeneUpList().toArray()[i]);
-		}
 	}
 
 	/**

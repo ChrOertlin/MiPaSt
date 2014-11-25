@@ -416,19 +416,20 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 				if (expressionTextField.equals(miRNAUpExpr)) {
 					DataHolding.setMiRNAUpCrit(expressionTextField.getText());
+					miRNAUpCrit.setExpression(expressionTextField.getText());
 					
 				}
 				if (expressionTextField.equals(geneUpExpr)) {
 					DataHolding.setGeneUpCrit(expressionTextField.getText());
-					
+					geneUpCrit.setExpression(expressionTextField.getText());
 				}
 				if (expressionTextField.equals(miRNADownExpr)) {
 					DataHolding.setMiRNADownCrit(expressionTextField.getText());
-					
+					miRNADownCrit.setExpression(expressionTextField.getText());
 				}
 				if (expressionTextField.equals(geneDownExpr)) {
 					DataHolding.setGeneDownCrit(expressionTextField.getText());
-			
+					geneDownCrit.setExpression(expressionTextField.getText());
 				}
 
 				exprFrame.dispose();
@@ -449,34 +450,36 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		DataHolding.setMiRNADownCrit(miRNADownExpr.getText());
 		DataHolding.setGeneDownCrit(geneDownExpr.getText());
 		
-		
+		miRNAUpCrit.setExpression(miRNAUpExpr.getText());
+		geneUpCrit.setExpression(geneUpExpr.getText());
+		miRNADownCrit.setExpression(miRNADownExpr.getText());
+		geneDownCrit.setExpression(geneDownExpr.getText());
 		
 		PositiveGeneList posLists = new PositiveGeneList(desktop, swingEngine, plugin);
-		posLists.retrieveCriteria(miRNAUpCrit, miRNAUpExpr.getText());
-		posLists.retrieveCriteria(miRNADownCrit, miRNADownExpr.getText());
-		posLists.retrieveCriteria(geneUpCrit, geneUpExpr.getText());
-		posLists.retrieveCriteria(geneDownCrit, geneDownExpr.getText());
 		
+		
+		
+			System.out.print("Row: " + desktop.getGexManager().getCachedData().isConnected()   + "\n");
+	
 		
 		zcMiU = new MiPastZScoreCalculator(
 				miRNAUpCrit, 
 				pwDir, 
 				desktop.getGexManager().getCachedData(),
-				null, 
-				null,null);
+				desktop.getSwingEngine().getGdbManager().getGeneDb(), 
+				null);
 
 		zcGu = new MiPastZScoreCalculator(geneUpCrit, pwDir,
-				desktop.getGexManager().getCachedData(), null, null,null);
+				desktop.getGexManager().getCachedData(), desktop.getSwingEngine().getGdbManager().getGeneDb(), null);
 
 		zcMiD = new MiPastZScoreCalculator(miRNADownCrit, pwDir,
-				desktop.getGexManager().getCachedData(), null, null,null);
+				desktop.getGexManager().getCachedData(), desktop.getSwingEngine().getGdbManager().getGeneDb(), null);
 		zcGd = new MiPastZScoreCalculator(geneDownCrit, pwDir,
-				desktop.getGexManager().getCachedData(), null, null,null);
+				desktop.getGexManager().getCachedData(), desktop.getSwingEngine().getGdbManager().getGeneDb(), null);
 		
 		try {
 			posLists.createXrefs( zcMiU, zcGu, zcMiD, zcGd);
 		} catch (IOException e) {
-			System.out.print("Error in PositiveGeneList.java");
 			e.printStackTrace();
 		}
 		posLists.retrieveFinalList();

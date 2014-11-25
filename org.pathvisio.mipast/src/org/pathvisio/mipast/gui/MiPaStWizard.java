@@ -16,10 +16,7 @@ package org.pathvisio.mipast.gui;
 
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.gui.SwingEngine;
-import org.pathvisio.mipast.DataHolding;
-import org.pathvisio.mipast.gui.StartInfoPage;
 import org.pathvisio.rip.RegIntPlugin;
-import org.pathvisio.rip.dialog.FilePage;
 import org.pathvisio.rip.dialog.ColumnPage;
 import org.pathvisio.rip.dialog.ImportPage;
 
@@ -53,9 +50,9 @@ public class MiPaStWizard extends Wizard {
 	RipInfoPage rip;
 	// FilePage fdp;
 	RipFileLoaderPage rfdp;
-	RipColumnPage cpd;
+	ColumnPage cpd;
 	//ImportPage ipd;
-	RipImportPage ip;
+	ImportPage ip;
 	CriterionPage scp;
 	StatInfoPage sti;
 	StatisticsPage sp;
@@ -82,8 +79,8 @@ public class MiPaStWizard extends Wizard {
 		// Regulatory interaction plugin wizard pages
 
 		rfdp = new RipFileLoaderPage(plugin);
-		cpd = new RipColumnPage(plugin);
-		ip = new 	RipImportPage(plugin);
+		cpd = new ColumnPage(plugin);
+		ip = new ImportPage(plugin, StatInfoPage.IDENTIFIER);
 
 		registerWizardPanel(sip);
 		registerWizardPanel(flp);

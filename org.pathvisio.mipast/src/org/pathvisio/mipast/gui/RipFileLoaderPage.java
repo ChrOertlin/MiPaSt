@@ -195,7 +195,7 @@ public class RipFileLoaderPage extends WizardPanelDescriptor implements
 	    
 
 	    public Object getNextPanelDescriptor() {
-	        return RipColumnPage.IDENTIFIER;
+	        return ColumnPage.IDENTIFIER;
 	    }
 
 	    public Object getBackPanelDescriptor()

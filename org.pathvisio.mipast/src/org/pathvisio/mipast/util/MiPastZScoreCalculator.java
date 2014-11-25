@@ -20,6 +20,7 @@ import org.pathvisio.data.IRow;
 import org.pathvisio.desktop.gex.CachedData;
 import org.pathvisio.desktop.visualization.Criterion;
 import org.pathvisio.desktop.visualization.Criterion.CriterionException;
+import org.pathvisio.mipast.DataHolding;
 import org.pathvisio.statistics.Column;
 import org.pathvisio.statistics.PathwayMap;
 import org.pathvisio.statistics.StatisticsPathwayResult;
@@ -60,7 +61,7 @@ public class MiPastZScoreCalculator {
 	
 	
 	public MiPastZScoreCalculator(Criterion crit, File pwDir, CachedData gex,
-			IDMapper gdb, ProgressKeeper pk, RefInfo refInfo) {
+			IDMapper gdb, ProgressKeeper pk) {
 		if (pk != null) {
 			pk.setProgress(0);
 			pk.setTaskName("Analyzing data");
@@ -76,7 +77,10 @@ public class MiPastZScoreCalculator {
 		result.gex = gex;
 		result.gdb = gdb;
 		this.pk = pk;
-		this.refInfo= refInfo;
+		//this.refInfo= refInfo;
+		
+		Xref test = new Xref("3303",DataHolding.getGeneImportInformation().getDataSource());
+		System.out.print("Gex: " +gex.getData(test)+ "\n"		);
 		
 		
 		
@@ -193,9 +197,12 @@ public class MiPastZScoreCalculator {
 	public RefInfo evaluateRef(Xref srcRef) {
 		Set<String> cGeneTotal = new HashSet<String>();
 		Set<String> cGenePositive = new HashSet<String>();
-
+		
+	
+		
 		List<? extends IRow> rows = result.gex.getData(srcRef);
-
+		//System.out.print("gex: "+ result.gex.getData(srcRef)+ "\n");
+	
 		if (rows != null) {
 			for (IRow row : rows) {
 				if (pk != null && pk.isCancelled())
@@ -204,6 +211,7 @@ public class MiPastZScoreCalculator {
 				cGeneTotal.add(row.getGroup() + "");
 				try {
 					boolean eval = result.crit.evaluate(row.getByName());
+					System.out.print("eval: "+  eval+"\n");
 					if (eval)
 						cGenePositive.add(row.getGroup() + "");
 				} catch (CriterionException e) {
