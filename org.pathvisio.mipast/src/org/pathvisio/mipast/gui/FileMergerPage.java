@@ -21,11 +21,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 
-import org.bridgedb.Xref;
+
 import org.pathvisio.core.debug.Logger;
 import org.pathvisio.core.util.ProgressKeeper;
 import org.pathvisio.core.util.ProgressKeeper.ProgressEvent;
 import org.pathvisio.core.util.ProgressKeeper.ProgressListener;
+import org.pathvisio.data.DataInterface;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.gexplugin.GexTxtImporter;
 import org.pathvisio.mipast.DataHolding;
@@ -71,6 +72,7 @@ class FileMergePage extends WizardPanelDescriptor implements ProgressListener {
 	private ProgressKeeper pk;
 	private JLabel lblTask;
 	private FileMerger fm = new FileMerger();
+	private DataInterface gex;
 
 	protected JPanel createContents() {
 		FormLayout layout = new FormLayout("fill:[100dlu,min]:grow",
@@ -157,13 +159,13 @@ class FileMergePage extends WizardPanelDescriptor implements ProgressListener {
 
 						}
 			
-						DataHolding.getCombinedImportInformation().setGexName(
-								DataHolding.getCombinedImportInformation()
-										.getTxtFile().getAbsolutePath());
+				
 
 						pk.setTaskName("Importing expression dataset file(s)");
 						
-						
+						DataHolding.getCombinedImportInformation().setGexName(
+								DataHolding.getCombinedImportInformation()
+										.getTxtFile().getAbsolutePath());
 						
 						GexTxtImporter.importFromTxt(
 								DataHolding.getCombinedImportInformation(), pk,
@@ -171,12 +173,7 @@ class FileMergePage extends WizardPanelDescriptor implements ProgressListener {
 										.getGdbManager().getCurrentGdb(),
 								desktop.getGexManager());
 						
-						
-						
-						
-						System.out.print("ds: " +DataHolding.getGeneImportInformation().getDataSource().getSystemCode()+"\n");
-						Xref test = new Xref("MIMAT0027618",DataHolding.getMiRNAImportInformation().getDataSource());
-						System.out.print("Gex: " +desktop.getGexManager().getCachedData().hasData(test)+ "\n");
+				
 
 						
 						
@@ -200,15 +197,14 @@ class FileMergePage extends WizardPanelDescriptor implements ProgressListener {
 						DataHolding.getMiRNAImportInformation().setGexName(
 								DataHolding.getMiRNAImportInformation()
 										.getTxtFile().getAbsolutePath());
+						
 						GexTxtImporter.importFromTxt(
 								DataHolding.getMiRNAImportInformation(), pk,
 								desktop.getSwingEngine()
 										.getGdbManager().getCurrentGdb(),
 								desktop.getGexManager());
 						
-						System.out.print("ds: " +DataHolding.getMiRNAImportInformation().getDataSource().getSystemCode()+"\n");
-						Xref test = new Xref("MIMAT0027618",DataHolding.getMiRNAImportInformation().getDataSource());
-						System.out.print("Gex: " +desktop.getGexManager().getCachedData().hasData(test)+ "\n");
+					
 						
 
 					} catch (Exception e) {

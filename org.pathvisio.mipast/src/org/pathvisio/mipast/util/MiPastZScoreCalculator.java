@@ -78,9 +78,7 @@ public class MiPastZScoreCalculator {
 		result.gdb = gdb;
 		this.pk = pk;
 		//this.refInfo= refInfo;
-		
-		Xref test = new Xref("3303",DataHolding.getGeneImportInformation().getDataSource());
-		System.out.print("Gex: " +gex.getData(test)+ "\n"		);
+	
 		
 		
 		
@@ -201,7 +199,7 @@ public class MiPastZScoreCalculator {
 	
 		
 		List<? extends IRow> rows = result.gex.getData(srcRef);
-		//System.out.print("gex: "+ result.gex.getData(srcRef)+ "\n");
+		
 	
 		if (rows != null) {
 			for (IRow row : rows) {

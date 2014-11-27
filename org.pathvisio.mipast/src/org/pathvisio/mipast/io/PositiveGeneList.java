@@ -18,16 +18,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.bridgedb.DataSource;
+import org.bridgedb.IDMapperException;
 import org.bridgedb.Xref;
 import org.pathvisio.core.preferences.GlobalPreference;
 import org.pathvisio.core.preferences.PreferenceManager;
 import org.pathvisio.core.util.ProgressKeeper;
+import org.pathvisio.data.DataException;
+import org.pathvisio.data.DataInterface;
 import org.pathvisio.desktop.PvDesktop;
-import org.pathvisio.desktop.visualization.Criterion;
+import org.pathvisio.desktop.gex.CachedData;
+
 import org.pathvisio.gexplugin.ImportInformation;
 import org.pathvisio.gui.SwingEngine;
 import org.pathvisio.mipast.DataHolding;
@@ -75,6 +81,10 @@ public class PositiveGeneList {
 	private Xref miRNADown;
 	private Xref geneUp;
 	private Xref geneDown;
+
+	private Xref miRNAXref;
+	private Xref geneXref;
+
 	private RefInfo miRNAUpRef;
 	private RefInfo geneUpRef;
 	private RefInfo miRNADownRef;
@@ -84,6 +94,9 @@ public class PositiveGeneList {
 	private Set<String> geneUpPosIntGenes;
 	private Set<String> miRNADownPosIntGenes;
 	private Set<String> geneDownPosIntGenes;
+
+	private Collection<Xref> xref = new ArrayList<Xref>();
+//
 
 	private File miRNAUpFile = new File(PreferenceManager.getCurrent().get(
 			GlobalPreference.DIR_LAST_USED_PGEX)
@@ -113,25 +126,7 @@ public class PositiveGeneList {
 
 	private WriteFiles wf = new WriteFiles();
 
-
-
-	
-
-	/**
-	 * This method creates the Xref based upon the criteria given in the
-	 * CriterionPage. It uses the method evaluateRef for this purpose. The
-	 * outcome will be up to 4 XrefInfo objects, containing the positive genes
-	 * and all genes measured. Furthermore there Xrefinfo will then be compared
-	 * to the interaction files loaded in the regulatory interaction plugin. If
-	 * the genes are in both lists, they will be added to a list containing all
-	 * genes that fulfill the given criteria and have at least one interaction.
-	 * 
-	 * @throws IOException
-	 */
-	public void createXrefs(MiPastZScoreCalculator zcMiU,
-			MiPastZScoreCalculator zcGu, MiPastZScoreCalculator zcMiD,
-			MiPastZScoreCalculator zcGd) throws IOException {
-
+	public void cacheData() throws IOException {
 		interactions = plugin.getInteractions();
 		importInformation = DataHolding.getCombinedImportInformation();
 
@@ -152,7 +147,85 @@ public class PositiveGeneList {
 						DataSource dsMiRNA = DataHolding
 								.getMiRNAImportInformation().getDataSource();
 						String miRNAString = str[0];
+						miRNAXref = new Xref(miRNAString, dsMiRNA);
+						xref.add(miRNAup);
+					
+
+					}
+					if (str[importInformation.getColNames().length - 1]
+							.contains("gene")) {
+
+						DataSource dsGene = DataHolding
+								.getGeneImportInformation().getDataSource();
+						String geneString = str[0];
+						geneXref = new Xref(geneString, dsGene);
+						
+						xref.add(geneUp);
+
+					}
+				}
+			}
+			System.out.print("miRNAXref: " + miRNAXref+ "\n");
+			System.out.print("geneXref: " + geneXref+ "\n");
+			if(!xref.contains(miRNAXref)){
+			xref.add(miRNAXref);}
+			if(!xref.contains(geneXref)){
+			xref.add(geneXref);}
+		}
+		
+		
+		try {
+			System.out.println("cache: " + desktop.getGexManager().getCachedData());
+			desktop.getGexManager().getCachedData()
+			.syncSeed(xref);
+		} catch (DataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IDMapperException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * This method creates the Xref based upon the criteria given in the
+	 * CriterionPage. It uses the method evaluateRef for this purpose. The
+	 * outcome will be up to 4 XrefInfo objects, containing the positive genes
+	 * and all genes measured. Furthermore there Xrefinfo will then be compared
+	 * to the interaction files loaded in the regulatory interaction plugin. If
+	 * the genes are in both lists, they will be added to a list containing all
+	 * genes that fulfill the given criteria and have at least one interaction.
+	 * 
+	 * @throws IOException
+	 */
+	public void createXrefs(MiPastZScoreCalculator zcMiU,
+			MiPastZScoreCalculator zcGu, MiPastZScoreCalculator zcMiD,
+			MiPastZScoreCalculator zcGd) throws IOException {
+
+		interactions = plugin.getInteractions();
+		importInformation = DataHolding.getCombinedImportInformation();
+
+		cacheData();
+		
+		BufferedReader in = new BufferedReader(new FileReader(
+				importInformation.getTxtFile()));
+		String line = new String();
+		for (int i = 0; i < importInformation.getDataRowsImported(); i++) {
+			in.readLine();
+
+			while ((line = in.readLine()) != null) {
+				String[] str = line.split(importInformation.getDelimiter());
+
+				for (int j = 0; j < importInformation.getDataRowsImported(); j++) {
+
+					if (str[importInformation.getColNames().length - 1]
+							.contains("miRNA")) {
+
+						DataSource dsMiRNA = DataHolding
+								.getMiRNAImportInformation().getDataSource();
+						String miRNAString = str[0];
 						miRNAup = new Xref(miRNAString, dsMiRNA);
+						xref.add(miRNAup);
 
 						miRNADown = new Xref(miRNAString, dsMiRNA);
 						if (miRNAup != null) {
@@ -173,8 +246,9 @@ public class PositiveGeneList {
 								.getGeneImportInformation().getDataSource();
 						String geneString = str[0];
 						geneUp = new Xref(geneString, dsGene);
-
+						xref.add(geneUp);
 						geneDown = new Xref(geneString, dsGene);
+
 						if (geneUp != null) {
 							geneUpRef = new RefInfo(zcGu.evaluateRef(geneUp)
 									.getProbesMeasured(), zcMiU.evaluateRef(
@@ -192,7 +266,7 @@ public class PositiveGeneList {
 			}
 		}
 
-		if (miRNAUpRef.getProbesPositive()== null) {
+		if (miRNAUpRef.getProbesPositive() == null) {
 			System.out.print("No positive probes" + "\n");
 		}
 

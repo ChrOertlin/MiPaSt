@@ -39,8 +39,9 @@ import javax.swing.event.DocumentListener;
 
 import org.pathvisio.core.util.ProgressKeeper;
 import org.pathvisio.data.DataException;
+
 import org.pathvisio.desktop.PvDesktop;
-import org.pathvisio.desktop.gex.GexManager;
+
 import org.pathvisio.desktop.util.TextFieldUtils;
 import org.pathvisio.desktop.visualization.Criterion;
 import org.pathvisio.gui.SwingEngine;
@@ -48,7 +49,6 @@ import org.pathvisio.mipast.DataHolding;
 import org.pathvisio.mipast.io.PositiveGeneList;
 import org.pathvisio.mipast.util.MiPastZScoreCalculator;
 import org.pathvisio.rip.RegIntPlugin;
-import org.pathvisio.statistics.ZScoreCalculator;
 
 import com.jgoodies.forms.builder.PanelBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -57,11 +57,11 @@ import com.nexes.wizard.WizardPanelDescriptor;
 
 /**
  * 
- * The CriterionPage is used for the input of criteria that specify the up and/or downregulation of either
- * or both the genes and miRNA. 
+ * The CriterionPage is used for the input of criteria that specify the up
+ * and/or downregulation of either or both the genes and miRNA.
  * 
  * @author ChrOertlin
- *
+ * 
  */
 
 public class CriterionPage extends WizardPanelDescriptor implements
@@ -71,20 +71,19 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	private PvDesktop desktop;
 	private SwingEngine swingEngine;
 	private RegIntPlugin plugin;
-	
-	
+
 	private static Criterion miRNAUpCrit = new Criterion();
 	private static Criterion geneUpCrit = new Criterion();
 	private static Criterion miRNADownCrit = new Criterion();
 	private static Criterion geneDownCrit = new Criterion();
-	
+
 	private MiPastZScoreCalculator zcMiU;
 	private MiPastZScoreCalculator zcGu;
 	private MiPastZScoreCalculator zcMiD;
 	private MiPastZScoreCalculator zcGd;
-	
+
 	private ProgressKeeper pk;
-    private File pwDir;
+	private File pwDir = new File("home/bigcat/Desktop/pathways/");
 
 	private boolean geneDataAvailable;
 
@@ -126,24 +125,18 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 	private JTextField setExpr;
 	private JButton exprOk;
-	
-	
-	
 
+	private JLabel pathwayLabel;
+	private JButton browsePathways;
+	private JTextField pathwayTextField;
 
 	public CriterionPage(PvDesktop desktop, SwingEngine se, RegIntPlugin plugin) {
 		super(IDENTIFIER);
 		this.desktop = desktop;
 		this.swingEngine = se;
-		this.plugin= plugin;
-		
-		
-		
-		
+		this.plugin = plugin;
+
 	}
-	
-	
-	
 
 	public Object getNextPanelDescriptor() {
 
@@ -186,7 +179,13 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 		infoBtn = new JButton("Info");
 
+		// pathway objects
+		pathwayLabel = new JLabel("Pathway directory:");
+		pathwayTextField = new JTextField(40);
+		browsePathways = new JButton("Browse");
+
 		CellConstraints cc = new CellConstraints();
+
 		FormLayout layout = new FormLayout(
 				"pref,15dlu,pref,15dlu,pref,15dlu,pref,15dlu,pref,15dlu, pref, 15dlu, pref, default",
 				"pref,10dlu, pref,8dlu,pref,20dlu,pref,20dlu,pref,10dlu,pref,8dlu,pref,8dlu,pref, 8dlu,pref");
@@ -241,7 +240,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 	public void aboutToDisplayPanel() {
 		getWizard().setPageTitle("Set Expression criteria");
-		
+
 	}
 
 	public Criterion getCriterion() {
@@ -260,9 +259,10 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	}
 
 	public List<String> getSampleNames() {
-		
+
 		try {
-			sampleNames = desktop.getGexManager().getCurrentGex().getSampleNames();
+			sampleNames = desktop.getGexManager().getCurrentGex()
+					.getSampleNames();
 		} catch (DataException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
@@ -417,7 +417,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 				if (expressionTextField.equals(miRNAUpExpr)) {
 					DataHolding.setMiRNAUpCrit(expressionTextField.getText());
 					miRNAUpCrit.setExpression(expressionTextField.getText());
-					
+
 				}
 				if (expressionTextField.equals(geneUpExpr)) {
 					DataHolding.setGeneUpCrit(expressionTextField.getText());
@@ -444,41 +444,37 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	}
 
 	public void aboutToHidePanel() {
-		
+
 		DataHolding.setMiRNAUpCrit(miRNAUpExpr.getText());
 		DataHolding.setGeneUpCrit(geneUpExpr.getText());
 		DataHolding.setMiRNADownCrit(miRNADownExpr.getText());
 		DataHolding.setGeneDownCrit(geneDownExpr.getText());
-		
+
 		miRNAUpCrit.setExpression(miRNAUpExpr.getText());
 		geneUpCrit.setExpression(geneUpExpr.getText());
 		miRNADownCrit.setExpression(miRNADownExpr.getText());
 		geneDownCrit.setExpression(geneDownExpr.getText());
-		
-		PositiveGeneList posLists = new PositiveGeneList(desktop, swingEngine, plugin);
-		
-		
-		
-			System.out.print("Row: " + desktop.getGexManager().getCachedData().isConnected()   + "\n");
-	
-		
-		zcMiU = new MiPastZScoreCalculator(
-				miRNAUpCrit, 
-				pwDir, 
-				desktop.getGexManager().getCachedData(),
-				desktop.getSwingEngine().getGdbManager().getGeneDb(), 
-				null);
 
-		zcGu = new MiPastZScoreCalculator(geneUpCrit, pwDir,
-				desktop.getGexManager().getCachedData(), desktop.getSwingEngine().getGdbManager().getGeneDb(), null);
+		PositiveGeneList posLists = new PositiveGeneList(desktop, swingEngine,
+				plugin);
 
-		zcMiD = new MiPastZScoreCalculator(miRNADownCrit, pwDir,
-				desktop.getGexManager().getCachedData(), desktop.getSwingEngine().getGdbManager().getGeneDb(), null);
-		zcGd = new MiPastZScoreCalculator(geneDownCrit, pwDir,
-				desktop.getGexManager().getCachedData(), desktop.getSwingEngine().getGdbManager().getGeneDb(), null);
-		
+		zcMiU = new MiPastZScoreCalculator(miRNAUpCrit, pwDir, desktop
+				.getGexManager().getCachedData(), desktop.getSwingEngine()
+				.getGdbManager().getGeneDb(), pk);
+
+		zcGu = new MiPastZScoreCalculator(geneUpCrit, pwDir, desktop
+				.getGexManager().getCachedData(), desktop.getSwingEngine()
+				.getGdbManager().getGeneDb(), pk);
+
+		zcMiD = new MiPastZScoreCalculator(miRNADownCrit, pwDir, desktop
+				.getGexManager().getCachedData(), desktop.getSwingEngine()
+				.getGdbManager().getGeneDb(), pk);
+		zcGd = new MiPastZScoreCalculator(geneDownCrit, pwDir, desktop
+				.getGexManager().getCachedData(), desktop.getSwingEngine()
+				.getGdbManager().getGeneDb(), pk);
+
 		try {
-			posLists.createXrefs( zcMiU, zcGu, zcMiD, zcGd);
+			posLists.createXrefs(zcMiU, zcGu, zcMiD, zcGd);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
