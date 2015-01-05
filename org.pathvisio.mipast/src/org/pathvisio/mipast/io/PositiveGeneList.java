@@ -20,6 +20,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,8 +33,12 @@ import org.pathvisio.core.preferences.PreferenceManager;
 import org.pathvisio.core.util.ProgressKeeper;
 import org.pathvisio.data.DataException;
 import org.pathvisio.data.DataInterface;
+import org.pathvisio.data.IRow;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.gex.CachedData;
+import org.pathvisio.desktop.gex.GexManager;
+import org.pathvisio.desktop.visualization.Criterion;
+import org.pathvisio.desktop.visualization.Criterion.CriterionException;
 
 import org.pathvisio.gexplugin.ImportInformation;
 import org.pathvisio.gui.SwingEngine;
@@ -59,7 +65,7 @@ import org.pathvisio.rip.RegIntPlugin;
  */
 public class PositiveGeneList {
 
-	private PvDesktop desktop;
+	private static PvDesktop desktop;
 	private SwingEngine se;
 	private RegIntPlugin plugin;
 
@@ -71,32 +77,17 @@ public class PositiveGeneList {
 
 	}
 
-	private ImportInformation importInformation;
-	private ProgressKeeper pk;
+	
 
-	private Map<Xref, List<Interaction>> interactions;
-	private File pwDir;
-
-	private Xref miRNAup;
-	private Xref miRNADown;
-	private Xref geneUp;
-	private Xref geneDown;
-
-	private Xref miRNAXref;
-	private Xref geneXref;
-
-	private RefInfo miRNAUpRef;
-	private RefInfo geneUpRef;
-	private RefInfo miRNADownRef;
-	private RefInfo geneDownRef;
-
+	
+	
 	private Set<String> miRNAUpPosIntGenes;
 	private Set<String> geneUpPosIntGenes;
 	private Set<String> miRNADownPosIntGenes;
 	private Set<String> geneDownPosIntGenes;
 
-	private Collection<Xref> xref = new ArrayList<Xref>();
-//
+
+	
 
 	private File miRNAUpFile = new File(PreferenceManager.getCurrent().get(
 			GlobalPreference.DIR_LAST_USED_PGEX)
@@ -126,243 +117,123 @@ public class PositiveGeneList {
 
 	private WriteFiles wf = new WriteFiles();
 
-	public void cacheData() throws IOException {
-		interactions = plugin.getInteractions();
-		importInformation = DataHolding.getCombinedImportInformation();
+	public void execute() throws DataException, IOException {
+		
+		
+		
+		
+		Set<Xref> miRNABackgroundSet = new HashSet<Xref>();
+		Set<Xref> geneBackgroundSet = new HashSet<Xref>();
+		Set<String> miRNAFinal = new HashSet<String>();
+		Set<String> geneFinal = new HashSet<String>();
 
-		BufferedReader in = new BufferedReader(new FileReader(
-				importInformation.getTxtFile()));
-		String line = new String();
-		for (int i = 0; i < importInformation.getDataRowsImported(); i++) {
-			in.readLine();
+		miRNABackgroundSet = backgroundList(DataHolding
+				.getMiRNAImportInformation().getDataSource());
+		geneBackgroundSet = backgroundList(DataHolding
+				.getGeneImportInformation().getDataSource());
 
-			while ((line = in.readLine()) != null) {
-				String[] str = line.split(importInformation.getDelimiter());
+		miRNAUpPosIntGenes = criterionEvaluation(DataHolding.miRNAUpCriterion,
+				miRNABackgroundSet);
+		miRNADownPosIntGenes = criterionEvaluation(
+				DataHolding.miRNADownCriterion, miRNABackgroundSet);
+		geneUpPosIntGenes = criterionEvaluation(DataHolding.geneUpCriterion,
+				geneBackgroundSet);
+		geneDownPosIntGenes = criterionEvaluation(
+				DataHolding.geneDownCriterion, geneBackgroundSet);
+		
+		miRNAFinal.addAll(createFinalList(miRNAUpPosIntGenes));
+		miRNAFinal.addAll(createFinalList(miRNADownPosIntGenes));
+		geneFinal.addAll(createFinalList(geneUpPosIntGenes));
+		geneFinal.addAll(createFinalList(geneDownPosIntGenes));
+		
+		wf.writeListToFile(miRNADownPosIntGenes, miRNADownFile);
+		wf.writeListToFile(miRNAUpPosIntGenes, miRNAUpFile);
+		wf.writeListToFile(geneDownPosIntGenes, geneDownFile);
+		wf.writeListToFile(geneUpPosIntGenes, geneUpFile);
+		System.out.println("miRNA"+ miRNAFinal +"\n");
+		System.out.println("gene" + geneFinal + "\n");
 
-				for (int j = 0; j < importInformation.getDataRowsImported(); j++) {
+	}
 
-					if (str[importInformation.getColNames().length - 1]
-							.contains("miRNA")) {
-
-						DataSource dsMiRNA = DataHolding
-								.getMiRNAImportInformation().getDataSource();
-						String miRNAString = str[0];
-						miRNAXref = new Xref(miRNAString, dsMiRNA);
-						xref.add(miRNAup);
-					
-
-					}
-					if (str[importInformation.getColNames().length - 1]
-							.contains("gene")) {
-
-						DataSource dsGene = DataHolding
-								.getGeneImportInformation().getDataSource();
-						String geneString = str[0];
-						geneXref = new Xref(geneString, dsGene);
-						
-						xref.add(geneUp);
-
-					}
-				}
+	public Set<String> createFinalList(Set<String> set) {
+		Map<Xref, List<Interaction>> interactions = plugin.getInteractions();
+		Set<String> finalList = new HashSet<String>();
+		String [] arr = set.toArray(new String[set.size()]);
+		for (int i = 0;i<arr.length;i++) {
+			System.out.print("arr" + arr[i] + "\n");
+			
+		
+			if (set != null
+					&& interactions
+							.containsKey(arr[i])) {
+				
+				
+				finalList.add(arr[i]);
 			}
-			System.out.print("miRNAXref: " + miRNAXref+ "\n");
-			System.out.print("geneXref: " + geneXref+ "\n");
-			if(!xref.contains(miRNAXref)){
-			xref.add(miRNAXref);}
-			if(!xref.contains(geneXref)){
-			xref.add(geneXref);}
 		}
-		
-		
+		return finalList;
+	}
+
+	
+
+
+	
+
+
+	public Set<Xref> backgroundList(DataSource ds) {
+		Set<String> cGeneTotal = new HashSet<String>();
+		Set<Xref> set = new HashSet<Xref>();
 		try {
-			System.out.println("cache: " + desktop.getGexManager().getCachedData());
-			desktop.getGexManager().getCachedData()
-			.syncSeed(xref);
-		} catch (DataException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IDMapperException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+			// get all xrefs in dataset
+			// TODO: for some reason the iterator doesn't work but in this way
+			// it works
 
-	/**
-	 * This method creates the Xref based upon the criteria given in the
-	 * CriterionPage. It uses the method evaluateRef for this purpose. The
-	 * outcome will be up to 4 XrefInfo objects, containing the positive genes
-	 * and all genes measured. Furthermore there Xrefinfo will then be compared
-	 * to the interaction files loaded in the regulatory interaction plugin. If
-	 * the genes are in both lists, they will be added to a list containing all
-	 * genes that fulfill the given criteria and have at least one interaction.
-	 * 
-	 * @throws IOException
-	 */
-	public void createXrefs(MiPastZScoreCalculator zcMiU,
-			MiPastZScoreCalculator zcGu, MiPastZScoreCalculator zcMiD,
-			MiPastZScoreCalculator zcGd) throws IOException {
-
-		interactions = plugin.getInteractions();
-		importInformation = DataHolding.getCombinedImportInformation();
-
-		cacheData();
-		
-		BufferedReader in = new BufferedReader(new FileReader(
-				importInformation.getTxtFile()));
-		String line = new String();
-		for (int i = 0; i < importInformation.getDataRowsImported(); i++) {
-			in.readLine();
-
-			while ((line = in.readLine()) != null) {
-				String[] str = line.split(importInformation.getDelimiter());
-
-				for (int j = 0; j < importInformation.getDataRowsImported(); j++) {
-
-					if (str[importInformation.getColNames().length - 1]
-							.contains("miRNA")) {
-
-						DataSource dsMiRNA = DataHolding
-								.getMiRNAImportInformation().getDataSource();
-						String miRNAString = str[0];
-						miRNAup = new Xref(miRNAString, dsMiRNA);
-						xref.add(miRNAup);
-
-						miRNADown = new Xref(miRNAString, dsMiRNA);
-						if (miRNAup != null) {
-							miRNAUpRef = new RefInfo(zcMiU.evaluateRef(miRNAup)
-									.getProbesMeasured(), zcMiU.evaluateRef(
-									miRNAup).getProbesPositive());
-						}
-						if (miRNADown != null) {
-							miRNADownRef = new RefInfo(zcGu.evaluateRef(
-									miRNADown).getProbesMeasured(), zcMiU
-									.evaluateRef(miRNADown).getProbesPositive());
-						}
-					}
-					if (str[importInformation.getColNames().length - 1]
-							.contains("gene")) {
-
-						DataSource dsGene = DataHolding
-								.getGeneImportInformation().getDataSource();
-						String geneString = str[0];
-						geneUp = new Xref(geneString, dsGene);
-						xref.add(geneUp);
-						geneDown = new Xref(geneString, dsGene);
-
-						if (geneUp != null) {
-							geneUpRef = new RefInfo(zcGu.evaluateRef(geneUp)
-									.getProbesMeasured(), zcMiU.evaluateRef(
-									geneUp).getProbesPositive());
-						}
-						if (geneDown != null) {
-							geneDownRef = new RefInfo(zcGu
-									.evaluateRef(geneDown).getProbesMeasured(),
-									zcMiU.evaluateRef(geneDown)
-											.getProbesPositive());
-						}
-					}
+			for (int i = 0; i < desktop.getGexManager().getCurrentGex()
+					.getNrRow(); i++) {
+				IRow row = desktop.getGexManager().getCurrentGex().getRow(i);
+				if (row.getXref().getDataSource() == ds) {
+					set.add(row.getXref());
 				}
-
 			}
-		}
-
-		if (miRNAUpRef.getProbesPositive() == null) {
-			System.out.print("No positive probes" + "\n");
-		}
-
-		if (miRNAUpRef != null) {
-			System.out.print("Positive probes" + "\n");
-		}
-
-		for (int i = 0; i < miRNAUpRef.getProbesPositive().size(); i++) {
-			if (interactions.containsKey(miRNAUpRef.getProbesPositive()
-					.toArray()[i]) && miRNAUpRef != null) {
-				miRNAUpPosIntGenes.add((String) miRNAUpRef.getProbesPositive()
-						.toArray()[i]);
-
+			Collection<? extends IRow> rows = desktop.getGexManager()
+					.getCurrentGex().getData(set);
+			if (rows != null) {
+				for (IRow row : rows) {
+					// Use group (line number) to identify a measurement
+					cGeneTotal.add(row.getGroup() + "");
+				}
 			}
-		}
-		for (int i = 0; i < geneUpRef.getProbesPositive().size(); i++) {
-			if (interactions.containsKey(geneUpRef.getProbesPositive()
-					.toArray()[i]) && geneUpRef != null) {
-				geneUpPosIntGenes.add((String) geneUpRef.getProbesPositive()
-						.toArray()[i]);
-			}
-		}
-		for (int i = 0; i < miRNADownRef.getProbesPositive().size(); i++) {
-			if (interactions.containsKey(miRNADownRef.getProbesPositive()
-					.toArray()[i]) && miRNADownRef != null) {
-				miRNADownPosIntGenes.add((String) miRNADownRef
-						.getProbesPositive().toArray()[i]);
-			}
-		}
-		for (int i = 0; i < geneDownRef.getProbesPositive().size(); i++) {
-			if (interactions.containsKey(geneDownRef.getProbesPositive()
-					.toArray()[i]) && geneDownRef != null) {
-				geneDownPosIntGenes.add((String) geneDownRef
-						.getProbesPositive().toArray()[i]);
-			}
-		}
 
-		DataHolding.setMiRNAUpList(miRNAUpPosIntGenes);
-		DataHolding.setGeneUpList(geneUpPosIntGenes);
-		DataHolding.setMiRNADownList(miRNADownPosIntGenes);
-		DataHolding.setGeneDownList(geneDownPosIntGenes);
-
-		// Write the different lists to a file to check what miRNA and genes
-		// met the criteria and what met the criteria and had interactions.
-
-		wf.writeListToFile(miRNADownRef.getProbesMeasured(), miRNADownFile);
-		wf.writeListToFile(miRNAUpRef.getProbesMeasured(), miRNAUpFile);
-		wf.writeListToFile(geneDownRef.getProbesMeasured(), geneDownFile);
-		wf.writeListToFile(geneUpRef.getProbesMeasured(), geneUpFile);
-
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		return set;
 	}
 
-	/**
-	 * 
-	 * The retrieveFinalList method compares all Positive lists with each other
-	 * and adds all genes to a final. Starting with the miRNAUpList, adding
-	 * everything of the other lists that is not already in there. This Results
-	 * into a final lists with genes that fulfill specified criteria and have an
-	 * interaction.
-	 * 
-	 * @author ChrOertlin
-	 */
+	public static Set<String> criterionEvaluation(Criterion crit, Set<Xref> set)
+			throws DataException {
 
-	public void retrieveFinalList() {
+		Set<String> cGenePositive = new HashSet<String>();
 
-		// do we actually need the miRNA list ??
+		Collection<? extends IRow> rows = desktop.getGexManager()
+				.getCurrentGex().getData(set);
 
-		DataHolding.positiveGeneList = null;
-		for (int i = 0; i < DataHolding.getMiRNAUpList().size(); i++) {
-			DataHolding.positiveGeneList.add((String) DataHolding
-					.getMiRNAUpList().toArray()[i]);
-		}
-
-		for (int i = 0; i < DataHolding.getMiRNADownList().size(); i++) {
-			if (!DataHolding.positiveGeneList.contains(DataHolding
-					.getMiRNAUpList().toArray()[i])) {
-				DataHolding.positiveGeneList.add((String) DataHolding
-						.getMiRNAUpList().toArray()[i]);
+		if (rows != null) {
+			for (IRow row : rows) {
+				// // Use group (line number) to identify a measurement
+				// cGeneTotal.add(row.getGroup() + "");
+				try {
+					boolean eval = crit.evaluate(row.getByName());
+					if (eval)
+						cGenePositive.add(row.getGroup() + "");
+				} catch (CriterionException e) {
+					e.printStackTrace();
+				}
 			}
 		}
-		for (int i = 0; i < DataHolding.getGeneDownList().size(); i++) {
-			if (!DataHolding.positiveGeneList.contains(DataHolding
-					.getGeneDownList().toArray()[i])) {
-				DataHolding.positiveGeneList.add((String) DataHolding
-						.getGeneDownList().toArray()[i]);
-			}
-		}
-		for (int i = 0; i < DataHolding.getGeneUpList().size(); i++) {
-			if (!DataHolding.positiveGeneList.contains(DataHolding
-					.getGeneUpList().toArray()[i])) {
-				DataHolding.positiveGeneList.add((String) DataHolding
-						.getGeneUpList().toArray()[i]);
-			}
-		}
-
-		DataHolding.setAllGenesList(geneUpRef.getProbesMeasured());
+		System.out.println("posgenes" + cGenePositive +"\n");
+		return cGenePositive;
 	}
-	// class end token
 }

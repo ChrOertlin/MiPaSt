@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.Set;
 
 import org.pathvisio.desktop.PvDesktop;
+import org.pathvisio.desktop.visualization.Criterion;
 import org.pathvisio.gexplugin.ImportInformation;
 import org.pathvisio.mipast.util.RipImportInformation;
 
@@ -49,6 +50,12 @@ public class DataHolding {
 	private static String geneUpCrit;
 	private static String miRNADownCrit;
 	private static String geneDownCrit;
+	
+	
+	public static Criterion miRNAUpCriterion = new Criterion();
+	public static Criterion geneUpCriterion= new Criterion();
+	public static Criterion miRNADownCriterion= new Criterion();
+	public static Criterion geneDownCriterion= new Criterion();
 	
 	private static Set<String> miRNAUpList;
 	private static Set<String> geneUpList;

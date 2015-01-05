@@ -445,41 +445,54 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 	public void aboutToHidePanel() {
 
-		DataHolding.setMiRNAUpCrit(miRNAUpExpr.getText());
-		DataHolding.setGeneUpCrit(geneUpExpr.getText());
-		DataHolding.setMiRNADownCrit(miRNADownExpr.getText());
-		DataHolding.setGeneDownCrit(geneDownExpr.getText());
+		DataHolding.miRNAUpCriterion.setExpression(miRNAUpExpr.getText());
+		DataHolding.geneUpCriterion.setExpression(geneUpExpr.getText());
+		DataHolding.miRNADownCriterion.setExpression(miRNADownExpr.getText());
+		DataHolding.geneDownCriterion.setExpression(geneDownExpr.getText());
 
 		miRNAUpCrit.setExpression(miRNAUpExpr.getText());
 		geneUpCrit.setExpression(geneUpExpr.getText());
 		miRNADownCrit.setExpression(miRNADownExpr.getText());
 		geneDownCrit.setExpression(geneDownExpr.getText());
-
-		PositiveGeneList posLists = new PositiveGeneList(desktop, swingEngine,
+		
+		PositiveGeneList posList = new PositiveGeneList(desktop, swingEngine,
 				plugin);
-
-		zcMiU = new MiPastZScoreCalculator(miRNAUpCrit, pwDir, desktop
-				.getGexManager().getCachedData(), desktop.getSwingEngine()
-				.getGdbManager().getGeneDb(), pk);
-
-		zcGu = new MiPastZScoreCalculator(geneUpCrit, pwDir, desktop
-				.getGexManager().getCachedData(), desktop.getSwingEngine()
-				.getGdbManager().getGeneDb(), pk);
-
-		zcMiD = new MiPastZScoreCalculator(miRNADownCrit, pwDir, desktop
-				.getGexManager().getCachedData(), desktop.getSwingEngine()
-				.getGdbManager().getGeneDb(), pk);
-		zcGd = new MiPastZScoreCalculator(geneDownCrit, pwDir, desktop
-				.getGexManager().getCachedData(), desktop.getSwingEngine()
-				.getGdbManager().getGeneDb(), pk);
-
 		try {
-			posLists.createXrefs(zcMiU, zcGu, zcMiD, zcGd);
+			posList.execute();
+		} catch (DataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		posLists.retrieveFinalList();
 
+		
+		
+
+//
+//		zcMiU = new MiPastZScoreCalculator(miRNAUpCrit, pwDir, desktop
+//				.getGexManager().getCachedData(), desktop.getSwingEngine()
+//				.getGdbManager().getGeneDb(), pk);
+//
+//		zcGu = new MiPastZScoreCalculator(geneUpCrit, pwDir, desktop
+//				.getGexManager().getCachedData(), desktop.getSwingEngine()
+//				.getGdbManager().getGeneDb(), pk);
+//
+//		zcMiD = new MiPastZScoreCalculator(miRNADownCrit, pwDir, desktop
+//				.getGexManager().getCachedData(), desktop.getSwingEngine()
+//				.getGdbManager().getGeneDb(), pk);
+//		zcGd = new MiPastZScoreCalculator(geneDownCrit, pwDir, desktop
+//				.getGexManager().getCachedData(), desktop.getSwingEngine()
+//				.getGdbManager().getGeneDb(), pk);
+
+//		try {
+//			posLists.createXrefs(zcMiU, zcGu, zcMiD, zcGd);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		posLists.retrieveFinalList();
+//
 	}
 
 }
