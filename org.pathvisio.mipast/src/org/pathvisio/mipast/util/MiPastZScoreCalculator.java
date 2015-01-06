@@ -68,7 +68,7 @@ public class MiPastZScoreCalculator {
 		}
 
 		result = new StatisticsResult();
-		result.crit = crit;
+		//result.crit = crit;
 		result.stm = new StatisticsTableModel();
 		result.stm.setColumns(new Column[] { Column.PATHWAY_NAME, Column.R,
 				Column.N, Column.TOTAL, Column.PCT, Column.ZSCORE,
@@ -185,42 +185,42 @@ public class MiPastZScoreCalculator {
 			return probesMeasured.size() > 0;
 		}
 	}
-
-	/**
-	 * Checks if the given ref evaluates positive for the criterion
-	 * 
-	 * Assumes that ref has already been cached earlier in a call to
-	 * result.gex.cacheData(...)
-	 */
-	public RefInfo evaluateRef(Xref srcRef) {
-		Set<String> cGeneTotal = new HashSet<String>();
-		Set<String> cGenePositive = new HashSet<String>();
-		
-	
-		
-		List<? extends IRow> rows = result.gex.getData(srcRef);
-		
-	
-		if (rows != null) {
-			for (IRow row : rows) {
-				if (pk != null && pk.isCancelled())
-					return null;
-				// Use group (line number) to identify a measurement
-				cGeneTotal.add(row.getGroup() + "");
-				try {
-					boolean eval = result.crit.evaluate(row.getByName());
-					System.out.print("eval: "+  eval+"\n");
-					if (eval)
-						cGenePositive.add(row.getGroup() + "");
-				} catch (CriterionException e) {
-					Logger.log.error("Unknown error during statistics", e);
-				}
-			}
-
-		}
-
-		return new RefInfo(cGeneTotal, cGenePositive);
-	}
+//
+//	/**
+//	 * Checks if the given ref evaluates positive for the criterion
+//	 * 
+//	 * Assumes that ref has already been cached earlier in a call to
+//	 * result.gex.cacheData(...)
+//	 */
+//	public RefInfo evaluateRef(Xref srcRef) {
+//		Set<String> cGeneTotal = new HashSet<String>();
+//		Set<String> cGenePositive = new HashSet<String>();
+//		
+//	
+//		
+//		List<? extends IRow> rows = result.gex.getData(srcRef);
+//		
+//	
+//		if (rows != null) {
+//			for (IRow row : rows) {
+//				if (pk != null && pk.isCancelled())
+//					return null;
+//				// Use group (line number) to identify a measurement
+//				cGeneTotal.add(row.getGroup() + "");
+//				try {
+//					boolean eval = result.crit.evaluate(row.getByName());
+//					System.out.print("eval: "+  eval+"\n");
+//					if (eval)
+//						cGenePositive.add(row.getGroup() + "");
+//				} catch (CriterionException e) {
+//					Logger.log.error("Unknown error during statistics", e);
+//				}
+//			}
+//
+//		}
+//
+//		return new RefInfo(cGeneTotal, cGenePositive);
+//	}
 
 	/**
 	 * Implementation of the Alternative method for calculating zscores. This

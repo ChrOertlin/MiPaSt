@@ -176,6 +176,7 @@ class FileLoaderPage extends WizardPanelDescriptor implements ActionListener {
 						geneText.setText(geneFile.getAbsolutePath());
 						geneFileLoaded = true;
 						DataHolding.getGeneImportInformation().setTxtFile(geneFile);
+						DataHolding.setGeneFileLoaded(true);
 						if (miRNAFileLoaded && databaseLoaded) {
 							getWizard().setNextFinishButtonEnabled(true);
 						}

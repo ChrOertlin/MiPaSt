@@ -30,12 +30,13 @@ import org.pathvisio.gexplugin.GexTxtImporter;
 import org.pathvisio.gexplugin.ImportInformation;
 
 import org.pathvisio.gexplugin.ImportInformation;
+import org.pathvisio.mipast.DataHolding;
 import org.pathvisio.mipast.MiPaStFileReader;
 
 /**
  * 
- * The FilerMerger class combines two data expression files into one combined file that can 
- * be further handled by PathVisio.
+ * The FilerMerger class combines two data expression files into one combined
+ * file that can be further handled by PathVisio.
  * 
  * @author ChrOertlin
  * 
@@ -45,9 +46,9 @@ public class FileMerger {
 	MiPaStFileReader fr = new MiPaStFileReader();
 	boolean sharedHeader = false;
 	File combinedFile = new File(PreferenceManager.getCurrent().get(
-			GlobalPreference.DIR_LAST_USED_PGEX) +"/combinedTxt.txt");
-	
-	
+			GlobalPreference.DIR_LAST_USED_PGEX)
+			+ "/combinedTxt.txt");
+
 	/**
 	 * Creates the combined file, if two files are given to the plugin, and
 	 * return a combinedFile which can be accessed for importinformation
@@ -57,7 +58,6 @@ public class FileMerger {
 	public File createCombinedFile(ImportInformation miRNA,
 			ImportInformation gene) throws IOException {
 
-		
 		File miRNAFile = new File("miRNA");
 		File geneFile = new File("gene");
 		List<String> miRNALines;
@@ -77,8 +77,8 @@ public class FileMerger {
 	}
 
 	/**
-	 * Creates the combined header of the two input files, if two headers are the same only one
-	 * of the headers is taken into the combined header.
+	 * Creates the combined header of the two input files, if two headers are
+	 * the same only one of the headers is taken into the combined header.
 	 * 
 	 */
 	public List<String> createCombinedHeader(ImportInformation miRNA,
@@ -120,9 +120,10 @@ public class FileMerger {
 	}
 
 	/**
-	 * Retrieves data rows from the expression data files and writes them to the 
-	 * combined file. If there are values that fall under a shared header they will be written below the 
-	 * shared header. If there is no value for a header then the column will be left blank.
+	 * Retrieves data rows from the expression data files and writes them to the
+	 * combined file. If there are values that fall under a shared header they
+	 * will be written below the shared header. If there is no value for a
+	 * header then the column will be left blank.
 	 */
 	public void getDataRows(ImportInformation miRNA, List<String> miRNALines,
 			ImportInformation gene, List<String> geneLines, BufferedWriter fbw)
@@ -182,6 +183,7 @@ public class FileMerger {
 					&& !combinedHeader.contains(info.getColNames()[k])
 					&& !systemCodeAdded) {
 				data.add(1, dataArray[info.getSyscodeColumn()]);
+			
 				systemCodeAdded = true;
 			}
 
@@ -198,6 +200,25 @@ public class FileMerger {
 			} else if (!combinedHeader.get(k).isEmpty()) {
 				data.add("");
 			}
+		}
+		
+		if (type == "gene"&& !info.isSyscodeFixed()) {
+			DataHolding.setGeneSysCode(dataArray[info
+					.getSyscodeColumn()]);
+		}
+		if(type == "gene"&& info.isSyscodeFixed()){
+			DataHolding.setGeneSysCode(info.getDataSource().getSystemCode());
+		
+
+		}
+		if (type == "miRNA" && !info.isSyscodeFixed()){
+			DataHolding.setMiRNASysCode(dataArray[info
+					.getSyscodeColumn()]);
+			
+		}
+		
+		if(type == "miRNA"&& info.isSyscodeFixed()){
+			DataHolding.setMiRNASysCode(info.getDataSource().getSystemCode());
 		}
 
 		return data;
@@ -216,9 +237,10 @@ public class FileMerger {
 
 	/**
 	 * checkDuplicateHeaders look in both files and checks if there are headers
-	 * that exist in both files. If so, sharedHeader will be true. This check is needed to report back
-	 * to make sure that a later visualization will be possible. If there are no shared columns it will not be 
-	 * possible to shows interactions.
+	 * that exist in both files. If so, sharedHeader will be true. This check is
+	 * needed to report back to make sure that a later visualization will be
+	 * possible. If there are no shared columns it will not be possible to shows
+	 * interactions.
 	 * 
 	 */
 	public void checkDuplicateHeaders(ImportInformation info,
@@ -234,13 +256,14 @@ public class FileMerger {
 	}
 
 	/**
-	 * Setters and getters 
-	 *
+	 * Setters and getters
+	 * 
 	 */
 	public boolean getSharedHeader() {
 		return sharedHeader;
 	}
-	public File getCombinedFile(){
+
+	public File getCombinedFile() {
 		return combinedFile;
 	}
 }

@@ -24,7 +24,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.bridgedb.DataSource;
 import org.bridgedb.IDMapperException;
 import org.bridgedb.Xref;
@@ -76,113 +80,126 @@ public class PositiveGeneList {
 		this.plugin = plugin;
 
 	}
-
-	
-
-	
 	
 	private Set<String> miRNAUpPosIntGenes;
 	private Set<String> geneUpPosIntGenes;
 	private Set<String> miRNADownPosIntGenes;
 	private Set<String> geneDownPosIntGenes;
 
+	private Set<String> positiveGeneList = new HashSet<String>();
 
-	
-
-	private File miRNAUpFile = new File(PreferenceManager.getCurrent().get(
-			GlobalPreference.DIR_LAST_USED_PGEX)
-			+ "/miRNA_up_criteria.txt");
-	private File miRNADownFile = new File(PreferenceManager.getCurrent().get(
-			GlobalPreference.DIR_LAST_USED_PGEX)
-			+ "/miRNA_down_criteria.txt");
-	private File geneUpFile = new File(PreferenceManager.getCurrent().get(
-			GlobalPreference.DIR_LAST_USED_PGEX)
-			+ "/gene_up_criteria.txt");
-	private File geneDownFile = new File(PreferenceManager.getCurrent().get(
-			GlobalPreference.DIR_LAST_USED_PGEX)
-			+ "/gene_down_criteria.txt");
-
-	private File miRNAUpIntFile = new File(PreferenceManager.getCurrent().get(
-			GlobalPreference.DIR_LAST_USED_PGEX)
-			+ "/miRNA_up_has_interactions.txt");
-	private File miRNADownIntFile = new File(PreferenceManager.getCurrent()
-			.get(GlobalPreference.DIR_LAST_USED_PGEX)
-			+ "/miRNA_down_has_interactions.txt");
-	private File geneUpIntFile = new File(PreferenceManager.getCurrent().get(
-			GlobalPreference.DIR_LAST_USED_PGEX)
-			+ "/gene_up_has_interactions.txt");
-	private File geneDownIntFile = new File(PreferenceManager.getCurrent().get(
-			GlobalPreference.DIR_LAST_USED_PGEX)
-			+ "/gene_down_has_interactions.txt");
-
-	private WriteFiles wf = new WriteFiles();
+	Set<Xref> xrefSet = new HashSet<Xref>();
 
 	public void execute() throws DataException, IOException {
-		
-		
-		
-		
+
 		Set<Xref> miRNABackgroundSet = new HashSet<Xref>();
 		Set<Xref> geneBackgroundSet = new HashSet<Xref>();
-		Set<String> miRNAFinal = new HashSet<String>();
-		Set<String> geneFinal = new HashSet<String>();
+		Set<Xref> miRNAFinal = new HashSet<Xref>();
+		Set<Xref> geneFinal = new HashSet<Xref>();
 
 		miRNABackgroundSet = backgroundList(DataHolding
-				.getMiRNAImportInformation().getDataSource());
-		geneBackgroundSet = backgroundList(DataHolding
-				.getGeneImportInformation().getDataSource());
+				.getMiRNAImportInformation().getDataSource(), "miRNA");
 
-		miRNAUpPosIntGenes = criterionEvaluation(DataHolding.miRNAUpCriterion,
-				miRNABackgroundSet);
-		miRNADownPosIntGenes = criterionEvaluation(
-				DataHolding.miRNADownCriterion, miRNABackgroundSet);
-		geneUpPosIntGenes = criterionEvaluation(DataHolding.geneUpCriterion,
-				geneBackgroundSet);
-		geneDownPosIntGenes = criterionEvaluation(
-				DataHolding.geneDownCriterion, geneBackgroundSet);
-		
-		miRNAFinal.addAll(createFinalList(miRNAUpPosIntGenes));
-		miRNAFinal.addAll(createFinalList(miRNADownPosIntGenes));
-		geneFinal.addAll(createFinalList(geneUpPosIntGenes));
-		geneFinal.addAll(createFinalList(geneDownPosIntGenes));
-		
-		wf.writeListToFile(miRNADownPosIntGenes, miRNADownFile);
-		wf.writeListToFile(miRNAUpPosIntGenes, miRNAUpFile);
-		wf.writeListToFile(geneDownPosIntGenes, geneDownFile);
-		wf.writeListToFile(geneUpPosIntGenes, geneUpFile);
-		System.out.println("miRNA"+ miRNAFinal +"\n");
-		System.out.println("gene" + geneFinal + "\n");
+		if (DataHolding.getGeneImportInformation() != null) {
+			geneBackgroundSet = backgroundList(DataHolding
+					.getGeneImportInformation().getDataSource(), "gene");
+		}
+
+		if (DataHolding.isMiRNAUpCritCheck()) {
+			miRNAUpPosIntGenes = criterionEvaluation(
+					DataHolding.getMiRNAUpCriterion(), miRNABackgroundSet);
+			miRNAFinal.addAll(createFinalList(miRNAUpPosIntGenes, xrefSet,
+					DataHolding.getMiRNASysCode()));
+			// wf.writeListToFile(miRNADownPosIntGenes, miRNADownFile);
+
+		}
+
+		if (DataHolding.isMiRNADownCritCheck()) {
+			miRNADownPosIntGenes = criterionEvaluation(
+					DataHolding.getMiRNADownCriterion(), miRNABackgroundSet);
+			miRNAFinal.addAll(createFinalList(miRNADownPosIntGenes, xrefSet,
+					DataHolding.getMiRNASysCode()));
+			// wf.writeListToFile(miRNAUpPosIntGenes, miRNAUpFile);
+
+		}
+
+		if (DataHolding.isGeneFileLoaded() && DataHolding.isGeneUpCritCheck()) {
+			geneUpPosIntGenes = criterionEvaluation(
+					DataHolding.geneUpCriterion, geneBackgroundSet);
+			
+			
+			
+			geneFinal.addAll(createFinalList(geneUpPosIntGenes, xrefSet,
+					DataHolding.getGeneSysCode()));
+			// wf.writeListToFile(geneUpPosIntGenes, geneUpFile);
+		}
+
+		if (DataHolding.isGeneFileLoaded() && DataHolding.isGeneDownCritCheck()) {
+			geneDownPosIntGenes = criterionEvaluation(
+					DataHolding.geneDownCriterion, geneBackgroundSet);
+			geneFinal.addAll(createFinalList(geneDownPosIntGenes, xrefSet,
+					DataHolding.getGeneSysCode()));
+			// wf.writeListToFile(geneDownPosIntGenes, geneDownFile);
+		}
+
+		if (DataHolding.isGeneFileLoaded()) {
+			for (Xref x : geneFinal) {
+				positiveGeneList.add(x.toString());
+			}
+		} else {
+			for (Xref x : miRNAFinal) {
+				positiveGeneList.add(x.toString());
+			}
+		}
+
+		DataHolding.setPositiveGeneList(positiveGeneList);
+
+		System.out.print("geneFinal: " + geneFinal + "\n");
+		System.out.print("Poslist: " + positiveGeneList + "\n ");
 
 	}
 
-	public Set<String> createFinalList(Set<String> set) {
+	public Set<Xref> createFinalList(Set<String> set, Set<Xref> xrefSet,
+			String ds) {
+
 		Map<Xref, List<Interaction>> interactions = plugin.getInteractions();
-		Set<String> finalList = new HashSet<String>();
-		String [] arr = set.toArray(new String[set.size()]);
-		for (int i = 0;i<arr.length;i++) {
-			System.out.print("arr" + arr[i] + "\n");
-			
+		Object[] refArr = xrefSet.toArray();
+		Set<Xref> finalList = new HashSet<Xref>();
+		String[] arr = set.toArray(new String[set.size()]);
 		
-			if (set != null
-					&& interactions
-							.containsKey(arr[i])) {
+		System.out.print("Xrefset: " + xrefSet + "\n");
+
+		
+		for (int i = 0; i < arr.length; i++) {
+			int k = Integer.parseInt(arr[i]);
+
+		
+			
+			if (set != null && interactions.containsKey(refArr[k])
+					&& refArr[k].toString().startsWith(ds)) {
 				
 				
-				finalList.add(arr[i]);
+				
+				finalList.add((Xref) refArr[k]);
 			}
 		}
 		return finalList;
 	}
 
-	
-
-
-	
-
-
-	public Set<Xref> backgroundList(DataSource ds) {
+	public Set<Xref> backgroundList(DataSource ds, String type) {
 		Set<String> cGeneTotal = new HashSet<String>();
-		Set<Xref> set = new HashSet<Xref>();
+		
+		
+		
+		if(ds == null && type == "miRNA"){
+			ds = DataSource.getBySystemCode(DataHolding.getMiRNASysCode());
+			System.out.print("miRNADS: " + ds + "\n");
+		}
+		
+		if(ds == null && type == "gene"){
+			ds = DataSource.getBySystemCode(DataHolding.getGeneSysCode());
+		}
+		
 		try {
 			// get all xrefs in dataset
 			// TODO: for some reason the iterator doesn't work but in this way
@@ -191,25 +208,27 @@ public class PositiveGeneList {
 			for (int i = 0; i < desktop.getGexManager().getCurrentGex()
 					.getNrRow(); i++) {
 				IRow row = desktop.getGexManager().getCurrentGex().getRow(i);
+			
 				if (row.getXref().getDataSource() == ds) {
-					set.add(row.getXref());
+					xrefSet.add(row.getXref());
+
 				}
 			}
 			Collection<? extends IRow> rows = desktop.getGexManager()
-					.getCurrentGex().getData(set);
+					.getCurrentGex().getData(xrefSet);
 			if (rows != null) {
 				for (IRow row : rows) {
 					// Use group (line number) to identify a measurement
 					cGeneTotal.add(row.getGroup() + "");
+					
 				}
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
-		return set;
+
+		return xrefSet;
 	}
 
 	public static Set<String> criterionEvaluation(Criterion crit, Set<Xref> set)
@@ -228,12 +247,14 @@ public class PositiveGeneList {
 					boolean eval = crit.evaluate(row.getByName());
 					if (eval)
 						cGenePositive.add(row.getGroup() + "");
+					
+
 				} catch (CriterionException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		System.out.println("posgenes" + cGenePositive +"\n");
+
 		return cGenePositive;
 	}
 }

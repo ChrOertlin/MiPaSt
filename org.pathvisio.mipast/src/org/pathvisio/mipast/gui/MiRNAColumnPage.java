@@ -33,6 +33,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
+import org.bridgedb.DataSource;
 import org.pathvisio.desktop.util.RowNumberHeader;
 import org.pathvisio.gui.DataSourceModel;
 import org.pathvisio.gui.util.PermissiveComboBox;
@@ -166,7 +167,7 @@ class MiRNAColumnPage extends WizardPanelDescriptor {
 			public void actionPerformed(ActionEvent ae) {
 				DataHolding.getMiRNAImportInformation().setSysodeColumn(cbSyscodeCol
 						.getSelectedIndex());
-
+				
 				columnPageRefresh();
 			}
 		});

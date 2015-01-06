@@ -240,7 +240,17 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 	public void aboutToDisplayPanel() {
 		getWizard().setPageTitle("Set Expression criteria");
+		
+		if(!DataHolding.isGeneFileLoaded()){
+			geneLbl.setVisible(false);
+			geneUp.setVisible(false);
+			geneUpExpr.setVisible(false);
+			geneUpButton.setVisible(false);
+			geneDown.setVisible(false);
+			geneDownExpr.setVisible(false);
+			geneDownButton.setVisible(false);
 
+		}
 	}
 
 	public Criterion getCriterion() {
@@ -414,20 +424,20 @@ public class CriterionPage extends WizardPanelDescriptor implements
 			if (ACTION_OK.equals(action)) {
 				expressionTextField.setText(getExpression());
 
-				if (expressionTextField.equals(miRNAUpExpr)) {
+				if (expressionTextField.equals(miRNAUpExpr)&& miRNAUpExpr.getText()!= null) {
 					DataHolding.setMiRNAUpCrit(expressionTextField.getText());
 					miRNAUpCrit.setExpression(expressionTextField.getText());
 
 				}
-				if (expressionTextField.equals(geneUpExpr)) {
+				if (expressionTextField.equals(geneUpExpr)&& geneUpExpr.getText()!= null) {
 					DataHolding.setGeneUpCrit(expressionTextField.getText());
 					geneUpCrit.setExpression(expressionTextField.getText());
 				}
-				if (expressionTextField.equals(miRNADownExpr)) {
+				if (expressionTextField.equals(miRNADownExpr)&& miRNADownExpr.getText()!= null) {
 					DataHolding.setMiRNADownCrit(expressionTextField.getText());
 					miRNADownCrit.setExpression(expressionTextField.getText());
 				}
-				if (expressionTextField.equals(geneDownExpr)) {
+				if (expressionTextField.equals(geneDownExpr)&& geneDownExpr.getText()!= null) {
 					DataHolding.setGeneDownCrit(expressionTextField.getText());
 					geneDownCrit.setExpression(expressionTextField.getText());
 				}
@@ -445,16 +455,36 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 	public void aboutToHidePanel() {
 
-		DataHolding.miRNAUpCriterion.setExpression(miRNAUpExpr.getText());
-		DataHolding.geneUpCriterion.setExpression(geneUpExpr.getText());
-		DataHolding.miRNADownCriterion.setExpression(miRNADownExpr.getText());
-		DataHolding.geneDownCriterion.setExpression(geneDownExpr.getText());
+		if (miRNAUpExpr.getText().length()> 2) {
+			DataHolding.miRNAUpCriterion.setExpression(miRNAUpExpr.getText());
+			miRNAUpCrit.setExpression(miRNAUpExpr.getText());
+			DataHolding.setMiRNAUpCritCheck(true);
+		}
 
-		miRNAUpCrit.setExpression(miRNAUpExpr.getText());
-		geneUpCrit.setExpression(geneUpExpr.getText());
-		miRNADownCrit.setExpression(miRNADownExpr.getText());
-		geneDownCrit.setExpression(geneDownExpr.getText());
-		
+		if (miRNADownExpr.getText().length()> 2) {
+			DataHolding.miRNADownCriterion.setExpression(miRNADownExpr
+					.getText());
+			miRNADownCrit.setExpression(miRNADownExpr.getText());
+			DataHolding.setMiRNADownCritCheck(true);
+			System.out.print("expr:  " + miRNADownExpr.getText()+ "\n");
+			
+		}
+
+		if (DataHolding.isGeneFileLoaded()) {
+			if (geneUpExpr.getText().length() > 2) {
+				DataHolding.geneUpCriterion.setExpression(geneUpExpr.getText());
+				geneUpCrit.setExpression(geneUpExpr.getText());
+				DataHolding.setGeneUpCritCheck(true);
+			}
+			if (geneDownExpr.getText().length()>2) {
+				DataHolding.geneDownCriterion.setExpression(geneDownExpr
+						.getText());
+				geneDownCrit.setExpression(geneDownExpr.getText());
+				DataHolding.setGeneDownCritCheck(true);
+			}
+
+		}
+
 		PositiveGeneList posList = new PositiveGeneList(desktop, swingEngine,
 				plugin);
 		try {
@@ -467,32 +497,6 @@ public class CriterionPage extends WizardPanelDescriptor implements
 			e.printStackTrace();
 		}
 
-		
-		
-
-//
-//		zcMiU = new MiPastZScoreCalculator(miRNAUpCrit, pwDir, desktop
-//				.getGexManager().getCachedData(), desktop.getSwingEngine()
-//				.getGdbManager().getGeneDb(), pk);
-//
-//		zcGu = new MiPastZScoreCalculator(geneUpCrit, pwDir, desktop
-//				.getGexManager().getCachedData(), desktop.getSwingEngine()
-//				.getGdbManager().getGeneDb(), pk);
-//
-//		zcMiD = new MiPastZScoreCalculator(miRNADownCrit, pwDir, desktop
-//				.getGexManager().getCachedData(), desktop.getSwingEngine()
-//				.getGdbManager().getGeneDb(), pk);
-//		zcGd = new MiPastZScoreCalculator(geneDownCrit, pwDir, desktop
-//				.getGexManager().getCachedData(), desktop.getSwingEngine()
-//				.getGdbManager().getGeneDb(), pk);
-
-//		try {
-//			posLists.createXrefs(zcMiU, zcGu, zcMiD, zcGd);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		posLists.retrieveFinalList();
-//
 	}
 
 }
