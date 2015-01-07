@@ -87,6 +87,7 @@ public class PositiveGeneList {
 	private Set<String> geneDownPosIntGenes;
 
 	private Set<String> positiveGeneList = new HashSet<String>();
+	private Set<String>	backgroundSet = new HashSet<String>();
 
 	Set<Xref> xrefSet = new HashSet<Xref>();
 
@@ -145,18 +146,22 @@ public class PositiveGeneList {
 		if (DataHolding.isGeneFileLoaded()) {
 			for (Xref x : geneFinal) {
 				positiveGeneList.add(x.toString());
+				}
+			for(Xref y: geneBackgroundSet){
+				backgroundSet.add(y.toString());
 			}
+			
 		} else {
 			for (Xref x : miRNAFinal) {
 				positiveGeneList.add(x.toString());
 			}
+			for (Xref y : miRNABackgroundSet){
+				backgroundSet.add(y.toString());
+			}
 		}
 
 		DataHolding.setPositiveGeneList(positiveGeneList);
-
-		System.out.print("geneFinal: " + geneFinal + "\n");
-		System.out.print("Poslist: " + positiveGeneList + "\n ");
-
+		DataHolding.setBackgroundSet(backgroundSet);
 	}
 
 	public Set<Xref> createFinalList(Set<String> set, Set<Xref> xrefSet,
@@ -167,7 +172,7 @@ public class PositiveGeneList {
 		Set<Xref> finalList = new HashSet<Xref>();
 		String[] arr = set.toArray(new String[set.size()]);
 		
-		System.out.print("Xrefset: " + xrefSet + "\n");
+	
 
 		
 		for (int i = 0; i < arr.length; i++) {
@@ -193,7 +198,7 @@ public class PositiveGeneList {
 		
 		if(ds == null && type == "miRNA"){
 			ds = DataSource.getBySystemCode(DataHolding.getMiRNASysCode());
-			System.out.print("miRNADS: " + ds + "\n");
+			
 		}
 		
 		if(ds == null && type == "gene"){

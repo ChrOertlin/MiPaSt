@@ -76,7 +76,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 	
 	private SwingEngine se;
 	private PvDesktop desktop;
-
+	private File pwDir;
 	private JLabel pathwayLabel;
 
 	private JButton calculate;
@@ -89,7 +89,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 	private JPanel pathwayPanel;
 
 	private JPanel buttonPanel;
-	private JLabel lblResult;
+	private JLabel lblResult = new JLabel();
 
 	private StatisticsResult result = null;
 
@@ -179,7 +179,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 	public void actionPerformed(ActionEvent e) {
 		String action = e.getActionCommand();
 		if (ACTION_CALCULATE.equals(action)) {
-
+			doCalculate(pwDir);
 		}
 
 		else if (ACTION_SAVE.equals(action)) {
@@ -192,6 +192,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 			jfc.setCurrentDirectory(new File(pathwayDirText.getText()));
 			if (jfc.showDialog(null, "Choose") == JFileChooser.APPROVE_OPTION) {
 				String newVal = "" + jfc.getSelectedFile();
+				pwDir= jfc.getSelectedFile();
 				pathwayDirText.setText(newVal);
 
 			}
@@ -250,7 +251,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 
 		ZScoreWorker(File pwDir, IDMapper gdb, ProgressKeeper pk) {
 			this.pk = pk;
-			calculator = new MiPastZScoreCalculator(null, pwDir, null, gdb, pk);
+			calculator = new MiPastZScoreCalculator(pwDir,pk);
 			temp = new StatisticsTableModel();
 			temp.setColumns(new Column[] { Column.PATHWAY_NAME, Column.R,
 					Column.N, Column.TOTAL, Column.PCT, Column.ZSCORE,
@@ -266,8 +267,10 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 			StatisticsResult result;
 
 			if (useMappFinder) {
+				System.out.print("mappfinder used" + "\n");
 				result = calculator.calculateMappFinder();
 			} else {
+				System.out.print("alternative used" + "\n");
 				result = calculator.calculateAlternative();
 			}
 			return result;

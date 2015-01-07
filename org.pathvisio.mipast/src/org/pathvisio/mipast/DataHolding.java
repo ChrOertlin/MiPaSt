@@ -74,6 +74,16 @@ public class DataHolding {
 	private static Set<String> geneDownList;
 
 	public static Set<String> positiveGeneList;
+	public static Set<String> backgroundSet;
+	
+
+	public static Set<String> getBackgroundSet() {
+		return backgroundSet;
+	}
+
+	public static void setBackgroundSet(Set<String> backgroundSet) {
+		DataHolding.backgroundSet = backgroundSet;
+	}
 
 	public static Set<String> allGenesList;
 

@@ -466,7 +466,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 					.getText());
 			miRNADownCrit.setExpression(miRNADownExpr.getText());
 			DataHolding.setMiRNADownCritCheck(true);
-			System.out.print("expr:  " + miRNADownExpr.getText()+ "\n");
+			
 			
 		}
 

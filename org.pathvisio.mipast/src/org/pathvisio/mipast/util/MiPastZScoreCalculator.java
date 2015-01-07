@@ -60,8 +60,11 @@ public class MiPastZScoreCalculator {
 	private RefInfo refInfo;
 	
 	
-	public MiPastZScoreCalculator(Criterion crit, File pwDir, CachedData gex,
-			IDMapper gdb, ProgressKeeper pk) {
+	/**
+	 * @param pwDir
+	 * @param pk
+	 */
+	public MiPastZScoreCalculator(File pwDir,ProgressKeeper pk) {
 		if (pk != null) {
 			pk.setProgress(0);
 			pk.setTaskName("Analyzing data");
@@ -74,8 +77,8 @@ public class MiPastZScoreCalculator {
 				Column.N, Column.TOTAL, Column.PCT, Column.ZSCORE,
 				Column.PERMPVAL });
 		result.pwDir = pwDir;
-		result.gex = gex;
-		result.gdb = gdb;
+		//result.gex = gex;
+		//result.gdb = gdb;
 		this.pk = pk;
 		//this.refInfo= refInfo;
 	
@@ -131,9 +134,11 @@ public class MiPastZScoreCalculator {
 		 * @param aProbesPostive
 		 *            must be >= 0, and <= aProbesMeasured.
 		 */
-		public RefInfo(Set<String> aProbesMeasured, Set<String> aProbesPositive) {
+		public RefInfo(Set<String> aProbesMeasured, Set<String>aProbesPositive) {
 			probesMeasured = aProbesMeasured;
 			probesPositive = aProbesPositive;
+			
+			
 			if (probesPositive.size() > probesMeasured.size())
 				throw new IllegalArgumentException();
 		}
@@ -184,8 +189,16 @@ public class MiPastZScoreCalculator {
 		boolean isMeasured() {
 			return probesMeasured.size() > 0;
 		}
+		
+		
 	}
 //
+	public RefInfo putRef(Set<String> background, Set<String> positive){
+		
+		return new RefInfo(background,positive);
+		
+	}
+	
 //	/**
 //	 * Checks if the given ref evaluates positive for the criterion
 //	 * 
@@ -431,8 +444,8 @@ public class MiPastZScoreCalculator {
 		for (Xref srcRef : pwyMap.getSrcRefs()) {
 			if (pk != null && pk.isCancelled())
 				return;
-			//RefInfo refInfo = evaluateRef(srcRef);
-			dataMap.put(srcRef, refInfo);
+			RefInfo efInfo = putRef(DataHolding.backgroundSet,DataHolding.positiveGeneList);
+			dataMap.put(srcRef, efInfo);
 		}
 	}
 
@@ -449,15 +462,15 @@ public class MiPastZScoreCalculator {
 		}
 		pwyMap = new PathwayMap(result.pwDir);
 
-		// cache data for all pathways at once.
-		if (pk != null) {
-			if (pk.isCancelled())
-				return null;
-			pk.setTaskName("Reading dataset");
-			pk.setProgress(20);
-		}
-		result.gex.setMapper(result.gdb);
-		result.gex.syncSeed(pwyMap.getSrcRefs());
+//		// cache data for all pathways at once.
+//		if (pk != null) {
+//			if (pk.isCancelled())
+//				return null;
+//			pk.setTaskName("Reading dataset");
+//			pk.setProgress(20);
+//		}
+//		result.gex.setMapper(result.gdb);
+//		result.gex.syncSeed(pwyMap.getSrcRefs());
 
 		// calculate dataMap
 		if (pk != null) {
