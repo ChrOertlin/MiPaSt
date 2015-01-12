@@ -16,8 +16,10 @@ import org.pathvisio.core.debug.Logger;
 import org.pathvisio.core.util.ProgressKeeper;
 import org.pathvisio.core.util.Stats;
 import org.pathvisio.data.DataException;
+import org.pathvisio.data.DataInterface;
 import org.pathvisio.data.IRow;
 import org.pathvisio.desktop.gex.CachedData;
+import org.pathvisio.desktop.gex.GexManager;
 import org.pathvisio.desktop.visualization.Criterion;
 import org.pathvisio.desktop.visualization.Criterion.CriterionException;
 import org.pathvisio.mipast.DataHolding;
@@ -27,6 +29,7 @@ import org.pathvisio.statistics.StatisticsPathwayResult;
 import org.pathvisio.statistics.StatisticsResult;
 import org.pathvisio.statistics.StatisticsTableModel;
 import org.pathvisio.statistics.PathwayMap.PathwayInfo;
+
 
 
 
@@ -57,19 +60,20 @@ public class MiPastZScoreCalculator {
 	private final StatisticsResult result;
 	private final ProgressKeeper pk;
 	private Map<PathwayInfo, StatisticsPathwayResult> statsMap = new HashMap<PathwayInfo, StatisticsPathwayResult>();
-	private RefInfo refInfo;
+	private GexManager gm;
 	
 	
 	/**
 	 * @param pwDir
 	 * @param pk
 	 */
-	public MiPastZScoreCalculator(File pwDir,ProgressKeeper pk) {
+	public MiPastZScoreCalculator(File pwDir,ProgressKeeper pk, CachedData gex, GexManager gm) {
 		if (pk != null) {
 			pk.setProgress(0);
 			pk.setTaskName("Analyzing data");
 		}
-
+		
+		
 		result = new StatisticsResult();
 		//result.crit = crit;
 		result.stm = new StatisticsTableModel();
@@ -77,11 +81,12 @@ public class MiPastZScoreCalculator {
 				Column.N, Column.TOTAL, Column.PCT, Column.ZSCORE,
 				Column.PERMPVAL });
 		result.pwDir = pwDir;
-		//result.gex = gex;
+		result.gex = gex;
 		//result.gdb = gdb;
 		this.pk = pk;
-		//this.refInfo= refInfo;
+		this.gm = gm;
 	
+		
 		
 		
 		
@@ -137,7 +142,7 @@ public class MiPastZScoreCalculator {
 		public RefInfo(Set<String> aProbesMeasured, Set<String>aProbesPositive) {
 			probesMeasured = aProbesMeasured;
 			probesPositive = aProbesPositive;
-			
+		
 			
 			if (probesPositive.size() > probesMeasured.size())
 				throw new IllegalArgumentException();
@@ -180,134 +185,49 @@ public class MiPastZScoreCalculator {
 		 * For an alternative way, check getPositiveFraction
 		 */
 		boolean isPositive() {
-			return probesPositive.size() > 0;
+			return probesPositive.contains("1");
 		}
 
 		/**
 		 * returns true if at least one probe is measured
 		 */
 		boolean isMeasured() {
-			return probesMeasured.size() > 0;
+			return probesMeasured.contains("1");
 		}
+
+			
 		
-		
-	}
-//
-	public RefInfo putRef(Set<String> background, Set<String> positive){
-		
-		return new RefInfo(background,positive);
 		
 	}
 	
-//	/**
-//	 * Checks if the given ref evaluates positive for the criterion
-//	 * 
-//	 * Assumes that ref has already been cached earlier in a call to
-//	 * result.gex.cacheData(...)
-//	 */
-//	public RefInfo evaluateRef(Xref srcRef) {
-//		Set<String> cGeneTotal = new HashSet<String>();
-//		Set<String> cGenePositive = new HashSet<String>();
+	public RefInfo evaluatedRef(Xref srcRef){
+		Set<String> cGeneTotal = new HashSet<String>();
+		Set<String> cGenePositive = new HashSet<String>();
+				
+		// srcRef = key
+		// ref info
+		// if xref in positive = zwei liste mit je 1 element
+		
 //		
-//	
-//		
-//		List<? extends IRow> rows = result.gex.getData(srcRef);
-//		
-//	
-//		if (rows != null) {
-//			for (IRow row : rows) {
-//				if (pk != null && pk.isCancelled())
-//					return null;
-//				// Use group (line number) to identify a measurement
-//				cGeneTotal.add(row.getGroup() + "");
-//				try {
-//					boolean eval = result.crit.evaluate(row.getByName());
-//					System.out.print("eval: "+  eval+"\n");
-//					if (eval)
-//						cGenePositive.add(row.getGroup() + "");
-//				} catch (CriterionException e) {
-//					Logger.log.error("Unknown error during statistics", e);
-//				}
-//			}
-//
-//		}
-//
-//		return new RefInfo(cGeneTotal, cGenePositive);
-//	}
-
-	/**
-	 * Implementation of the Alternative method for calculating zscores. This
-	 * takes the whole dataset into account.
-	 */
-	private class AlternativeMethod extends Method {
-		@Override
-		/**
-		 * calculate bigN and bigR, based on the dataset.
-		 * This goes through every row of the dataset and counts the number
-		 * of total rows (bigN) and the number of rows meeting our criterion (bigR)
-		 */
-		public void calculateTotals() throws IDMapperException, DataException {
-			for (IRow d : result.gex.getIterator()) {
-				if (pk != null && pk.isCancelled())
-					return;
-				try {
-					result.bigN++;
-					boolean eval = result.crit.evaluate(d.getByName());
-					if (eval) {
-						result.bigR++;
-					}
-				} catch (CriterionException e) {
-					Logger.log.error("Problem during row handling ", e);
-				}
-
-				if (pk != null)
-					pk.setProgress((int) (0.1 * 100.0));
-			}
+//		// if xref in total && !positive = zwei listen - background 1, positive 0
+		if (DataHolding.getGeneTotal().contains(srcRef)){
+			
+			cGeneTotal.add("1");
+			
 		}
-
-		@Override
-		public void permute() {
-			// TODO: currently only implemented for MappFinderMethod.
-			// adjP and permP will be 0 for all pathways
+		if(DataHolding.getGeneFinal().contains(srcRef)){
+			cGenePositive.add("1");
 		}
-
-		/**
-		 * Calculates n and r for a pathway the alternative way:
-		 * <UL>
-		 * <LI>n: the number of rows in the dataset that map to a gene in the
-		 * pathway.
-		 * <LI>r: the number of significant rows in the dataset that map to a
-		 * gene in the pathway.
-		 * </UL>
-		 */
-		public StatisticsPathwayResult calculatePathway(PathwayInfo pi) {
-			Set<String> probesMeasured = new HashSet<String>();
-			Set<String> probesPositive = new HashSet<String>();
-
-			for (Xref ref : pi.getSrcRefs()) {
-				RefInfo refInfo = dataMap.get(ref);
-				probesMeasured.addAll(refInfo.getProbesMeasured());
-				probesPositive.addAll(refInfo.getProbesPositive());
-			}
-
-			int cPwyMeasured = probesMeasured.size();
-			int cPwyPositive = probesPositive.size();
-			int cPwyTotal = pi.getSrcRefs().size();
-
-			double zscore = Stats.zscore(cPwyMeasured, cPwyPositive,
-					result.bigN, result.bigR);
-			StatisticsPathwayResult spr = new StatisticsPathwayResult(
-					pi.getFile(), pi.getName(), cPwyMeasured, cPwyPositive,
-					cPwyTotal, zscore);
-			return spr;
-		}
-
-		public String getDescription() {
-			return "Calculation method: data-centric. Calculations are performed before mapping data to pathways.";
-		}
+		
+//		// if xref !total = zwei leere listen
+		
+		
+		
+		return new RefInfo(cGeneTotal, cGenePositive);
+		
 	}
-
-	/**
+//
+	/*
 	 * Implementation of the MAPPFinder method for calculating zscores. This
 	 * takes only the part of the dataset into account that maps to pathways.
 	 */
@@ -363,6 +283,7 @@ public class MiPastZScoreCalculator {
 					for (Xref ref : pi.getSrcRefs()) {
 						RefInfo refInfo = dataMap2.get(ref);
 						if (refInfo.isMeasured())
+							
 							cPwyMeasured++;
 						if (refInfo.isPositive())
 							cPwyPositive++;
@@ -399,12 +320,17 @@ public class MiPastZScoreCalculator {
 		public void calculateTotals() {
 			// go over all datanodes in all pathways
 			for (Xref ref : dataMap.keySet()) {
+				
+				
 				RefInfo refInfo = dataMap.get(ref);
+				
 				if (refInfo.isMeasured())
 					result.bigN++;
 				if (refInfo.isPositive())
 					result.bigR++;
 			}
+			
+			
 		}
 
 		/**
@@ -438,14 +364,14 @@ public class MiPastZScoreCalculator {
 		}
 	}
 
-	private void calculateDataMap(RefInfo refInfo) {
+	private void calculateDataMap() {
 		dataMap = new HashMap<Xref, RefInfo>();
 		// go over all datanodes in all pathways
 		for (Xref srcRef : pwyMap.getSrcRefs()) {
 			if (pk != null && pk.isCancelled())
 				return;
-			RefInfo efInfo = putRef(DataHolding.backgroundSet,DataHolding.positiveGeneList);
-			dataMap.put(srcRef, efInfo);
+			RefInfo refInfo = evaluatedRef(srcRef);
+			dataMap.put(srcRef, refInfo);
 		}
 	}
 
@@ -461,16 +387,16 @@ public class MiPastZScoreCalculator {
 			pk.setProgress(0);
 		}
 		pwyMap = new PathwayMap(result.pwDir);
-
-//		// cache data for all pathways at once.
-//		if (pk != null) {
-//			if (pk.isCancelled())
-//				return null;
-//			pk.setTaskName("Reading dataset");
-//			pk.setProgress(20);
-//		}
-//		result.gex.setMapper(result.gdb);
-//		result.gex.syncSeed(pwyMap.getSrcRefs());
+		
+		// cache data for all pathways at once.
+		if (pk != null) {
+			if (pk.isCancelled())
+				return null;
+			pk.setTaskName("Reading dataset");
+			pk.setProgress(20);
+		}
+		//result.gex.setMapper(result.gdb);
+		//result.gex.syncSeed(pwyMap.getSrcRefs());
 
 		// calculate dataMap
 		if (pk != null) {
@@ -479,7 +405,8 @@ public class MiPastZScoreCalculator {
 			pk.setTaskName("Calculating expression data");
 			pk.setProgress(40);
 		}
-		calculateDataMap(refInfo);
+		
+		calculateDataMap();
 
 		if (pk != null) {
 			if (pk.isCancelled())
@@ -487,6 +414,9 @@ public class MiPastZScoreCalculator {
 			pk.setTaskName("Calculating on dataset");
 			pk.setProgress(60);
 		}
+		
+		
+		
 		m.calculateTotals();
 		Logger.log.info("N: " + result.bigN + ", R: " + result.bigR);
 
@@ -531,10 +461,7 @@ public class MiPastZScoreCalculator {
 	 * 
 	 * @throws DataException
 	 */
-	public StatisticsResult calculateAlternative() throws IDMapperException,
-			DataException {
-		return calculate(new AlternativeMethod());
-	}
+
 
 	public StatisticsResult calculateMappFinder() throws IDMapperException,
 			DataException {

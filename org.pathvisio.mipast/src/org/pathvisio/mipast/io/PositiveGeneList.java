@@ -80,14 +80,15 @@ public class PositiveGeneList {
 		this.plugin = plugin;
 
 	}
-	
+
+	private Set<Xref> geneTotalList = new HashSet<Xref>();
 	private Set<String> miRNAUpPosIntGenes;
 	private Set<String> geneUpPosIntGenes;
 	private Set<String> miRNADownPosIntGenes;
 	private Set<String> geneDownPosIntGenes;
 
 	private Set<String> positiveGeneList = new HashSet<String>();
-	private Set<String>	backgroundSet = new HashSet<String>();
+	private Set<String> backgroundSet = new HashSet<String>();
 
 	Set<Xref> xrefSet = new HashSet<Xref>();
 
@@ -127,9 +128,7 @@ public class PositiveGeneList {
 		if (DataHolding.isGeneFileLoaded() && DataHolding.isGeneUpCritCheck()) {
 			geneUpPosIntGenes = criterionEvaluation(
 					DataHolding.geneUpCriterion, geneBackgroundSet);
-			
-			
-			
+
 			geneFinal.addAll(createFinalList(geneUpPosIntGenes, xrefSet,
 					DataHolding.getGeneSysCode()));
 			// wf.writeListToFile(geneUpPosIntGenes, geneUpFile);
@@ -146,22 +145,28 @@ public class PositiveGeneList {
 		if (DataHolding.isGeneFileLoaded()) {
 			for (Xref x : geneFinal) {
 				positiveGeneList.add(x.toString());
-				}
-			for(Xref y: geneBackgroundSet){
+			}
+			for (Xref y : geneTotalList) {
 				backgroundSet.add(y.toString());
 			}
 			
+		
 		} else {
 			for (Xref x : miRNAFinal) {
 				positiveGeneList.add(x.toString());
 			}
-			for (Xref y : miRNABackgroundSet){
+			for (Xref y : miRNABackgroundSet) {
 				backgroundSet.add(y.toString());
 			}
 		}
 
-		DataHolding.setPositiveGeneList(positiveGeneList);
-		DataHolding.setBackgroundSet(backgroundSet);
+	
+		
+		
+		DataHolding.setGeneFinal(geneFinal);
+		DataHolding.setGeneTotal(geneTotalList);
+		
+	
 	}
 
 	public Set<Xref> createFinalList(Set<String> set, Set<Xref> xrefSet,
@@ -171,40 +176,35 @@ public class PositiveGeneList {
 		Object[] refArr = xrefSet.toArray();
 		Set<Xref> finalList = new HashSet<Xref>();
 		String[] arr = set.toArray(new String[set.size()]);
-		
-	
 
-		
 		for (int i = 0; i < arr.length; i++) {
-			int k = Integer.parseInt(arr[i]);
 
-		
-			
+			int k = Integer.parseInt(arr[i]);
+			if (k == refArr.length) {
+				k = refArr.length - 1;
+			}
 			if (set != null && interactions.containsKey(refArr[k])
 					&& refArr[k].toString().startsWith(ds)) {
-				
-				
-				
+
 				finalList.add((Xref) refArr[k]);
 			}
+
 		}
 		return finalList;
 	}
 
 	public Set<Xref> backgroundList(DataSource ds, String type) {
 		Set<String> cGeneTotal = new HashSet<String>();
-		
-		
-		
-		if(ds == null && type == "miRNA"){
+
+		if (ds == null && type == "miRNA") {
 			ds = DataSource.getBySystemCode(DataHolding.getMiRNASysCode());
-			
+
 		}
-		
-		if(ds == null && type == "gene"){
+
+		if (ds == null && type == "gene") {
 			ds = DataSource.getBySystemCode(DataHolding.getGeneSysCode());
 		}
-		
+
 		try {
 			// get all xrefs in dataset
 			// TODO: for some reason the iterator doesn't work but in this way
@@ -213,9 +213,13 @@ public class PositiveGeneList {
 			for (int i = 0; i < desktop.getGexManager().getCurrentGex()
 					.getNrRow(); i++) {
 				IRow row = desktop.getGexManager().getCurrentGex().getRow(i);
-			
+
 				if (row.getXref().getDataSource() == ds) {
 					xrefSet.add(row.getXref());
+
+				}
+				if (row.getXref().getDataSource() == ds && type!= "miRNA") {
+					geneTotalList.add(row.getXref());
 
 				}
 			}
@@ -225,7 +229,7 @@ public class PositiveGeneList {
 				for (IRow row : rows) {
 					// Use group (line number) to identify a measurement
 					cGeneTotal.add(row.getGroup() + "");
-					
+
 				}
 			}
 
@@ -252,7 +256,6 @@ public class PositiveGeneList {
 					boolean eval = crit.evaluate(row.getByName());
 					if (eval)
 						cGenePositive.add(row.getGroup() + "");
-					
 
 				} catch (CriterionException e) {
 					e.printStackTrace();

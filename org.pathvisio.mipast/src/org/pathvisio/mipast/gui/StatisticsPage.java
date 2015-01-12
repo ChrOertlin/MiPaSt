@@ -99,6 +99,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 		super(IDENTIFIER);
 		this.desktop = desktop;
 		se = desktop.getSwingEngine();
+		
 	}
 
 	@Override
@@ -229,11 +230,10 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 	 * asynchronous statistics calculation function
 	 */
 	private void doCalculate(final File pwDir) {
+		
 		save.setEnabled(false);
-
 		ProgressKeeper pk = new ProgressKeeper(100);
-		final ZScoreWorker worker = new ZScoreWorker(pwDir, se.getGdbManager()
-				.getCurrentGdb(), pk);
+		final ZScoreWorker worker = new ZScoreWorker(pwDir, se.getGdbManager().getCurrentGdb(), pk);
 		ProgressDialog d = new ProgressDialog(
 				JOptionPane.getFrameForComponent(desktop.getFrame()),
 				"Calculating Z-scores", pk, true, true);
@@ -247,18 +247,18 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 
 		// temporary model that will be filled with intermediate results.
 		private StatisticsTableModel temp;
-		private boolean useMappFinder;
+		
 
 		ZScoreWorker(File pwDir, IDMapper gdb, ProgressKeeper pk) {
 			this.pk = pk;
-			calculator = new MiPastZScoreCalculator(pwDir,pk);
+			calculator = new MiPastZScoreCalculator(pwDir,pk, desktop.getGexManager().getCachedData(),desktop.getGexManager());
 			temp = new StatisticsTableModel();
 			temp.setColumns(new Column[] { Column.PATHWAY_NAME, Column.R,
 					Column.N, Column.TOTAL, Column.PCT, Column.ZSCORE,
 					Column.PERMPVAL });
 			tblResult.setModel(temp);
-			useMappFinder = PreferenceManager.getCurrent().getBoolean(
-					StatisticsPreference.MAPPFINDER_COMPATIBILITY);
+//			useMappFinder = PreferenceManager.getCurrent().getBoolean(
+//					StatisticsPreference.MAPPFINDER_COMPATIBILITY);
 		}
 
 		@Override
@@ -266,13 +266,8 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 				DataException {
 			StatisticsResult result;
 
-			if (useMappFinder) {
-				System.out.print("mappfinder used" + "\n");
+		
 				result = calculator.calculateMappFinder();
-			} else {
-				System.out.print("alternative used" + "\n");
-				result = calculator.calculateAlternative();
-			}
 			return result;
 		}
 

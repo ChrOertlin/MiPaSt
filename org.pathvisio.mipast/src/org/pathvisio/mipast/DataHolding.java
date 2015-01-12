@@ -76,6 +76,25 @@ public class DataHolding {
 	public static Set<String> positiveGeneList;
 	public static Set<String> backgroundSet;
 	
+	public static Set<Xref>	geneFinal;
+	public static Set<Xref> geneTotal;
+	
+
+	public static Set<Xref> getGeneFinal() {
+		return geneFinal;
+	}
+
+	public static void setGeneFinal(Set<Xref> geneFinal) {
+		DataHolding.geneFinal = geneFinal;
+	}
+
+	public static Set<Xref> getGeneTotal() {
+		return geneTotal;
+	}
+
+	public static void setGeneTotal(Set<Xref> geneTotal) {
+		DataHolding.geneTotal = geneTotal;
+	}
 
 	public static Set<String> getBackgroundSet() {
 		return backgroundSet;

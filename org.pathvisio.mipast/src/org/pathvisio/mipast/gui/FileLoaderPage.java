@@ -211,9 +211,7 @@ class FileLoaderPage extends WizardPanelDescriptor implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				String action = e.getActionCommand();
 
-				if (ACTION_GDB.equals(action)
-						&& !standaloneEngine.getGexManager().getCurrentGex()
-								.isConnected()) {
+				if (ACTION_GDB.equals(action)) {
 					standaloneEngine.selectGdb("Gene");
 					dbText.setText(PreferenceManager.getCurrent().get(
 							GlobalPreference.DB_CONNECTSTRING_GDB));
