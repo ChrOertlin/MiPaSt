@@ -387,6 +387,7 @@ public class MiPastZScoreCalculator {
 			pk.setProgress(0);
 		}
 		pwyMap = new PathwayMap(result.pwDir);
+		DataHolding.setPathwayGenes(pwyMap.getSrcRefs());
 		
 		// cache data for all pathways at once.
 		if (pk != null) {

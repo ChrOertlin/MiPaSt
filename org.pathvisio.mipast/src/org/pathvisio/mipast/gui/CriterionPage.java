@@ -27,6 +27,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -77,15 +78,6 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	private static Criterion miRNADownCrit = new Criterion();
 	private static Criterion geneDownCrit = new Criterion();
 
-	private MiPastZScoreCalculator zcMiU;
-	private MiPastZScoreCalculator zcGu;
-	private MiPastZScoreCalculator zcMiD;
-	private MiPastZScoreCalculator zcGd;
-
-	private ProgressKeeper pk;
-	private File pwDir = new File("home/bigcat/Desktop/pathways/");
-
-	private boolean geneDataAvailable;
 
 	private Criterion myCriterion = new Criterion();
 	private List<String> sampleNames;
@@ -95,6 +87,11 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	final static String ACTION_GENE_UP = "geneUpregulation";
 	final static String ACTION_MIRNA_DOWN = "miRNADownregulation";
 	final static String ACTION_GENE_DOWN = "geneDownregulation";
+	final static String ACTION_NEG_INVERSE = "negInverse";
+	final static String ACTION_POS_INVERSE = "posInverse";
+	final static String ACTION_NEG_DIRECT = "negDirect";
+	final static String ACTION_POS_DIRECT = "posDirect";
+	final static String ACTION_ALL_REG = "allRegulation";
 
 	final static String ACTION_INFO = "InfoButton";
 
@@ -126,9 +123,24 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	private JTextField setExpr;
 	private JButton exprOk;
 
-	private JLabel pathwayLabel;
-	private JButton browsePathways;
-	private JTextField pathwayTextField;
+	private JLabel negInverse;
+	private JCheckBox negInverseCheck;
+
+	private JLabel posInverse;
+	private JCheckBox posInverseCheck;
+
+	private JLabel negDirect;
+	private JCheckBox negDirectCheck;
+
+	private JLabel posDirect;
+	private JCheckBox posDirectCheck;
+
+	private JLabel allRegulations;
+	private JCheckBox allRegulationsCheck;
+	
+	
+	
+	
 
 	public CriterionPage(PvDesktop desktop, SwingEngine se, RegIntPlugin plugin) {
 		super(IDENTIFIER);
@@ -179,16 +191,31 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 		infoBtn = new JButton("Info");
 
+		negInverse = new JLabel(
+				"Inverse: miRNA downregulated, Gene upregulated");
+		negInverseCheck = new JCheckBox();
+
+		posInverse = new JLabel(
+				"Inverse: miRNA upregulated, Gene downregulated");
+		posInverseCheck = new JCheckBox();
+
+		negDirect = new JLabel("Direct: miRNA upregulated, Gene upregulated");
+		negDirectCheck = new JCheckBox();
+
+		posDirect = new JLabel(
+				"Direct: miRNA downregulated, Gene downregulated");
+		posDirectCheck = new JCheckBox();
+
+		allRegulations = new JLabel("All of the above");
+		allRegulationsCheck = new JCheckBox();
+
 		// pathway objects
-		pathwayLabel = new JLabel("Pathway directory:");
-		pathwayTextField = new JTextField(40);
-		browsePathways = new JButton("Browse");
 
 		CellConstraints cc = new CellConstraints();
 
 		FormLayout layout = new FormLayout(
 				"pref,15dlu,pref,15dlu,pref,15dlu,pref,15dlu,pref,15dlu, pref, 15dlu, pref, default",
-				"pref,10dlu, pref,8dlu,pref,20dlu,pref,20dlu,pref,10dlu,pref,8dlu,pref,8dlu,pref, 8dlu,pref");
+				"pref,10dlu, pref,8dlu,pref,20dlu,pref,20dlu,pref,10dlu,pref,8dlu,pref,8dlu,pref, 8dlu,pref, 8dlu,pref, 8dlu,pref, 8dlu,pref");
 		PanelBuilder builder = new PanelBuilder(layout);
 
 		builder.addSeparator("", cc.xyw(1, 2, 10));
@@ -220,6 +247,22 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 		builder.add(infoBtn, cc.xy(5, 13));
 
+		builder.add(negInverse, cc.xy(1, 15));
+		builder.add(negInverseCheck, cc.xy(3, 15));
+
+		builder.add(posInverse, cc.xy(1, 17));
+		builder.add(posInverseCheck, cc.xy(3, 17));
+
+		builder.add(posDirect, cc.xy(1, 19));
+		builder.add(posDirectCheck, cc.xy(3, 19));
+		
+		builder.add(negDirect, cc.xy(1, 21));
+		builder.add(negDirect, cc.xy(3, 21));
+		
+
+		builder.add(allRegulations, cc.xy(1, 23));
+		builder.add(allRegulationsCheck, cc.xy(3, 23));
+
 		infoBtn.addActionListener(this);
 		infoBtn.setActionCommand(ACTION_INFO);
 
@@ -235,13 +278,28 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		geneDownButton.addActionListener(this);
 		geneDownButton.setActionCommand(ACTION_GENE_DOWN);
 
+		negInverseCheck.addActionListener(this);
+		negInverseCheck.setActionCommand(ACTION_NEG_INVERSE);
+
+		posInverseCheck.addActionListener(this);
+		posInverseCheck.setActionCommand(ACTION_POS_INVERSE);
+
+		negDirectCheck.addActionListener(this);
+		negDirectCheck.setActionCommand(ACTION_NEG_DIRECT);
+
+		posDirectCheck.addActionListener(this);
+		posDirectCheck.setActionCommand(ACTION_POS_DIRECT);
+
+		allRegulationsCheck.addActionListener(this);
+		allRegulationsCheck.setActionCommand(ACTION_ALL_REG);
+
 		return builder.getPanel();
 	}
 
 	public void aboutToDisplayPanel() {
 		getWizard().setPageTitle("Set Expression criteria");
-		
-		if(!DataHolding.isGeneFileLoaded()){
+
+		if (!DataHolding.isGeneFileLoaded()) {
 			geneLbl.setVisible(false);
 			geneUp.setVisible(false);
 			geneUpExpr.setVisible(false);
@@ -293,20 +351,64 @@ public class CriterionPage extends WizardPanelDescriptor implements
 			}
 		}
 
-		else if (ACTION_MIRNA_UP.equals(action)) {
+		if (ACTION_MIRNA_UP.equals(action)) {
 			ed.ExpressionDialog(miRNAUpExpr);
 		}
 
-		else if (ACTION_GENE_UP.equals(action)) {
+		if (ACTION_GENE_UP.equals(action)) {
 			ed.ExpressionDialog(geneUpExpr);
 		}
 
-		else if (ACTION_MIRNA_DOWN.equals(action)) {
+		if (ACTION_MIRNA_DOWN.equals(action)) {
 			ed.ExpressionDialog(miRNADownExpr);
 		}
 
-		else if (ACTION_GENE_DOWN.equals(action)) {
+		if (ACTION_GENE_DOWN.equals(action)) {
 			ed.ExpressionDialog(geneDownExpr);
+		}
+
+		if (ACTION_NEG_INVERSE.equals(action)) {
+			if(negInverseCheck.isSelected()){
+				DataHolding.setBolNegInverse(true);
+			}
+			if(!negInverseCheck.isSelected()){
+				DataHolding.setBolNegInverse(false);
+			}
+		}
+		if (ACTION_POS_INVERSE.equals(action)) {
+			if(posInverseCheck.isSelected()){
+				DataHolding.setBolPosInverse(true);
+			}
+			if(!posInverseCheck.isSelected()){
+				DataHolding.setBolPosInverse(false);
+			}
+
+		}
+		if (ACTION_NEG_DIRECT.equals(action)) {
+			if(negDirectCheck.isSelected()){
+				DataHolding.setBolNegDirect(true);
+			}
+			if(!negDirectCheck.isSelected()){
+				DataHolding.setBolNegDirect(false);
+			}
+
+		}
+		if (ACTION_POS_DIRECT.equals(action)) {
+			if(posDirectCheck.isSelected()){
+				DataHolding.setBolPosDirect(true);
+			}
+			if(!posDirectCheck.isSelected()){
+				DataHolding.setBolPosDirect(false);
+			}
+		}
+		if (ACTION_ALL_REG.equals(action)) {
+			if(allRegulationsCheck.isSelected()){
+				DataHolding.setBolAllReg(true);
+			}
+			if(!allRegulationsCheck.isSelected()){
+				DataHolding.setBolAllReg(false);
+			}
+
 		}
 
 	}
@@ -424,20 +526,24 @@ public class CriterionPage extends WizardPanelDescriptor implements
 			if (ACTION_OK.equals(action)) {
 				expressionTextField.setText(getExpression());
 
-				if (expressionTextField.equals(miRNAUpExpr)&& miRNAUpExpr.getText()!= null) {
+				if (expressionTextField.equals(miRNAUpExpr)
+						&& miRNAUpExpr.getText() != null) {
 					DataHolding.setMiRNAUpCrit(expressionTextField.getText());
 					miRNAUpCrit.setExpression(expressionTextField.getText());
 
 				}
-				if (expressionTextField.equals(geneUpExpr)&& geneUpExpr.getText()!= null) {
+				if (expressionTextField.equals(geneUpExpr)
+						&& geneUpExpr.getText() != null) {
 					DataHolding.setGeneUpCrit(expressionTextField.getText());
 					geneUpCrit.setExpression(expressionTextField.getText());
 				}
-				if (expressionTextField.equals(miRNADownExpr)&& miRNADownExpr.getText()!= null) {
+				if (expressionTextField.equals(miRNADownExpr)
+						&& miRNADownExpr.getText() != null) {
 					DataHolding.setMiRNADownCrit(expressionTextField.getText());
 					miRNADownCrit.setExpression(expressionTextField.getText());
 				}
-				if (expressionTextField.equals(geneDownExpr)&& geneDownExpr.getText()!= null) {
+				if (expressionTextField.equals(geneDownExpr)
+						&& geneDownExpr.getText() != null) {
 					DataHolding.setGeneDownCrit(expressionTextField.getText());
 					geneDownCrit.setExpression(expressionTextField.getText());
 				}
@@ -455,19 +561,18 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 	public void aboutToHidePanel() {
 
-		if (miRNAUpExpr.getText().length()> 2) {
+		if (miRNAUpExpr.getText().length() > 2) {
 			DataHolding.miRNAUpCriterion.setExpression(miRNAUpExpr.getText());
 			miRNAUpCrit.setExpression(miRNAUpExpr.getText());
 			DataHolding.setMiRNAUpCritCheck(true);
 		}
 
-		if (miRNADownExpr.getText().length()> 2) {
+		if (miRNADownExpr.getText().length() > 2) {
 			DataHolding.miRNADownCriterion.setExpression(miRNADownExpr
 					.getText());
 			miRNADownCrit.setExpression(miRNADownExpr.getText());
 			DataHolding.setMiRNADownCritCheck(true);
-			
-			
+
 		}
 
 		if (DataHolding.isGeneFileLoaded()) {
@@ -476,7 +581,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 				geneUpCrit.setExpression(geneUpExpr.getText());
 				DataHolding.setGeneUpCritCheck(true);
 			}
-			if (geneDownExpr.getText().length()>2) {
+			if (geneDownExpr.getText().length() > 2) {
 				DataHolding.geneDownCriterion.setExpression(geneDownExpr
 						.getText());
 				geneDownCrit.setExpression(geneDownExpr.getText());

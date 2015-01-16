@@ -77,8 +77,95 @@ public class DataHolding {
 	public static Set<String> backgroundSet;
 	
 	public static Set<Xref>	geneFinal;
-	public static Set<Xref> geneTotal;
+	public static Set<Xref> geneBackgroundSet;
 	
+	public static Set<Xref> miRNAFinal;
+	
+	
+	public static Set<Xref> allGenesList;
+	public static Set<Xref> allmiRNAList;
+	
+	public static Set<Xref> pathwayGenes;
+	
+	public static boolean bolNegInverse;
+	public static boolean bolPosInverse;
+	public static boolean bolNegDirect;
+	public static boolean bolPosDirect;
+	public static boolean bolAllReg;
+	
+
+
+	public static boolean isBolNegInverse() {
+		return bolNegInverse;
+	}
+
+	public static void setBolNegInverse(boolean bolNegInverse) {
+		DataHolding.bolNegInverse = bolNegInverse;
+	}
+
+	public static boolean isBolPosInverse() {
+		return bolPosInverse;
+	}
+
+	public static void setBolPosInverse(boolean bolPosInverse) {
+		DataHolding.bolPosInverse = bolPosInverse;
+	}
+
+	public static boolean isBolNegDirect() {
+		return bolNegDirect;
+	}
+
+	public static void setBolNegDirect(boolean bolNegDirect) {
+		DataHolding.bolNegDirect = bolNegDirect;
+	}
+
+	public static boolean isBolPosDirect() {
+		return bolPosDirect;
+	}
+
+	public static void setBolPosDirect(boolean bolPosDirect) {
+		DataHolding.bolPosDirect = bolPosDirect;
+	}
+
+	public static boolean isBolAllReg() {
+		return bolAllReg;
+	}
+
+	public static void setBolAllReg(boolean bolAllReg) {
+		DataHolding.bolAllReg = bolAllReg;
+	}
+
+	public static Set<Xref> getPathwayGenes() {
+		return pathwayGenes;
+	}
+
+	public static void setPathwayGenes(Set<Xref> pathwayGenes) {
+		DataHolding.pathwayGenes = pathwayGenes;
+	}
+
+	public static Set<Xref> getAllmiRNAList() {
+		return allmiRNAList;
+	}
+
+	public static void setAllmiRNAList(Set<Xref> allmiRNAList) {
+		DataHolding.allmiRNAList = allmiRNAList;
+	}
+
+	public static Set<Xref> getGeneBackgroundSet() {
+		return geneBackgroundSet;
+	}
+
+	public static void setGeneBackgroundSet(Set<Xref> geneBackgroundSet) {
+		DataHolding.geneBackgroundSet = geneBackgroundSet;
+	}
+
+	public static Set<Xref> getMiRNAFinal() {
+		return miRNAFinal;
+	}
+
+	public static void setMiRNAFinal(Set<Xref> miRNAFinal) {
+		DataHolding.miRNAFinal = miRNAFinal;
+	}
 
 	public static Set<Xref> getGeneFinal() {
 		return geneFinal;
@@ -89,11 +176,11 @@ public class DataHolding {
 	}
 
 	public static Set<Xref> getGeneTotal() {
-		return geneTotal;
+		return geneBackgroundSet;
 	}
 
 	public static void setGeneTotal(Set<Xref> geneTotal) {
-		DataHolding.geneTotal = geneTotal;
+		DataHolding.geneBackgroundSet = geneTotal;
 	}
 
 	public static Set<String> getBackgroundSet() {
@@ -104,13 +191,13 @@ public class DataHolding {
 		DataHolding.backgroundSet = backgroundSet;
 	}
 
-	public static Set<String> allGenesList;
 
-	public static Set<String> getAllGenesList() {
+
+	public static Set<Xref> getAllGenesList() {
 		return allGenesList;
 	}
 
-	public static void setAllGenesList(Set<String> allGenesList) {
+	public static void setAllGenesList(Set<Xref> allGenesList) {
 		DataHolding.allGenesList = allGenesList;
 	}
 
@@ -333,4 +420,6 @@ public class DataHolding {
 	public static void setMiRNASysCode(String miRNASysCode) {
 		DataHolding.miRNASysCode = miRNASysCode;
 	}
+
+	
 }

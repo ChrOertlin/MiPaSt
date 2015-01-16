@@ -47,6 +47,7 @@ import org.pathvisio.desktop.visualization.Criterion.CriterionException;
 import org.pathvisio.gexplugin.ImportInformation;
 import org.pathvisio.gui.SwingEngine;
 import org.pathvisio.mipast.DataHolding;
+import org.pathvisio.mipast.util.BackgroundsetMethods;
 import org.pathvisio.mipast.util.MiPastZScoreCalculator;
 import org.pathvisio.mipast.util.MiPastZScoreCalculator.RefInfo;
 import org.pathvisio.mipast.util.WriteFiles;
@@ -81,92 +82,125 @@ public class PositiveGeneList {
 
 	}
 
+	private Set<Xref> allXref = new HashSet<Xref>();
 	private Set<Xref> geneTotalList = new HashSet<Xref>();
+	private Set<Xref> miRNATotalList = new HashSet<Xref>();
 	private Set<String> miRNAUpPosIntGenes;
 	private Set<String> geneUpPosIntGenes;
 	private Set<String> miRNADownPosIntGenes;
 	private Set<String> geneDownPosIntGenes;
 
-	private Set<String> positiveGeneList = new HashSet<String>();
-	private Set<String> backgroundSet = new HashSet<String>();
-
 	Set<Xref> xrefSet = new HashSet<Xref>();
 
 	public void execute() throws DataException, IOException {
 
-		Set<Xref> miRNABackgroundSet = new HashSet<Xref>();
-		Set<Xref> geneBackgroundSet = new HashSet<Xref>();
+		Set<Xref> allMiRNAInDataset = new HashSet<Xref>();
+		Set<Xref> allGenesInDataset = new HashSet<Xref>();
+
+		Set<Xref> miRNAFinalUp = new HashSet<Xref>();
+		Set<Xref> geneFinalUp = new HashSet<Xref>();
+		Set<Xref> miRNAFinalDown = new HashSet<Xref>();
+		Set<Xref> geneFinalDown = new HashSet<Xref>();
+
 		Set<Xref> miRNAFinal = new HashSet<Xref>();
 		Set<Xref> geneFinal = new HashSet<Xref>();
 
-		miRNABackgroundSet = backgroundList(DataHolding
-				.getMiRNAImportInformation().getDataSource(), "miRNA");
+		allMiRNAInDataset = getallXrefs(DataHolding.getMiRNAImportInformation()
+				.getDataSource(), "miRNA");
 
 		if (DataHolding.getGeneImportInformation() != null) {
-			geneBackgroundSet = backgroundList(DataHolding
+			allGenesInDataset = getallXrefs(DataHolding
 					.getGeneImportInformation().getDataSource(), "gene");
 		}
 
-		if (DataHolding.isMiRNAUpCritCheck()) {
+		if (DataHolding.isMiRNAUpCritCheck() & DataHolding.isBolNegInverse()
+				|| DataHolding.isMiRNAUpCritCheck()
+				& DataHolding.isBolPosDirect()
+				|| DataHolding.isMiRNAUpCritCheck() & DataHolding.isBolAllReg()) {
 			miRNAUpPosIntGenes = criterionEvaluation(
-					DataHolding.getMiRNAUpCriterion(), miRNABackgroundSet);
-			miRNAFinal.addAll(createFinalList(miRNAUpPosIntGenes, xrefSet,
+					DataHolding.getMiRNAUpCriterion(), allMiRNAInDataset);
+			miRNAFinalUp.addAll(createFinalList(miRNAUpPosIntGenes, allXref,
 					DataHolding.getMiRNASysCode()));
 			// wf.writeListToFile(miRNADownPosIntGenes, miRNADownFile);
 
+			System.out.print("miRNAUpRegulated");
 		}
 
-		if (DataHolding.isMiRNADownCritCheck()) {
+		if (DataHolding.isMiRNAUpCritCheck() & DataHolding.isBolPosInverse()
+				|| DataHolding.isMiRNAUpCritCheck()
+				& DataHolding.isBolNegDirect()
+				|| DataHolding.isMiRNAUpCritCheck() & DataHolding.isBolAllReg()) {
 			miRNADownPosIntGenes = criterionEvaluation(
-					DataHolding.getMiRNADownCriterion(), miRNABackgroundSet);
-			miRNAFinal.addAll(createFinalList(miRNADownPosIntGenes, xrefSet,
-					DataHolding.getMiRNASysCode()));
-			// wf.writeListToFile(miRNAUpPosIntGenes, miRNAUpFile);
-
-		}
-
-		if (DataHolding.isGeneFileLoaded() && DataHolding.isGeneUpCritCheck()) {
-			geneUpPosIntGenes = criterionEvaluation(
-					DataHolding.geneUpCriterion, geneBackgroundSet);
-
-			geneFinal.addAll(createFinalList(geneUpPosIntGenes, xrefSet,
-					DataHolding.getGeneSysCode()));
-			// wf.writeListToFile(geneUpPosIntGenes, geneUpFile);
-		}
-
-		if (DataHolding.isGeneFileLoaded() && DataHolding.isGeneDownCritCheck()) {
-			geneDownPosIntGenes = criterionEvaluation(
-					DataHolding.geneDownCriterion, geneBackgroundSet);
-			geneFinal.addAll(createFinalList(geneDownPosIntGenes, xrefSet,
-					DataHolding.getGeneSysCode()));
-			// wf.writeListToFile(geneDownPosIntGenes, geneDownFile);
-		}
-
-		if (DataHolding.isGeneFileLoaded()) {
-			for (Xref x : geneFinal) {
-				positiveGeneList.add(x.toString());
-			}
-			for (Xref y : geneTotalList) {
-				backgroundSet.add(y.toString());
-			}
+					DataHolding.getMiRNADownCriterion(), allMiRNAInDataset);
+			miRNAFinalDown.addAll(createFinalList(miRNADownPosIntGenes,
+					allXref, DataHolding.getMiRNASysCode()));
 			
-		
-		} else {
-			for (Xref x : miRNAFinal) {
-				positiveGeneList.add(x.toString());
-			}
-			for (Xref y : miRNABackgroundSet) {
-				backgroundSet.add(y.toString());
-			}
+			System.out.print("miRNADownRegulated");
+
 		}
 
-	
+		if (DataHolding.isGeneFileLoaded() & DataHolding.isGeneUpCritCheck()
+				& DataHolding.isBolAllReg() || DataHolding.isGeneFileLoaded()
+				& DataHolding.isGeneUpCritCheck()
+				& DataHolding.isBolPosInverse()
+				|| DataHolding.isGeneFileLoaded()
+				& DataHolding.isGeneUpCritCheck()
+				& DataHolding.isBolPosDirect()) {
+			geneUpPosIntGenes = criterionEvaluation(
+					DataHolding.geneUpCriterion, allGenesInDataset);
+
+			geneFinalUp.addAll(createFinalList(geneUpPosIntGenes, allXref,
+					DataHolding.getGeneSysCode()));
+			
+			System.out.print("GeneUpRegulated");
+			
+		}
+
+		if (DataHolding.isGeneFileLoaded() & DataHolding.isGeneUpCritCheck()
+				& DataHolding.isBolAllReg() || DataHolding.isGeneFileLoaded()
+				& DataHolding.isGeneUpCritCheck()
+				& DataHolding.isBolNegInverse()
+				|| DataHolding.isGeneFileLoaded()
+				& DataHolding.isGeneUpCritCheck()
+				& DataHolding.isBolNegDirect()) {
+			geneDownPosIntGenes = criterionEvaluation(
+					DataHolding.geneDownCriterion, allGenesInDataset);
+			geneFinalDown.addAll(createFinalList(geneDownPosIntGenes, allXref,
+					DataHolding.getGeneSysCode()));
+			
+			System.out.print("GeneDownRegulated");
+
+		}
+
+		// if (DataHolding.isGeneFileLoaded()) {
+		// for (Xref x : geneFinal) {
+		// positiveGeneList.add(x.toString());
+		// }
+		// for (Xref y : geneTotalList) {
+		// backgroundSet.add(y.toString());
+		// }
+
+		// }
+		// else {
+		// for (Xref x : miRNAFinal) {
+		// positiveGeneList.add(x.toString());
+		// }
+		// for (Xref y : miRNABackgroundSet) {
+		// backgroundSet.add(y.toString());
+		// }
+		// }
+
 		
-		
+
+		DataHolding.setAllGenesList(allGenesInDataset);
+		DataHolding.setAllmiRNAList(allMiRNAInDataset);
+
 		DataHolding.setGeneFinal(geneFinal);
-		DataHolding.setGeneTotal(geneTotalList);
-		
-	
+		DataHolding.setMiRNAFinal(miRNAFinal);
+
+		BackgroundsetMethods bm = new BackgroundsetMethods(desktop, plugin);
+		bm.datasetMethod();
+
 	}
 
 	public Set<Xref> createFinalList(Set<String> set, Set<Xref> xrefSet,
@@ -193,7 +227,17 @@ public class PositiveGeneList {
 		return finalList;
 	}
 
-	public Set<Xref> backgroundList(DataSource ds, String type) {
+	/**
+	 * This methods goes through all rows in the dataset and gets the Xrefs from
+	 * the data. And adds their Xref to the xrefSet list. Creates two lists one
+	 * for the miRNA Xrefs and one for the Gene Xrefs.
+	 * 
+	 * @param ds
+	 * @param type
+	 * @return
+	 */
+
+	public Set<Xref> getallXrefs(DataSource ds, String type) {
 		Set<String> cGeneTotal = new HashSet<String>();
 
 		if (ds == null && type == "miRNA") {
@@ -215,16 +259,19 @@ public class PositiveGeneList {
 				IRow row = desktop.getGexManager().getCurrentGex().getRow(i);
 
 				if (row.getXref().getDataSource() == ds) {
-					xrefSet.add(row.getXref());
+					allXref.add(row.getXref());
+				}
+				if (row.getXref().getDataSource() == ds && type != "gene") {
+					miRNATotalList.add(row.getXref());
 
 				}
-				if (row.getXref().getDataSource() == ds && type!= "miRNA") {
+				if (row.getXref().getDataSource() == ds && type != "miRNA") {
 					geneTotalList.add(row.getXref());
 
 				}
 			}
 			Collection<? extends IRow> rows = desktop.getGexManager()
-					.getCurrentGex().getData(xrefSet);
+					.getCurrentGex().getData(allXref);
 			if (rows != null) {
 				for (IRow row : rows) {
 					// Use group (line number) to identify a measurement
@@ -237,9 +284,24 @@ public class PositiveGeneList {
 			e.printStackTrace();
 		}
 
+		if (type == "gene") {
+			xrefSet = geneTotalList;
+		}
+		if (type == "miRNA") {
+			xrefSet = miRNATotalList;
+		}
 		return xrefSet;
 	}
 
+	/**
+	 * This methods goes through the Xrefset and looks for genes that fulfull
+	 * the criteria set by the user.
+	 * 
+	 * @param crit
+	 * @param set
+	 * @return
+	 * @throws DataException
+	 */
 	public static Set<String> criterionEvaluation(Criterion crit, Set<Xref> set)
 			throws DataException {
 
