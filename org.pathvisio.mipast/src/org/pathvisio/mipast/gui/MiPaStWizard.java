@@ -74,7 +74,7 @@ public class MiPaStWizard extends Wizard {
 		fmp = new FileMergePage(desktop);
 		rip = new RipInfoPage();
 		scp = new CriterionPage(desktop, se,plugin);
-		sp = new StatisticsPage(desktop);
+		sp = new StatisticsPage(desktop,plugin);
 		sti = new StatInfoPage();
 		// Regulatory interaction plugin wizard pages
 

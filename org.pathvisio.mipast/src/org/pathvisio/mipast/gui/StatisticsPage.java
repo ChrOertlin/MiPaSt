@@ -42,6 +42,7 @@ import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.gui.ProgressDialog;
 import org.pathvisio.gui.SwingEngine;
 import org.pathvisio.mipast.util.MiPastZScoreCalculator;
+import org.pathvisio.rip.RegIntPlugin;
 import org.pathvisio.statistics.Column;
 import org.pathvisio.statistics.StatisticsPathwayResult;
 import org.pathvisio.statistics.StatisticsPlugin;
@@ -92,13 +93,14 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 	private JLabel lblResult = new JLabel();
 
 	private StatisticsResult result = null;
+	private RegIntPlugin plugin;
 
-
-
-	public StatisticsPage(PvDesktop desktop) {
+	
+	public StatisticsPage(PvDesktop desktop, RegIntPlugin plugin) {
 		super(IDENTIFIER);
 		this.desktop = desktop;
 		se = desktop.getSwingEngine();
+		this.plugin = plugin;
 		
 	}
 
@@ -251,7 +253,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 
 		ZScoreWorker(File pwDir, IDMapper gdb, ProgressKeeper pk) {
 			this.pk = pk;
-			calculator = new MiPastZScoreCalculator(pwDir,pk, desktop.getGexManager().getCachedData(),desktop.getGexManager());
+			calculator = new MiPastZScoreCalculator(pwDir,pk, desktop.getGexManager().getCachedData(),desktop.getGexManager(), plugin);
 			temp = new StatisticsTableModel();
 			temp.setColumns(new Column[] { Column.PATHWAY_NAME, Column.R,
 					Column.N, Column.TOTAL, Column.PCT, Column.ZSCORE,

@@ -94,6 +94,10 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	final static String ACTION_ALL_REG = "allRegulation";
 
 	final static String ACTION_INFO = "InfoButton";
+	
+	
+	final static String ACTION_METHOD_DATASET = "methodDataset";
+	final static String ACTION_METHOD_PATHWAY = "methodPathway";
 
 	// MiRNA GUI objects
 	private JLabel miRNALbl;
@@ -138,6 +142,12 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	private JLabel allRegulations;
 	private JCheckBox allRegulationsCheck;
 	
+	
+	private JLabel methodDataset;
+	private JCheckBox methodDatasetCheck;
+	
+	private JLabel methodPathway;
+	private JCheckBox methodPathwayCheck;
 	
 	
 	
@@ -209,6 +219,13 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		allRegulations = new JLabel("All of the above");
 		allRegulationsCheck = new JCheckBox();
 
+		
+		methodDataset = new JLabel("Interaction Background");
+		methodDatasetCheck = new JCheckBox();
+		
+		methodPathway = new JLabel("Pathway Background");
+		methodPathwayCheck = new JCheckBox();
+		
 		// pathway objects
 
 		CellConstraints cc = new CellConstraints();
@@ -257,11 +274,19 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		builder.add(posDirectCheck, cc.xy(3, 19));
 		
 		builder.add(negDirect, cc.xy(1, 21));
-		builder.add(negDirect, cc.xy(3, 21));
+		builder.add(negDirectCheck, cc.xy(3, 21));
 		
 
 		builder.add(allRegulations, cc.xy(1, 23));
 		builder.add(allRegulationsCheck, cc.xy(3, 23));
+		
+		
+		builder.add(methodDataset, cc.xy(7, 15));
+		builder.add(methodDatasetCheck, cc.xy(9, 15));
+		
+		builder.add(methodPathway, cc.xy(7, 17));
+		builder.add(methodPathwayCheck, cc.xy(9, 17));
+		
 
 		infoBtn.addActionListener(this);
 		infoBtn.setActionCommand(ACTION_INFO);
@@ -292,7 +317,16 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 		allRegulationsCheck.addActionListener(this);
 		allRegulationsCheck.setActionCommand(ACTION_ALL_REG);
+		
+		methodDatasetCheck.addActionListener(this);
+		methodDatasetCheck.setActionCommand(ACTION_METHOD_DATASET);
+		
 
+		methodPathwayCheck.addActionListener(this);
+		methodPathwayCheck.setActionCommand(ACTION_METHOD_PATHWAY);
+		
+		
+		
 		return builder.getPanel();
 	}
 
@@ -409,6 +443,28 @@ public class CriterionPage extends WizardPanelDescriptor implements
 				DataHolding.setBolAllReg(false);
 			}
 
+		}
+		
+		if ( ACTION_METHOD_DATASET.equals(action)){
+			if(methodDatasetCheck.isSelected()){
+				DataHolding.setBolMethodDataset(true);
+				methodPathwayCheck.setEnabled(false);
+			}
+			if(!methodDatasetCheck.isSelected()){
+				DataHolding.setBolMethodDataset(false);
+				methodPathwayCheck.setEnabled(true);
+			}
+		}
+		
+		if(ACTION_METHOD_PATHWAY.equals(action)){
+			if(methodPathwayCheck.isSelected()){
+				DataHolding.setBolMethodPathway(true);
+				methodDatasetCheck.setEnabled(false);
+			}
+			if(!methodPathwayCheck.isSelected()){
+				DataHolding.setBolMethodPathway(false);
+				methodDatasetCheck.setEnabled(true);
+			}
 		}
 
 	}

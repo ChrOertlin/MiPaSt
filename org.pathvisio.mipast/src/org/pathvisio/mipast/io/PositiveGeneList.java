@@ -198,8 +198,7 @@ public class PositiveGeneList {
 		DataHolding.setGeneFinal(geneFinal);
 		DataHolding.setMiRNAFinal(miRNAFinal);
 
-		BackgroundsetMethods bm = new BackgroundsetMethods(desktop, plugin);
-		bm.datasetMethod();
+		
 
 	}
 

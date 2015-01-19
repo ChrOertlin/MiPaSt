@@ -23,6 +23,7 @@ import org.pathvisio.desktop.gex.GexManager;
 import org.pathvisio.desktop.visualization.Criterion;
 import org.pathvisio.desktop.visualization.Criterion.CriterionException;
 import org.pathvisio.mipast.DataHolding;
+import org.pathvisio.rip.RegIntPlugin;
 import org.pathvisio.statistics.Column;
 import org.pathvisio.statistics.PathwayMap;
 import org.pathvisio.statistics.StatisticsPathwayResult;
@@ -61,13 +62,14 @@ public class MiPastZScoreCalculator {
 	private final ProgressKeeper pk;
 	private Map<PathwayInfo, StatisticsPathwayResult> statsMap = new HashMap<PathwayInfo, StatisticsPathwayResult>();
 	private GexManager gm;
+	private RegIntPlugin plugin;
 	
 	
 	/**
 	 * @param pwDir
 	 * @param pk
 	 */
-	public MiPastZScoreCalculator(File pwDir,ProgressKeeper pk, CachedData gex, GexManager gm) {
+	public MiPastZScoreCalculator(File pwDir,ProgressKeeper pk, CachedData gex, GexManager gm, RegIntPlugin plugin) {
 		if (pk != null) {
 			pk.setProgress(0);
 			pk.setTaskName("Analyzing data");
@@ -85,6 +87,7 @@ public class MiPastZScoreCalculator {
 		//result.gdb = gdb;
 		this.pk = pk;
 		this.gm = gm;
+		this.plugin = plugin;
 	
 		
 		
@@ -389,6 +392,8 @@ public class MiPastZScoreCalculator {
 		pwyMap = new PathwayMap(result.pwDir);
 		DataHolding.setPathwayGenes(pwyMap.getSrcRefs());
 		
+	
+		
 		// cache data for all pathways at once.
 		if (pk != null) {
 			if (pk.isCancelled())
@@ -405,6 +410,16 @@ public class MiPastZScoreCalculator {
 				return null;
 			pk.setTaskName("Calculating expression data");
 			pk.setProgress(40);
+		}
+		
+		BackgroundsetMethods bm = new BackgroundsetMethods(plugin);
+		
+		if(DataHolding.isBolMethodDataset()){
+			bm.datasetMethod();
+		}
+		
+		if(DataHolding.isBolMethodPathway()){
+			bm.pathwayMethod();
 		}
 		
 		calculateDataMap();

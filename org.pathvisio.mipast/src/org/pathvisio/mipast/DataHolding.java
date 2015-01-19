@@ -93,7 +93,26 @@ public class DataHolding {
 	public static boolean bolPosDirect;
 	public static boolean bolAllReg;
 	
+	public static boolean bolMethodDataset;
+	public static boolean bolMethodPathway;
+	
 
+
+	public static boolean isBolMethodDataset() {
+		return bolMethodDataset;
+	}
+
+	public static void setBolMethodDataset(boolean bolMethodDataset) {
+		DataHolding.bolMethodDataset = bolMethodDataset;
+	}
+
+	public static boolean isBolMethodPathway() {
+		return bolMethodPathway;
+	}
+
+	public static void setBolMethodPathway(boolean bolMethodPathway) {
+		DataHolding.bolMethodPathway = bolMethodPathway;
+	}
 
 	public static boolean isBolNegInverse() {
 		return bolNegInverse;

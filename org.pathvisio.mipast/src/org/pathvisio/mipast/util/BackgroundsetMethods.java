@@ -16,9 +16,9 @@ public class BackgroundsetMethods {
 	private RegIntPlugin plugin;
 	
 	
-	public  BackgroundsetMethods(PvDesktop desktop, RegIntPlugin plugin){
+	public  BackgroundsetMethods(RegIntPlugin plugin){
 		this.plugin= plugin;
-		this.desktop= desktop;
+		
 		
 	}
 	
