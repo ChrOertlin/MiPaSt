@@ -32,13 +32,15 @@ public class BackgroundsetMethods {
 					if(plugin.getInteractions().containsKey(y)){
 						
 						geneMeasuredAndInteraction.add(x);
+						
 					}
 					
 				}
 				
 			}
 		}
-		
+		System.out.print("datasetM: "+ geneMeasuredAndInteraction + "\n");
+		DataHolding.setGeneTotal(geneMeasuredAndInteraction);
 	}
 
 	
@@ -51,5 +53,7 @@ public class BackgroundsetMethods {
 				geneMeasuredAndInPathway.add(x);
 			}
 		}
+		System.out.print("datasetM: "+ geneMeasuredAndInPathway + "\n");
+		DataHolding.setGeneTotal(geneMeasuredAndInPathway);
 	}
 }

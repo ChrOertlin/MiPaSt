@@ -119,7 +119,7 @@ public class PositiveGeneList {
 				|| DataHolding.isMiRNAUpCritCheck() & DataHolding.isBolAllReg()) {
 			miRNAUpPosIntGenes = criterionEvaluation(
 					DataHolding.getMiRNAUpCriterion(), allMiRNAInDataset);
-			miRNAFinalUp.addAll(createFinalList(miRNAUpPosIntGenes, allXref,
+			miRNAFinalUp.addAll(createMetcriteriaHaveInteractionList(miRNAUpPosIntGenes, allXref,
 					DataHolding.getMiRNASysCode()));
 			// wf.writeListToFile(miRNADownPosIntGenes, miRNADownFile);
 
@@ -132,7 +132,7 @@ public class PositiveGeneList {
 				|| DataHolding.isMiRNAUpCritCheck() & DataHolding.isBolAllReg()) {
 			miRNADownPosIntGenes = criterionEvaluation(
 					DataHolding.getMiRNADownCriterion(), allMiRNAInDataset);
-			miRNAFinalDown.addAll(createFinalList(miRNADownPosIntGenes,
+			miRNAFinalDown.addAll(createMetcriteriaHaveInteractionList(miRNADownPosIntGenes,
 					allXref, DataHolding.getMiRNASysCode()));
 			
 			System.out.print("miRNADownRegulated");
@@ -149,7 +149,7 @@ public class PositiveGeneList {
 			geneUpPosIntGenes = criterionEvaluation(
 					DataHolding.geneUpCriterion, allGenesInDataset);
 
-			geneFinalUp.addAll(createFinalList(geneUpPosIntGenes, allXref,
+			geneFinalUp.addAll(createMetcriteriaHaveInteractionList(geneUpPosIntGenes, allXref,
 					DataHolding.getGeneSysCode()));
 			
 			System.out.print("GeneUpRegulated");
@@ -165,7 +165,7 @@ public class PositiveGeneList {
 				& DataHolding.isBolNegDirect()) {
 			geneDownPosIntGenes = criterionEvaluation(
 					DataHolding.geneDownCriterion, allGenesInDataset);
-			geneFinalDown.addAll(createFinalList(geneDownPosIntGenes, allXref,
+			geneFinalDown.addAll(createMetcriteriaHaveInteractionList(geneDownPosIntGenes, allXref,
 					DataHolding.getGeneSysCode()));
 			
 			System.out.print("GeneDownRegulated");
@@ -195,19 +195,38 @@ public class PositiveGeneList {
 		DataHolding.setAllGenesList(allGenesInDataset);
 		DataHolding.setAllmiRNAList(allMiRNAInDataset);
 
+		geneFinal = addLists(geneFinalDown,geneFinalUp);
+		miRNAFinal = addLists(miRNAFinalDown,miRNAFinalUp);
+		
+		System.out.print("genefinal: " + geneFinal+ "\n");
+		System.out.print("miRNAfinal: " + miRNAFinal+ "\n");
+		
 		DataHolding.setGeneFinal(geneFinal);
 		DataHolding.setMiRNAFinal(miRNAFinal);
 
 		
 
 	}
+	
+	
+	public Set<Xref> addLists(Set<Xref> listDown, Set<Xref> listUp){
+		Set<Xref> finalList = new HashSet<Xref>();
+		for(Xref x:listDown){
+			finalList.add(x);
+		}
+		for(Xref y:listUp){
+			finalList.add(y);
+		}
+		return finalList;
+	}
+	
 
-	public Set<Xref> createFinalList(Set<String> set, Set<Xref> xrefSet,
+	public Set<Xref> createMetcriteriaHaveInteractionList(Set<String> set, Set<Xref> xrefSet,
 			String ds) {
 
 		Map<Xref, List<Interaction>> interactions = plugin.getInteractions();
 		Object[] refArr = xrefSet.toArray();
-		Set<Xref> finalList = new HashSet<Xref>();
+		Set<Xref> positiveList = new HashSet<Xref>();
 		String[] arr = set.toArray(new String[set.size()]);
 
 		for (int i = 0; i < arr.length; i++) {
@@ -219,11 +238,11 @@ public class PositiveGeneList {
 			if (set != null && interactions.containsKey(refArr[k])
 					&& refArr[k].toString().startsWith(ds)) {
 
-				finalList.add((Xref) refArr[k]);
+				positiveList.add((Xref) refArr[k]);
 			}
 
 		}
-		return finalList;
+		return positiveList;
 	}
 
 	/**
