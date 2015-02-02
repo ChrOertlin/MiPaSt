@@ -21,6 +21,7 @@ import java.net.URI;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JTabbedPane;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -30,6 +31,7 @@ import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.plugin.Plugin;
 
 import org.pathvisio.mipast.gui.MiPaStWizard;
+import org.pathvisio.mipast.io.MiPaStTab;
 import org.pathvisio.rip.RegIntPlugin;
 
 /**
@@ -50,6 +52,10 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 	private JMenuItem help;
 	private BundleContext context;
 	private RegIntPlugin plugin;
+	
+	// tab components
+	private MiPaStTab	mipastTab;
+	private JTabbedPane sidebarTabbedPane;
 
 	/**
 	 * init gets called by PvDesktop to initialize the plugin
@@ -65,7 +71,10 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 		}
 		JMenu menu = createMiPaStMenu();
 		desktop.registerSubMenu("Plugins", menu);
+		createSidePanel();
 	}
+
+	
 
 	/**
 	 * creates MiPaSt Menu that is added in the PathVisio 'Plugins' menu
@@ -104,6 +113,16 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 		}
 		return null;
 	}
+	
+	private void createSidePanel(){
+		mipastTab = new MiPaStTab(desktop);
+		sidebarTabbedPane = desktop.getSideBarTabbedPane();
+		
+		sidebarTabbedPane.add("MiPaSt", mipastTab);
+		
+		
+	}
+	
 
 	/**
 	 * Opens URL to help page of the plugin
@@ -144,4 +163,7 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 	public void stop(BundleContext context) throws Exception {
 		this.done();
 	}
+	
+	
+	
 }
