@@ -152,7 +152,7 @@ public class PositiveGeneList {
 			geneFinalUp.addAll(createMetcriteriaHaveInteractionList(geneUpPosIntGenes, allXref,
 					DataHolding.getGeneSysCode()));
 			
-			System.out.print("GeneUpRegulated");
+			
 			
 		}
 
@@ -168,7 +168,7 @@ public class PositiveGeneList {
 			geneFinalDown.addAll(createMetcriteriaHaveInteractionList(geneDownPosIntGenes, allXref,
 					DataHolding.getGeneSysCode()));
 			
-			System.out.print("GeneDownRegulated");
+		
 
 		}
 
@@ -198,8 +198,7 @@ public class PositiveGeneList {
 		geneFinal = addLists(geneFinalDown,geneFinalUp);
 		miRNAFinal = addLists(miRNAFinalDown,miRNAFinalUp);
 		
-		System.out.print("genefinal: " + geneFinal+ "\n");
-		System.out.print("miRNAfinal: " + miRNAFinal+ "\n");
+		
 		
 		DataHolding.setGeneFinal(geneFinal);
 		DataHolding.setMiRNAFinal(miRNAFinal);

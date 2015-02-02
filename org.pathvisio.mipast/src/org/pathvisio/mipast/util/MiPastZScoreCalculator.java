@@ -421,9 +421,9 @@ public class MiPastZScoreCalculator {
 		if(DataHolding.isBolMethodPathway()){
 			bm.pathwayMethod();
 		}
-		System.out.print("before datamap \n");
+		
 		calculateDataMap();
-		System.out.print("after datamap \n");
+		
 	
 		
 		if (pk != null) {
@@ -435,9 +435,9 @@ public class MiPastZScoreCalculator {
 		
 		
 		
-		System.out.print("before totals \n");
+		
 		m.calculateTotals();
-		System.out.print("after totals \n");
+		
 		Logger.log.info("N: " + result.bigN + ", R: " + result.bigR);
 
 		int i = 0;

@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -39,8 +40,10 @@ import org.pathvisio.core.preferences.PreferenceManager;
 import org.pathvisio.core.util.ProgressKeeper;
 import org.pathvisio.data.DataException;
 import org.pathvisio.desktop.PvDesktop;
+import org.pathvisio.desktop.visualization.Criterion;
 import org.pathvisio.gui.ProgressDialog;
 import org.pathvisio.gui.SwingEngine;
+import org.pathvisio.mipast.DataHolding;
 import org.pathvisio.mipast.util.MiPastZScoreCalculator;
 import org.pathvisio.rip.RegIntPlugin;
 import org.pathvisio.statistics.Column;
@@ -57,11 +60,12 @@ import com.nexes.wizard.WizardPanelDescriptor;
 
 /**
  * 
- * The StatisticsPage is lets the user load the Pathway file on which the statistics should be performed.
- * Furthermore, the user has the option to  save the statistical output to a file. 
+ * The StatisticsPage is lets the user load the Pathway file on which the
+ * statistics should be performed. Furthermore, the user has the option to save
+ * the statistical output to a file.
  * 
  * @author ChrOertlin
- *
+ * 
  */
 
 public class StatisticsPage extends WizardPanelDescriptor implements
@@ -73,11 +77,12 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 	final static String ACTION_PW_DIR = "browse";
 	final static String ACTION_SAVE = "save";
 
-	
-	
+	private JDialog dlg;
+
 	private SwingEngine se;
 	private PvDesktop desktop;
 	private File pwDir;
+
 	private JLabel pathwayLabel;
 
 	private JButton calculate;
@@ -90,18 +95,17 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 	private JPanel pathwayPanel;
 
 	private JPanel buttonPanel;
-	private JLabel lblResult = new JLabel();
+	private JLabel lblResult;
 
 	private StatisticsResult result = null;
 	private RegIntPlugin plugin;
 
-	
 	public StatisticsPage(PvDesktop desktop, RegIntPlugin plugin) {
 		super(IDENTIFIER);
 		this.desktop = desktop;
 		se = desktop.getSwingEngine();
 		this.plugin = plugin;
-		
+
 	}
 
 	@Override
@@ -127,6 +131,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 
 		calculate = new JButton("Calculate");
 		save = new JButton("Save Results");
+		lblResult = new JLabel();
 
 		tblResult = new JTable();
 
@@ -139,6 +144,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 
 		builder.add(pathwayPanel, cc.xy(2, 2));
 		builder.add(buttonPanel, cc.xy(2, 4));
+		builder.add(lblResult, cc.xyw(2, 6, 3));
 		builder.add(new JScrollPane(tblResult), cc.xy(2, 12));
 
 		tblResult.addMouseListener(new MouseAdapter() {
@@ -195,7 +201,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 			jfc.setCurrentDirectory(new File(pathwayDirText.getText()));
 			if (jfc.showDialog(null, "Choose") == JFileChooser.APPROVE_OPTION) {
 				String newVal = "" + jfc.getSelectedFile();
-				pwDir= jfc.getSelectedFile();
+				pwDir = jfc.getSelectedFile();
 				pathwayDirText.setText(newVal);
 
 			}
@@ -203,6 +209,16 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 	}
 
 	private void doSave() {
+		Criterion c = new Criterion();
+		c.setExpression("miRNA Upregulated: "
+				+ DataHolding.getMiRNAUpCriterion().getExpression() + "\n"
+				+ "miRNA downregulated: "
+				+ DataHolding.getMiRNADownCriterion().getExpression() + "\n"
+				+ "Genes Upregulated: "
+				+ DataHolding.getGeneUpCriterion().getExpression() + "\n"
+				+ "GeneDown: "
+				+ DataHolding.getGeneDownCriterion().getExpression() + "\n");
+		result.crit = c;
 		JFileChooser jfc = new JFileChooser();
 		jfc.setDialogTitle("Save results");
 		jfc.setFileFilter(new SimpleFileFilter("Tab delimited text", "*.txt",
@@ -210,7 +226,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 		jfc.setDialogType(JFileChooser.SAVE_DIALOG);
 		jfc.setCurrentDirectory(PreferenceManager.getCurrent().getFile(
 				StatisticsPreference.STATS_DIR_LAST_USED_RESULTS));
-		if (jfc.showDialog(null, "Save") == JFileChooser.APPROVE_OPTION) {
+		if (jfc.showDialog(dlg, "Save") == JFileChooser.APPROVE_OPTION) {
 			File f = jfc.getSelectedFile();
 			PreferenceManager.getCurrent().setFile(
 					StatisticsPreference.STATS_DIR_LAST_USED_RESULTS,
@@ -221,7 +237,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 			try {
 				result.save(f);
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(null, "Could not save results: "
+				JOptionPane.showMessageDialog(dlg, "Could not save results: "
 						+ e.getMessage());
 				Logger.log.error("Could not save results", e);
 			}
@@ -232,10 +248,11 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 	 * asynchronous statistics calculation function
 	 */
 	private void doCalculate(final File pwDir) {
-		
+
 		save.setEnabled(false);
 		ProgressKeeper pk = new ProgressKeeper(100);
-		final ZScoreWorker worker = new ZScoreWorker(pwDir, se.getGdbManager().getCurrentGdb(), pk);
+		final ZScoreWorker worker = new ZScoreWorker(pwDir, se.getGdbManager()
+				.getCurrentGdb(), pk);
 		ProgressDialog d = new ProgressDialog(
 				JOptionPane.getFrameForComponent(desktop.getFrame()),
 				"Calculating Z-scores", pk, true, true);
@@ -249,18 +266,19 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 
 		// temporary model that will be filled with intermediate results.
 		private StatisticsTableModel temp;
-		
 
 		ZScoreWorker(File pwDir, IDMapper gdb, ProgressKeeper pk) {
 			this.pk = pk;
-			calculator = new MiPastZScoreCalculator(pwDir,pk, desktop.getGexManager().getCachedData(),desktop.getGexManager(), plugin);
+			calculator = new MiPastZScoreCalculator(pwDir, pk, desktop
+					.getGexManager().getCachedData(), desktop.getGexManager(),
+					plugin);
 			temp = new StatisticsTableModel();
 			temp.setColumns(new Column[] { Column.PATHWAY_NAME, Column.R,
 					Column.N, Column.TOTAL, Column.PCT, Column.ZSCORE,
 					Column.PERMPVAL });
 			tblResult.setModel(temp);
-//			useMappFinder = PreferenceManager.getCurrent().getBoolean(
-//					StatisticsPreference.MAPPFINDER_COMPATIBILITY);
+			// useMappFinder = PreferenceManager.getCurrent().getBoolean(
+			// StatisticsPreference.MAPPFINDER_COMPATIBILITY);
 		}
 
 		@Override
@@ -268,8 +286,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 				DataException {
 			StatisticsResult result;
 
-		
-				result = calculator.calculateMappFinder();
+			result = calculator.calculateMappFinder();
 			return result;
 		}
 
@@ -290,7 +307,7 @@ public class StatisticsPage extends WizardPanelDescriptor implements
 								+ result.getBigN()
 								+ "<br>Rows meeting criterion (R): "
 								+ result.getBigR());
-						StatisticsDlg.result = result;
+						StatisticsPage.this.result = result;
 						// dlg.pack();
 					}
 				} catch (InterruptedException e) {
