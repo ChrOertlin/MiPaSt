@@ -123,19 +123,19 @@ public class PositiveGeneList {
 					DataHolding.getMiRNASysCode()));
 			// wf.writeListToFile(miRNADownPosIntGenes, miRNADownFile);
 
-			System.out.print("miRNAUpRegulated");
+			
 		}
 
-		if (DataHolding.isMiRNAUpCritCheck() & DataHolding.isBolPosInverse()
-				|| DataHolding.isMiRNAUpCritCheck()
+		if (DataHolding.isMiRNADownCritCheck() & DataHolding.isBolPosInverse()
+				|| DataHolding.isMiRNADownCritCheck()
 				& DataHolding.isBolNegDirect()
-				|| DataHolding.isMiRNAUpCritCheck() & DataHolding.isBolAllReg()) {
+				|| DataHolding.isMiRNADownCritCheck() & DataHolding.isBolAllReg()) {
 			miRNADownPosIntGenes = criterionEvaluation(
 					DataHolding.getMiRNADownCriterion(), allMiRNAInDataset);
 			miRNAFinalDown.addAll(createMetcriteriaHaveInteractionList(miRNADownPosIntGenes,
 					allXref, DataHolding.getMiRNASysCode()));
 			
-			System.out.print("miRNADownRegulated");
+			
 
 		}
 
@@ -156,12 +156,12 @@ public class PositiveGeneList {
 			
 		}
 
-		if (DataHolding.isGeneFileLoaded() & DataHolding.isGeneUpCritCheck()
+		if (DataHolding.isGeneFileLoaded() & DataHolding.isGeneDownCritCheck()
 				& DataHolding.isBolAllReg() || DataHolding.isGeneFileLoaded()
-				& DataHolding.isGeneUpCritCheck()
+				& DataHolding.isGeneDownCritCheck()
 				& DataHolding.isBolNegInverse()
 				|| DataHolding.isGeneFileLoaded()
-				& DataHolding.isGeneUpCritCheck()
+				& DataHolding.isGeneDownCritCheck()
 				& DataHolding.isBolNegDirect()) {
 			geneDownPosIntGenes = criterionEvaluation(
 					DataHolding.geneDownCriterion, allGenesInDataset);
