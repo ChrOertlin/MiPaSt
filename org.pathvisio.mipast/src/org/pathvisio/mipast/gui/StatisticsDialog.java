@@ -171,8 +171,9 @@ public class StatisticsDialog implements ActionListener{
 
 		dlg.add(builder);
 		dlg.pack();
+		dlg.setTitle("Perform Statistics");
 		dlg.getComponentListeners();
-		dlg.setSize(500, 500);
+		dlg.setSize(800, 800);
 		dlg.requestFocus();
 		dlg.setModal(false);
 		dlg.setVisible(true);
