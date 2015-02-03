@@ -3,8 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: org.pathvisio.mipast
 Bundle-SymbolicName: org.pathvisio.mipast
 Bundle-Version: 1.0.0
-Import-Package: org.osgi.framework;version="1.5.0",
- org.pathvisio.visualization
+Import-Package: org.osgi.framework;version="1.5.0"
 Bundle-Activator: org.pathvisio.mipast.MiPaStPlugin
 Require-Bundle: org.pathvisio.core;bundle-version="3.2.0",
  org.pathvisio.data;bundle-version="3.2.0",
