@@ -29,6 +29,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.plugin.Plugin;
+import org.pathvisio.gui.SwingEngine;
 
 import org.pathvisio.mipast.gui.MiPaStWizard;
 import org.pathvisio.mipast.io.MiPaStTab;
@@ -52,6 +53,7 @@ public class MiPaStPlugin implements BundleActivator, Plugin {
 	private JMenuItem help;
 	private BundleContext context;
 	private RegIntPlugin plugin;
+	
 	
 	// tab components
 	private MiPaStTab	mipastTab;

@@ -161,7 +161,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	}
 
 	public Object getNextPanelDescriptor() {
-
+		
 		return StatisticsPage.IDENTIFIER;
 	}
 
@@ -657,7 +657,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		getWizard().getDialog().dispose();
 	}
 
 }

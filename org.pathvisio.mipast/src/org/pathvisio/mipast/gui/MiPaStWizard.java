@@ -60,7 +60,7 @@ public class MiPaStWizard extends Wizard {
 	public MiPaStWizard(PvDesktop desktop, RegIntPlugin plugin) {
 		this.desktop = desktop;
 		this.plugin = plugin;
-
+		
 		
 		
 		
