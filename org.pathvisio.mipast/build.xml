@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<project name="org.pathvisio.mipast" default="jar" basedir=".">
+<project name="org.pathvisio.mipast" default="dist" basedir=".">
   
   <!-- change property pathvisio directory to local pathvisio directory-->
-  <property name="pathvisio.dir" value="/home/bigcat/Desktop/pathvisio"/>
+  <property name="pathvisio.dir" value="/home/bigcat/Workspace/pathvisio"/>
 	
   <property name="base.name" value="org.pathvisio.mipast"/>
   <property name="jar.name" value="${base.name}.jar"/>
@@ -10,11 +10,7 @@
   <!-- path to required bundles -->
   <path id="project.class.path">
     <fileset dir="${pathvisio.dir}/modules">
-      	<include name="org.pathvisio.core.jar"/>
-    	<include name="org.pathvisio.gui.jar"/>
-    	<include name="org.pathvisio.desktop.jar"/>
-    	<include name="org.pathvisio.data.jar"/>
-    	<include name="org.pathvisio.gexplugin.jar"/>
+      	<include name="org.pathvisio.*.jar"/>
     </fileset>
     <fileset dir="${pathvisio.dir}/lib">
 		<include name="org.bridgedb.jar"/>
@@ -53,6 +49,18 @@
 		<jar jarfile="${jar.name}" basedir="build" manifest="META-INF/MANIFEST.MF" />
 	</target>
 
+	<target name="dist" depends="jar">
+		<mkdir dir="dist"/>
+		<copy toDir="dist">
+			<fileset dir=".">
+				<include name="${jar.name}"/>
+			</fileset>
+			<fileset dir="lib">	
+				<include name="org.pathvisio.rip.jar"/>
+			</fileset>
+		</copy>
+		<delete file="${jar.name}"/>
+	</target>
   <target name="clean">
 	<delete dir="build"/>
   </target>

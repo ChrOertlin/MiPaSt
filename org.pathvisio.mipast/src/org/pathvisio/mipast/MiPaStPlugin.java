@@ -29,7 +29,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.plugin.Plugin;
-import org.pathvisio.gui.SwingEngine;
+
 
 import org.pathvisio.mipast.gui.MiPaStWizard;
 import org.pathvisio.mipast.io.MiPaStTab;

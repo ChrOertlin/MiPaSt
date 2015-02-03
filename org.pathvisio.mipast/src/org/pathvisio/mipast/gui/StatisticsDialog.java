@@ -176,6 +176,7 @@ public class StatisticsDialog implements ActionListener{
 		dlg.setSize(800, 800);
 		dlg.requestFocus();
 		dlg.setModal(false);
+		dlg.setLocationRelativeTo(desktop.getFrame());
 		dlg.setVisible(true);
 	}
 
