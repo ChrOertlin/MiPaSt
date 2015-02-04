@@ -421,6 +421,12 @@ public class MiPastZScoreCalculator {
 		if(DataHolding.isBolMethodPathway()){
 			bm.pathwayMethod();
 		}
+		if(DataHolding.isBolMethodAllGenesMeasured()){
+			bm.allGenesMeasuredMethod();
+		}
+		if(DataHolding.isBolMethodPathway2()){
+			bm.pathwayMethod2();
+		}
 		
 		calculateDataMap();
 		

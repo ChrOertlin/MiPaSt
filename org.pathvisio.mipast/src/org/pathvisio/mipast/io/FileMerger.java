@@ -45,10 +45,8 @@ public class FileMerger {
 
 	MiPaStFileReader fr = new MiPaStFileReader();
 	boolean sharedHeader = false;
-	File combinedFile = new File(PreferenceManager.getCurrent().get(
-			GlobalPreference.DIR_LAST_USED_PGEX)
-			+ "/combinedTxt.txt");
-
+	File combinedFile;
+	
 	/**
 	 * Creates the combined file, if two files are given to the plugin, and
 	 * return a combinedFile which can be accessed for importinformation
@@ -57,6 +55,9 @@ public class FileMerger {
 	 */
 	public File createCombinedFile(ImportInformation miRNA,
 			ImportInformation gene) throws IOException {
+	
+		combinedFile = new File(miRNA.getTxtFile().getParentFile()
+				+ "/combinedTxt.txt");
 
 		File miRNAFile = new File("miRNA");
 		File geneFile = new File("gene");

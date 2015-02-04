@@ -97,7 +97,9 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	
 	
 	final static String ACTION_METHOD_DATASET = "methodDataset";
-	final static String ACTION_METHOD_PATHWAY = "methodPathway";
+	final static String ACTION_METHOD_PATHWAY = "methodPathwayAndInteractions";
+	final static String ACTION_METHOD_PATHWAY2 = "methodPathway";
+	final static String ACTION_METHOD_ALL_GENES_MEASURED = "methodAllGenesMeasured";
 
 	// MiRNA GUI objects
 	private JLabel miRNALbl;
@@ -146,10 +148,14 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	private JLabel methodDataset;
 	private JCheckBox methodDatasetCheck;
 	
+	private JLabel methodInteractionPathway;
+	private JCheckBox methodInteractionPathwayCheck;
+	
 	private JLabel methodPathway;
 	private JCheckBox methodPathwayCheck;
 	
-	
+	private JLabel methodAllGenesMeasured;
+	private JCheckBox methodAllGenesMeasuredCheck;
 	
 
 	public CriterionPage(PvDesktop desktop, SwingEngine se, RegIntPlugin plugin) {
@@ -223,8 +229,15 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		methodDataset = new JLabel("Interaction Background");
 		methodDatasetCheck = new JCheckBox();
 		
+		methodInteractionPathway = new JLabel("Pathway with Interaction Background");
+		methodInteractionPathwayCheck = new JCheckBox();
+		
 		methodPathway = new JLabel("Pathway Background");
-		methodPathwayCheck = new JCheckBox();
+		methodPathwayCheck= new JCheckBox();
+		
+		
+		methodAllGenesMeasured = new JLabel("All genes measured Background");
+		methodAllGenesMeasuredCheck= new JCheckBox();
 		
 		// pathway objects
 
@@ -284,10 +297,17 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		builder.add(methodDataset, cc.xy(7, 15));
 		builder.add(methodDatasetCheck, cc.xy(9, 15));
 		
-		builder.add(methodPathway, cc.xy(7, 17));
-		builder.add(methodPathwayCheck, cc.xy(9, 17));
+		builder.add(methodInteractionPathway, cc.xy(7, 17));
+		builder.add(methodInteractionPathwayCheck, cc.xy(9, 17));
 		
+		builder.add(methodPathway, cc.xy(7, 19));
+		builder.add(methodPathwayCheck, cc.xy(9, 19));
+		
+		builder.add(methodAllGenesMeasured, cc.xy(7,21));
+		builder.add(methodAllGenesMeasuredCheck, cc.xy(9,21));
 
+		
+		
 		infoBtn.addActionListener(this);
 		infoBtn.setActionCommand(ACTION_INFO);
 
@@ -322,9 +342,14 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		methodDatasetCheck.setActionCommand(ACTION_METHOD_DATASET);
 		
 
-		methodPathwayCheck.addActionListener(this);
-		methodPathwayCheck.setActionCommand(ACTION_METHOD_PATHWAY);
+		methodInteractionPathwayCheck.addActionListener(this);
+		methodInteractionPathwayCheck.setActionCommand(ACTION_METHOD_PATHWAY);
 		
+		methodPathwayCheck.addActionListener(this);
+		methodPathwayCheck.setActionCommand(ACTION_METHOD_PATHWAY2);
+		
+		methodAllGenesMeasuredCheck.addActionListener(this);
+		methodAllGenesMeasuredCheck.setActionCommand(ACTION_METHOD_ALL_GENES_MEASURED);
 		
 		
 		return builder.getPanel();
@@ -448,25 +473,63 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		if ( ACTION_METHOD_DATASET.equals(action)){
 			if(methodDatasetCheck.isSelected()){
 				DataHolding.setBolMethodDataset(true);
+				methodInteractionPathwayCheck.setEnabled(false);
 				methodPathwayCheck.setEnabled(false);
+				methodAllGenesMeasuredCheck.setEnabled(false);
 			}
 			if(!methodDatasetCheck.isSelected()){
 				DataHolding.setBolMethodDataset(false);
+				methodInteractionPathwayCheck.setEnabled(true);
 				methodPathwayCheck.setEnabled(true);
+				methodAllGenesMeasuredCheck.setEnabled(true);
 			}
 		}
 		
 		if(ACTION_METHOD_PATHWAY.equals(action)){
-			if(methodPathwayCheck.isSelected()){
+			if(methodInteractionPathwayCheck.isSelected()){
 				DataHolding.setBolMethodPathway(true);
 				methodDatasetCheck.setEnabled(false);
+				methodPathwayCheck.setEnabled(false);
+				methodAllGenesMeasuredCheck.setEnabled(false);
 			}
-			if(!methodPathwayCheck.isSelected()){
+			if(!methodInteractionPathwayCheck.isSelected()){
 				DataHolding.setBolMethodPathway(false);
 				methodDatasetCheck.setEnabled(true);
+				methodPathwayCheck.setEnabled(true);
+				methodAllGenesMeasuredCheck.setEnabled(true);
 			}
 		}
-
+		
+		if(ACTION_METHOD_PATHWAY2.equals(action)){
+			if(methodPathwayCheck.isSelected()){
+				DataHolding.setBolMethodPathway2(true);
+				methodInteractionPathwayCheck.setEnabled(false);
+				methodDatasetCheck.setEnabled(false);
+				methodAllGenesMeasuredCheck.setEnabled(false);
+				
+			}
+			if(!methodPathwayCheck.isSelected()){
+				DataHolding.setBolMethodPathway2(false);
+				methodInteractionPathwayCheck.setEnabled(true);
+				methodDatasetCheck.setEnabled(true);
+				methodAllGenesMeasuredCheck.setEnabled(true);
+			}
+		}
+		
+		if(ACTION_METHOD_ALL_GENES_MEASURED.equals(action)){
+			if(methodAllGenesMeasuredCheck.isSelected()){
+				DataHolding.setBolMethodAllGenesMeasured(true);
+				methodInteractionPathwayCheck.setEnabled(false);
+				methodDatasetCheck.setEnabled(false);
+				methodPathwayCheck.setEnabled(false);
+			}
+			if(!methodAllGenesMeasuredCheck.isSelected()){
+				DataHolding.setBolMethodAllGenesMeasured(false);
+				methodInteractionPathwayCheck.setEnabled(true);
+				methodDatasetCheck.setEnabled(true);
+				methodPathwayCheck.setEnabled(true);
+			}
+		}
 	}
 
 	public void helpURL() throws Exception {

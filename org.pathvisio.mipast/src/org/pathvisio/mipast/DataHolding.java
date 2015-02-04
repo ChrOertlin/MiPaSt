@@ -96,7 +96,27 @@ public class DataHolding {
 	public static boolean bolMethodDataset;
 	public static boolean bolMethodPathway;
 	
+	public static boolean bolMethodPathway2;
+	public static boolean bolMethodAllGenesMeasured;
+	
 
+
+	public static boolean isBolMethodPathway2() {
+		return bolMethodPathway2;
+	}
+
+	public static void setBolMethodPathway2(boolean bolMethodPathway2) {
+		DataHolding.bolMethodPathway2 = bolMethodPathway2;
+	}
+
+	public static boolean isBolMethodAllGenesMeasured() {
+		return bolMethodAllGenesMeasured;
+	}
+
+	public static void setBolMethodAllGenesMeasured(
+			boolean bolMethodAllGenesMeasured) {
+		DataHolding.bolMethodAllGenesMeasured = bolMethodAllGenesMeasured;
+	}
 
 	public static boolean isBolMethodDataset() {
 		return bolMethodDataset;
