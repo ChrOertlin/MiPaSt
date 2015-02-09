@@ -130,6 +130,7 @@ public class PositiveGeneList {
 				|| DataHolding.isMiRNADownCritCheck()
 				& DataHolding.isBolmiRNADownGeneDown()
 				|| DataHolding.isMiRNADownCritCheck() & DataHolding.isBolAllReg()) {
+			
 			miRNADownPosIntGenes = criterionEvaluation(
 					DataHolding.getMiRNADownCriterion(), allMiRNAInDataset);
 			miRNAFinalDown.addAll(createMetcriteriaHaveInteractionList(miRNADownPosIntGenes,
@@ -172,23 +173,6 @@ public class PositiveGeneList {
 
 		}
 
-		// if (DataHolding.isGeneFileLoaded()) {
-		// for (Xref x : geneFinal) {
-		// positiveGeneList.add(x.toString());
-		// }
-		// for (Xref y : geneTotalList) {
-		// backgroundSet.add(y.toString());
-		// }
-
-		// }
-		// else {
-		// for (Xref x : miRNAFinal) {
-		// positiveGeneList.add(x.toString());
-		// }
-		// for (Xref y : miRNABackgroundSet) {
-		// backgroundSet.add(y.toString());
-		// }
-		// }
 
 		
 
@@ -203,9 +187,22 @@ public class PositiveGeneList {
 		DataHolding.setGeneFinal(geneFinal);
 		DataHolding.setMiRNAFinal(miRNAFinal);
 
-		for (Xref x : plugin.getInteractions().keySet()){
-			System.out.print("intKey: " + x+"\n");
-		}
+//		System.out.print("setGeneFinal " + geneFinal + "\n");
+//		System.out.print("setmiRNAFinal " + miRNAFinal + "\n");
+//		
+//		System.out.print("genes " + allGenesInDataset.size() + "\n");
+//		System.out.print("miRNA " + allMiRNAInDataset.size()+"\n");
+//		
+//		System.out.print("genesupcrit "+ geneUpPosIntGenes.size()+"\n");
+//		System.out.print(geneUpPosIntGenes + "\n");
+//		System.out.print("genesdowncrit "+ geneDownPosIntGenes.size()+"\n");
+//		System.out.print(geneDownPosIntGenes + "\n");
+//		System.out.print("miRNAupcrit "+ miRNAUpPosIntGenes.size()+"\n");
+//		System.out.print(miRNAUpPosIntGenes + "\n");
+//		System.out.print("miRNAdowncrit "+ miRNADownPosIntGenes.size()+"\n");
+//		System.out.print(miRNADownPosIntGenes + "\n");
+		
+		
 
 	}
 	
