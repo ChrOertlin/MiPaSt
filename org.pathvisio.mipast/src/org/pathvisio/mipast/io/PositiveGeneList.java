@@ -198,20 +198,7 @@ public class PositiveGeneList {
 		geneFinal = addLists(geneFinalDown,geneFinalUp);
 		miRNAFinal = addLists(miRNAFinalDown,miRNAFinalUp);
 		
-		System.out.print("miRNADown"+miRNADownPosIntGenes+"\n");
-		System.out.print("miRNAUp"+miRNAUpPosIntGenes+"\n");
-		System.out.print("geneDown"+geneDownPosIntGenes+"\n");
-		System.out.print("geneUp"+geneUpPosIntGenes+"\n");
-		System.out.print("Downgenesint: " + geneFinalDown + "\n");
-		System.out.print("DowntmiRNAint: " + miRNAFinalDown + "\n");	
-		System.out.print("Upgenesint: " + geneFinalUp + "\n");
-		System.out.print("UpmiRNAint: " + miRNAFinalUp + "\n");
-		
-		System.out.print("lastgenes: " + geneFinal + "\n");
-		System.out.print("lastmiRNA: " + miRNAFinal + "\n");
-		
-		System.out.print("allmiRNA" + allMiRNAInDataset+ "\n");
-		System.out.print("allgenes" + allGenesInDataset+"\n");
+
 		
 		DataHolding.setGeneFinal(geneFinal);
 		DataHolding.setMiRNAFinal(miRNAFinal);

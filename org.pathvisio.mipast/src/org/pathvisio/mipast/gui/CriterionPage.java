@@ -429,7 +429,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		if (ACTION_NEG_INVERSE.equals(action)) {
 			if(miRNAUpGeneDownCheck.isSelected()){
 				DataHolding.setBolmiRNAUpGeneDown(true);
-				System.out.print("miRNAUpGeneDown\n");
+				
 			}
 			if(!miRNAUpGeneDownCheck.isSelected()){
 				DataHolding.setBolmiRNAUpGeneDown(false);
@@ -438,7 +438,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		if (ACTION_POS_INVERSE.equals(action)) {
 			if(miRNADownGeneUpCheck.isSelected()){
 				DataHolding.setBolmiRNADownGeneUp(true);
-				System.out.print("miRNADOwnGeneUp\n");
+				
 			}
 			if(!miRNADownGeneUpCheck.isSelected()){
 				DataHolding.setBolmiRNADownGeneUp(false);
@@ -448,7 +448,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		if (ACTION_NEG_DIRECT.equals(action)) {
 			if(miRNADownGeneDownCheck.isSelected()){
 				DataHolding.setBolmiRNADownGeneDown(true);
-				System.out.print("miRNADownGeneDown\n");
+				
 			}
 			if(!miRNADownGeneDownCheck.isSelected()){
 				DataHolding.setBolmiRNADownGeneDown(false);
@@ -458,7 +458,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		if (ACTION_POS_DIRECT.equals(action)) {
 			if(miRNAUpGeneUpCheck.isSelected()){
 				DataHolding.setBolmiRNAUpGeneUp(true);
-				System.out.print("up up\n");
+				
 			}
 			if(!miRNAUpGeneUpCheck.isSelected()){
 				DataHolding.setBolmiRNAUpGeneUp(false);
