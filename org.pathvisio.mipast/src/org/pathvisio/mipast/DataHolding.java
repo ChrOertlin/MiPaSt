@@ -87,10 +87,43 @@ public class DataHolding {
 	
 	public static Set<Xref> pathwayGenes;
 	
-	public static boolean bolNegInverse;
-	public static boolean bolPosInverse;
-	public static boolean bolNegDirect;
-	public static boolean bolPosDirect;
+	public static boolean bolmiRNAUpGeneDown;
+	public static boolean bolmiRNADownGeneUp;
+	public static boolean bolmiRNADownGeneDown;
+	public static boolean bolmiRNAUpGeneUp;
+	
+	public static boolean isBolmiRNAUpGeneDown() {
+		return bolmiRNAUpGeneDown;
+	}
+
+	public static void setBolmiRNAUpGeneDown(boolean bolmiRNAUpGeneDown) {
+		DataHolding.bolmiRNAUpGeneDown = bolmiRNAUpGeneDown;
+	}
+
+	public static boolean isBolmiRNADownGeneUp() {
+		return bolmiRNADownGeneUp;
+	}
+
+	public static void setBolmiRNADownGeneUp(boolean bolmiRNADownGeneUp) {
+		DataHolding.bolmiRNADownGeneUp = bolmiRNADownGeneUp;
+	}
+
+	public static boolean isBolmiRNADownGeneDown() {
+		return bolmiRNADownGeneDown;
+	}
+
+	public static void setBolmiRNADownGeneDown(boolean bolmiRNADownGeneDown) {
+		DataHolding.bolmiRNADownGeneDown = bolmiRNADownGeneDown;
+	}
+
+	public static boolean isBolmiRNAUpGeneUp() {
+		return bolmiRNAUpGeneUp;
+	}
+
+	public static void setBolmiRNAUpGeneUp(boolean bolmiRNAUpGeneUp) {
+		DataHolding.bolmiRNAUpGeneUp = bolmiRNAUpGeneUp;
+	}
+
 	public static boolean bolAllReg;
 	
 	public static boolean bolMethodDataset;
@@ -134,37 +167,7 @@ public class DataHolding {
 		DataHolding.bolMethodPathway = bolMethodPathway;
 	}
 
-	public static boolean isBolNegInverse() {
-		return bolNegInverse;
-	}
-
-	public static void setBolNegInverse(boolean bolNegInverse) {
-		DataHolding.bolNegInverse = bolNegInverse;
-	}
-
-	public static boolean isBolPosInverse() {
-		return bolPosInverse;
-	}
-
-	public static void setBolPosInverse(boolean bolPosInverse) {
-		DataHolding.bolPosInverse = bolPosInverse;
-	}
-
-	public static boolean isBolNegDirect() {
-		return bolNegDirect;
-	}
-
-	public static void setBolNegDirect(boolean bolNegDirect) {
-		DataHolding.bolNegDirect = bolNegDirect;
-	}
-
-	public static boolean isBolPosDirect() {
-		return bolPosDirect;
-	}
-
-	public static void setBolPosDirect(boolean bolPosDirect) {
-		DataHolding.bolPosDirect = bolPosDirect;
-	}
+	
 
 	public static boolean isBolAllReg() {
 		return bolAllReg;

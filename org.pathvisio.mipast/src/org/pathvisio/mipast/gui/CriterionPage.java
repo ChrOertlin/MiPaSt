@@ -129,17 +129,17 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	private JTextField setExpr;
 	private JButton exprOk;
 
-	private JLabel negInverse;
-	private JCheckBox negInverseCheck;
+	private JLabel miRNAUpGeneDown;
+	private JCheckBox miRNAUpGeneDownCheck;
 
-	private JLabel posInverse;
-	private JCheckBox posInverseCheck;
+	private JLabel miRNADownGeneUp;
+	private JCheckBox miRNADownGeneUpCheck;
 
-	private JLabel negDirect;
-	private JCheckBox negDirectCheck;
+	private JLabel miRNADownGeneDown;
+	private JCheckBox miRNADownGeneDownCheck;
 
-	private JLabel posDirect;
-	private JCheckBox posDirectCheck;
+	private JLabel miRNAUpGeneUp;
+	private JCheckBox miRNAUpGeneUpCheck;
 
 	private JLabel allRegulations;
 	private JCheckBox allRegulationsCheck;
@@ -207,20 +207,20 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 		infoBtn = new JButton("Info");
 
-		negInverse = new JLabel(
-				"Inverse: miRNA downregulated, Gene upregulated");
-		negInverseCheck = new JCheckBox();
-
-		posInverse = new JLabel(
+		miRNAUpGeneDown = new JLabel(
 				"Inverse: miRNA upregulated, Gene downregulated");
-		posInverseCheck = new JCheckBox();
+		miRNAUpGeneDownCheck = new JCheckBox();
 
-		negDirect = new JLabel("Direct: miRNA upregulated, Gene upregulated");
-		negDirectCheck = new JCheckBox();
+		miRNADownGeneUp = new JLabel(
+				"Inverse: miRNA downregulated, Gene upregulated");
+		miRNADownGeneUpCheck = new JCheckBox();
 
-		posDirect = new JLabel(
-				"Direct: miRNA downregulated, Gene downregulated");
-		posDirectCheck = new JCheckBox();
+		miRNADownGeneDown = new JLabel("Direct: miRNA downregulated, Gene downregulated");
+		miRNADownGeneDownCheck = new JCheckBox();
+
+		miRNAUpGeneUp = new JLabel(
+				"Direct: miRNA upregulated, Gene upregulated");
+		miRNAUpGeneUpCheck = new JCheckBox();
 
 		allRegulations = new JLabel("All of the above");
 		allRegulationsCheck = new JCheckBox();
@@ -277,17 +277,17 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 		builder.add(infoBtn, cc.xy(5, 13));
 
-		builder.add(negInverse, cc.xy(1, 15));
-		builder.add(negInverseCheck, cc.xy(3, 15));
+		builder.add(miRNAUpGeneDown, cc.xy(1, 15));
+		builder.add(miRNAUpGeneDownCheck, cc.xy(3, 15));
 
-		builder.add(posInverse, cc.xy(1, 17));
-		builder.add(posInverseCheck, cc.xy(3, 17));
+		builder.add(miRNADownGeneUp, cc.xy(1, 17));
+		builder.add(miRNADownGeneUpCheck, cc.xy(3, 17));
 
-		builder.add(posDirect, cc.xy(1, 19));
-		builder.add(posDirectCheck, cc.xy(3, 19));
+		builder.add(miRNAUpGeneUp, cc.xy(1, 19));
+		builder.add(miRNAUpGeneUpCheck, cc.xy(3, 19));
 		
-		builder.add(negDirect, cc.xy(1, 21));
-		builder.add(negDirectCheck, cc.xy(3, 21));
+		builder.add(miRNADownGeneDown, cc.xy(1, 21));
+		builder.add(miRNADownGeneDownCheck, cc.xy(3, 21));
 		
 
 		builder.add(allRegulations, cc.xy(1, 23));
@@ -323,17 +323,17 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		geneDownButton.addActionListener(this);
 		geneDownButton.setActionCommand(ACTION_GENE_DOWN);
 
-		negInverseCheck.addActionListener(this);
-		negInverseCheck.setActionCommand(ACTION_NEG_INVERSE);
+		miRNAUpGeneDownCheck.addActionListener(this);
+		miRNAUpGeneDownCheck.setActionCommand(ACTION_NEG_INVERSE);
 
-		posInverseCheck.addActionListener(this);
-		posInverseCheck.setActionCommand(ACTION_POS_INVERSE);
+		miRNADownGeneUpCheck.addActionListener(this);
+		miRNADownGeneUpCheck.setActionCommand(ACTION_POS_INVERSE);
 
-		negDirectCheck.addActionListener(this);
-		negDirectCheck.setActionCommand(ACTION_NEG_DIRECT);
+		miRNADownGeneDownCheck.addActionListener(this);
+		miRNADownGeneDownCheck.setActionCommand(ACTION_NEG_DIRECT);
 
-		posDirectCheck.addActionListener(this);
-		posDirectCheck.setActionCommand(ACTION_POS_DIRECT);
+		miRNAUpGeneUpCheck.addActionListener(this);
+		miRNAUpGeneUpCheck.setActionCommand(ACTION_POS_DIRECT);
 
 		allRegulationsCheck.addActionListener(this);
 		allRegulationsCheck.setActionCommand(ACTION_ALL_REG);
@@ -427,37 +427,41 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		}
 
 		if (ACTION_NEG_INVERSE.equals(action)) {
-			if(negInverseCheck.isSelected()){
-				DataHolding.setBolNegInverse(true);
+			if(miRNAUpGeneDownCheck.isSelected()){
+				DataHolding.setBolmiRNAUpGeneDown(true);
+				System.out.print("miRNAUpGeneDown\n");
 			}
-			if(!negInverseCheck.isSelected()){
-				DataHolding.setBolNegInverse(false);
+			if(!miRNAUpGeneDownCheck.isSelected()){
+				DataHolding.setBolmiRNAUpGeneDown(false);
 			}
 		}
 		if (ACTION_POS_INVERSE.equals(action)) {
-			if(posInverseCheck.isSelected()){
-				DataHolding.setBolPosInverse(true);
+			if(miRNADownGeneUpCheck.isSelected()){
+				DataHolding.setBolmiRNADownGeneUp(true);
+				System.out.print("miRNADOwnGeneUp\n");
 			}
-			if(!posInverseCheck.isSelected()){
-				DataHolding.setBolPosInverse(false);
+			if(!miRNADownGeneUpCheck.isSelected()){
+				DataHolding.setBolmiRNADownGeneUp(false);
 			}
 
 		}
 		if (ACTION_NEG_DIRECT.equals(action)) {
-			if(negDirectCheck.isSelected()){
-				DataHolding.setBolNegDirect(true);
+			if(miRNADownGeneDownCheck.isSelected()){
+				DataHolding.setBolmiRNADownGeneDown(true);
+				System.out.print("miRNADownGeneDown\n");
 			}
-			if(!negDirectCheck.isSelected()){
-				DataHolding.setBolNegDirect(false);
+			if(!miRNADownGeneDownCheck.isSelected()){
+				DataHolding.setBolmiRNADownGeneDown(false);
 			}
 
 		}
 		if (ACTION_POS_DIRECT.equals(action)) {
-			if(posDirectCheck.isSelected()){
-				DataHolding.setBolPosDirect(true);
+			if(miRNAUpGeneUpCheck.isSelected()){
+				DataHolding.setBolmiRNAUpGeneUp(true);
+				System.out.print("up up\n");
 			}
-			if(!posDirectCheck.isSelected()){
-				DataHolding.setBolPosDirect(false);
+			if(!miRNAUpGeneUpCheck.isSelected()){
+				DataHolding.setBolmiRNAUpGeneUp(false);
 			}
 		}
 		if (ACTION_ALL_REG.equals(action)) {
