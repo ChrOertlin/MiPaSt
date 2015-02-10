@@ -14,7 +14,6 @@
 
 package org.pathvisio.mipast.io;
 
-
 import java.io.IOException;
 
 import java.util.Collection;
@@ -24,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.Set;
-
 
 import org.bridgedb.DataSource;
 
@@ -37,7 +35,6 @@ import org.pathvisio.desktop.PvDesktop;
 
 import org.pathvisio.desktop.visualization.Criterion;
 import org.pathvisio.desktop.visualization.Criterion.CriterionException;
-
 
 import org.pathvisio.gui.SwingEngine;
 import org.pathvisio.mipast.DataHolding;
@@ -86,17 +83,14 @@ public class PositiveGeneList {
 		Set<Xref> allMiRNAInDataset = new HashSet<Xref>();
 		Set<Xref> allGenesInDataset = new HashSet<Xref>();
 
-	
-
 		Set<Xref> miRNAFinal = new HashSet<Xref>();
 		Set<Xref> geneFinal = new HashSet<Xref>();
-		
+
 		Set<Xref> allReg = new HashSet<Xref>();
 		Set<Xref> directUp = new HashSet<Xref>();
-		Set<Xref> directDown= new HashSet<Xref>();
+		Set<Xref> directDown = new HashSet<Xref>();
 		Set<Xref> miRNAUpGeneDown = new HashSet<Xref>();
 		Set<Xref> miRNADownGeneUp = new HashSet<Xref>();
-		
 
 		allMiRNAInDataset = getallXrefs(DataHolding.getMiRNAImportInformation()
 				.getDataSource(), "miRNA");
@@ -106,166 +100,174 @@ public class PositiveGeneList {
 					.getGeneImportInformation().getDataSource(), "gene");
 		}
 
-		if (DataHolding.isMiRNAUpCritCheck() 
-//				& DataHolding.isBolmiRNAUpGeneDown()
-//				|| DataHolding.isMiRNAUpCritCheck()
-//				& DataHolding.isBolmiRNAUpGeneUp()
-//				|| DataHolding.isMiRNAUpCritCheck() & DataHolding.isBolAllReg()
-				) {
-			miRNAUp = criterionEvaluation(
-					DataHolding.getMiRNAUpCriterion(), allMiRNAInDataset);
-//			miRNAFinalUp.addAll(createMetcriteriaHaveInteractionList(miRNAUpPosIntGenes, allXref,
-//					DataHolding.getMiRNASysCode()));
-//		
+		if (DataHolding.isMiRNAUpCritCheck()
+		// & DataHolding.isBolmiRNAUpGeneDown()
+		// || DataHolding.isMiRNAUpCritCheck()
+		// & DataHolding.isBolmiRNAUpGeneUp()
+		// || DataHolding.isMiRNAUpCritCheck() & DataHolding.isBolAllReg()
+		) {
+			miRNAUp = criterionEvaluation(DataHolding.getMiRNAUpCriterion(),
+					allMiRNAInDataset);
+			// miRNAFinalUp.addAll(createMetcriteriaHaveInteractionList(miRNAUpPosIntGenes,
+			// allXref,
+			// DataHolding.getMiRNASysCode()));
+			//
 		}
 
-		if (DataHolding.isMiRNADownCritCheck() 
-//				& DataHolding.isBolmiRNADownGeneUp()
-//				|| DataHolding.isMiRNADownCritCheck()
-//				& DataHolding.isBolmiRNADownGeneDown()
-//				|| DataHolding.isMiRNADownCritCheck() & DataHolding.isBolAllReg()
-				) {
-			
+		if (DataHolding.isMiRNADownCritCheck()
+		// & DataHolding.isBolmiRNADownGeneUp()
+		// || DataHolding.isMiRNADownCritCheck()
+		// & DataHolding.isBolmiRNADownGeneDown()
+		// || DataHolding.isMiRNADownCritCheck() & DataHolding.isBolAllReg()
+		) {
+
 			miRNADown = criterionEvaluation(
 					DataHolding.getMiRNADownCriterion(), allMiRNAInDataset);
-//			miRNAFinalDown.addAll(createMetcriteriaHaveInteractionList(miRNADownPosIntGenes,
-//					allXref, DataHolding.getMiRNASysCode()));
+			// miRNAFinalDown.addAll(createMetcriteriaHaveInteractionList(miRNADownPosIntGenes,
+			// allXref, DataHolding.getMiRNASysCode()));
 		}
 
 		if (DataHolding.isGeneFileLoaded() & DataHolding.isGeneUpCritCheck()
-//				& DataHolding.isBolAllReg() || DataHolding.isGeneFileLoaded()
-//				& DataHolding.isGeneUpCritCheck()
-//				& DataHolding.isBolmiRNADownGeneUp()
-//				|| DataHolding.isGeneFileLoaded()
-//				& DataHolding.isGeneUpCritCheck()
-//				& DataHolding.isBolmiRNAUpGeneUp()
-				) {
-			geneUp = criterionEvaluation(
-					DataHolding.geneUpCriterion, allGenesInDataset);
+		// & DataHolding.isBolAllReg() || DataHolding.isGeneFileLoaded()
+		// & DataHolding.isGeneUpCritCheck()
+		// & DataHolding.isBolmiRNADownGeneUp()
+		// || DataHolding.isGeneFileLoaded()
+		// & DataHolding.isGeneUpCritCheck()
+		// & DataHolding.isBolmiRNAUpGeneUp()
+		) {
+			geneUp = criterionEvaluation(DataHolding.geneUpCriterion,
+					allGenesInDataset);
 
-//			geneFinalUp.addAll(createMetcriteriaHaveInteractionList(geneUpPosIntGenes, allXref,
-//					DataHolding.getGeneSysCode()));
-			
+			// geneFinalUp.addAll(createMetcriteriaHaveInteractionList(geneUpPosIntGenes,
+			// allXref,
+			// DataHolding.getGeneSysCode()));
+
 		}
 
 		if (DataHolding.isGeneFileLoaded() & DataHolding.isGeneDownCritCheck()
-//				& DataHolding.isBolAllReg() || DataHolding.isGeneFileLoaded()
-//				& DataHolding.isGeneDownCritCheck()
-//				& DataHolding.isBolmiRNAUpGeneDown()
-//				|| DataHolding.isGeneFileLoaded()
-//				& DataHolding.isGeneDownCritCheck()
-//				& DataHolding.isBolmiRNADownGeneDown()
-				) {
-			geneDown = criterionEvaluation(
-					DataHolding.geneDownCriterion, allGenesInDataset);
-//			geneFinalDown.addAll(createMetcriteriaHaveInteractionList(geneDownPosIntGenes, allXref,
-//					DataHolding.getGeneSysCode()));	
+		// & DataHolding.isBolAllReg() || DataHolding.isGeneFileLoaded()
+		// & DataHolding.isGeneDownCritCheck()
+		// & DataHolding.isBolmiRNAUpGeneDown()
+		// || DataHolding.isGeneFileLoaded()
+		// & DataHolding.isGeneDownCritCheck()
+		// & DataHolding.isBolmiRNADownGeneDown()
+		) {
+			geneDown = criterionEvaluation(DataHolding.geneDownCriterion,
+					allGenesInDataset);
+			// geneFinalDown.addAll(createMetcriteriaHaveInteractionList(geneDownPosIntGenes,
+			// allXref,
+			// DataHolding.getGeneSysCode()));
 		}
 
+		if (DataHolding.isBolAllReg()) {
 
-		if(DataHolding.isBolAllReg()){
-			
 			Set<Xref> empty1 = new HashSet<Xref>();
 			Set<Xref> empty2 = new HashSet<Xref>();
 			Set<Xref> empty3 = new HashSet<Xref>();
-			
-			
+
 			Set<Xref> allGenesMetCriteria = new HashSet<Xref>();
 			Set<Xref> allMiRNAMetCriteria = new HashSet<Xref>();
-			
-			allGenesMetCriteria = addLists(geneDown,geneUp,empty1,empty2,empty3);
-			allMiRNAMetCriteria = addLists(miRNADown,miRNAUp,empty1,empty2,empty3);
-			allReg = createMetcriteriaHaveInteractionList(allGenesMetCriteria, allMiRNAMetCriteria, DataHolding.getGeneSysCode());
+
+			allGenesMetCriteria = addLists(geneDown, geneUp, empty1, empty2,
+					empty3);
+			allMiRNAMetCriteria = addLists(miRNADown, miRNAUp, empty1, empty2,
+					empty3);
+			allReg = createMetcriteriaHaveInteractionList(allGenesMetCriteria,
+					allMiRNAMetCriteria, DataHolding.getGeneSysCode());
 		}
-		
-		
-	
-		if(DataHolding.isBolmiRNAUpGeneUp()){
-			directUp = createMetcriteriaHaveInteractionList(geneUp, miRNAUp, DataHolding.getGeneSysCode());
+
+		if (DataHolding.isBolmiRNAUpGeneUp()) {
+			directUp = createMetcriteriaHaveInteractionList(geneUp, miRNAUp,
+					DataHolding.getGeneSysCode());
 		}
-		if(DataHolding.isBolmiRNADownGeneDown()){
-			directDown= createMetcriteriaHaveInteractionList(geneDown, miRNADown, DataHolding.getGeneSysCode());
+		if (DataHolding.isBolmiRNADownGeneDown()) {
+			directDown = createMetcriteriaHaveInteractionList(geneDown,
+					miRNADown, DataHolding.getGeneSysCode());
 		}
-		if(DataHolding.isBolmiRNAUpGeneDown()){
-			miRNAUpGeneDown = createMetcriteriaHaveInteractionList(geneDown, miRNAUp, DataHolding.getGeneSysCode());
+		if (DataHolding.isBolmiRNAUpGeneDown()) {
+			miRNAUpGeneDown = createMetcriteriaHaveInteractionList(geneDown,
+					miRNAUp, DataHolding.getGeneSysCode());
 		}
-		if(DataHolding.isBolmiRNADownGeneUp()){
-			miRNADownGeneUp = createMetcriteriaHaveInteractionList(geneUp, miRNADown, DataHolding.getGeneSysCode());
+		if (DataHolding.isBolmiRNADownGeneUp()) {
+			miRNADownGeneUp = createMetcriteriaHaveInteractionList(geneUp,
+					miRNADown, DataHolding.getGeneSysCode());
 		}
-		
+
 		DataHolding.setAllGenesList(allGenesInDataset);
 		DataHolding.setAllmiRNAList(allMiRNAInDataset);
 
-//		geneFinal = addLists(geneFinalDown,geneFinalUp);
-//		miRNAFinal = addLists(miRNAFinalDown,miRNAFinalUp);
-		
-		geneFinal = addLists(allReg,directUp, miRNADownGeneUp,miRNAUpGeneDown,directDown);
-		
+		// geneFinal = addLists(geneFinalDown,geneFinalUp);
+		// miRNAFinal = addLists(miRNAFinalDown,miRNAFinalUp);
+
+		geneFinal = addLists(allReg, directUp, miRNADownGeneUp,
+				miRNAUpGeneDown, directDown);
+
 		DataHolding.setGeneFinal(geneFinal);
 		DataHolding.setMiRNAFinal(miRNAFinal);
 
-//		System.out.print("setGeneFinal " + geneFinal + "\n");
-//		System.out.print("setmiRNAFinal " + miRNAFinal + "\n");
-//		
-//		System.out.print("genes " + allGenesInDataset.size() + "\n");
-//		System.out.print("miRNA " + allMiRNAInDataset.size()+"\n");
-//		
-//		System.out.print("genesupcrit "+ geneUpPosIntGenes.size()+"\n");
-//		System.out.print(geneUpPosIntGenes + "\n");
-//		System.out.print("genesdowncrit "+ geneDownPosIntGenes.size()+"\n");
-//		System.out.print(geneDownPosIntGenes + "\n");
-//		System.out.print("miRNAupcrit "+ miRNAUpPosIntGenes.size()+"\n");
-//		System.out.print(miRNAUpPosIntGenes + "\n");
-//		System.out.print("miRNAdowncrit "+ miRNADownPosIntGenes.size()+"\n");
-//		System.out.print(miRNADownPosIntGenes + "\n");
-		
-		
-
+		System.out.print("allreg " + allReg + "\n");
+		System.out.print("directUp " + directUp + "\n");
+		System.out.print("directDown " + directDown + "\n");
+		System.out.print("miRNADownGeneUp " + miRNADownGeneUp + "\n");
+		System.out.print("miRNAUpGeneDown" + miRNAUpGeneDown + "\n");
+		System.out.print("geneFinal " + geneFinal + "\n");
 	}
-	
-	
-	public Set<Xref> addLists(Set<Xref> allReg, Set<Xref> miRNAUpGeneUp, Set<Xref>miRNAdownGeneUp,Set<Xref>miRNAUpGeneDown,Set<Xref>miRNADownGeneDown){
+
+	public Set<Xref> addLists(Set<Xref> allReg, Set<Xref> miRNAUpGeneUp,
+			Set<Xref> miRNAdownGeneUp, Set<Xref> miRNAUpGeneDown,
+			Set<Xref> miRNADownGeneDown) {
 		Set<Xref> finalList = new HashSet<Xref>();
-		for(Xref x:allReg){
+		for (Xref x : allReg) {
 			finalList.add(x);
 		}
-		for(Xref y:miRNAUpGeneUp){
+		for (Xref y : miRNAUpGeneUp) {
 			finalList.add(y);
 		}
-		for(Xref t:miRNAdownGeneUp){
+		for (Xref t : miRNAdownGeneUp) {
 			finalList.add(t);
 		}
-		for(Xref i:miRNAUpGeneDown){
+		for (Xref i : miRNAUpGeneDown) {
 			finalList.add(i);
 		}
-		for(Xref l:miRNADownGeneDown){
+		for (Xref l : miRNADownGeneDown) {
 			finalList.add(l);
 		}
 		return finalList;
 	}
-	
 
-	public Set<Xref> createMetcriteriaHaveInteractionList(Set<Xref> genes,Set<Xref> miRNA,
-			String ds ) {
+	public Set<Xref> createMetcriteriaHaveInteractionList(Set<Xref> genes,
+			Set<Xref> miRNA, String ds) {
 
 		Map<Xref, List<Interaction>> interactions = plugin.getInteractions();
 		Set<Xref> positiveList = new HashSet<Xref>();
-		boolean hasInt=false;
-		
-		for(Xref x: genes){
-			for(Xref y:miRNA){
-				if(interactions.get(x).contains(y)){
-					hasInt= true;
+		boolean hasInt = false;
+
+		for (Xref x : genes) {
+
+			if (interactions.containsKey(x)) {
+
+				
+				for (Interaction value : interactions.get(x)) {
+					for (Xref y : miRNA) {
+						
+						if (value.getRegulator().equals(y)) {
+							hasInt = true;
+							
+						}
+					}
 				}
 			}
+			
 			if (genes != null && interactions.containsKey(x)
-					&& x.toString().startsWith(ds)&& hasInt==true) {
+					&& x.toString().startsWith(ds) && hasInt == true) {
 
 				positiveList.add(x);
+
 			}
-			hasInt=false;
-		}
+			hasInt = false;
 		
+		}
+
 		return positiveList;
 	}
 
