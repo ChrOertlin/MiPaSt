@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.crypto.Data;
+
 import org.bridgedb.DataSource;
 import org.bridgedb.IDMapperException;
 import org.bridgedb.Xref;
@@ -71,7 +73,7 @@ public class PositiveGeneList {
 
 	Set<Xref> xrefSet = new HashSet<Xref>();
 
-	public void execute() throws DataException, IOException {
+	public void execute() throws DataException, IOException, IDMapperException {
 
 		Set<Xref> allMiRNAInDataset = new HashSet<Xref>();
 		Set<Xref> allGenesInDataset = new HashSet<Xref>();
@@ -122,6 +124,7 @@ public class PositiveGeneList {
 			Set<Xref> allGenes = new HashSet<Xref>();
 			allGenes.addAll(geneUp);
 			allGenes.addAll(geneDown);
+			System.out.println("\tallGenes\t" + allGenes.size());
 			Set<Xref> validTargetsDown = findRegulatedTargets(targetsDown, allGenes);
 			Set<Xref> validTargetsUp = findRegulatedTargets(targetsUp, allGenes);
 			genesFinal.addAll(validTargetsUp);
@@ -226,12 +229,15 @@ public class PositiveGeneList {
 		return finalList;
 	}
 	
-	public Set<Xref> findRegulatedTargets(Set<Xref> allTargets, Set<Xref> selectedGenes) {
+	public Set<Xref> findRegulatedTargets(Set<Xref> allTargets, Set<Xref> selectedGenes) throws IDMapperException {
 		Set<Xref> positive = new HashSet<Xref>();
-		for(Xref x : selectedGenes) {
-			if(allTargets.contains(x)) {
-				if(!positive.contains(x)) {
-					positive.add(x);
+		for(Xref x : allTargets) {
+			Set<Xref> result = desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(x, DataHolding.getGeneImportInformation().getDataSource());
+			for(Xref xref : result) {
+				if(selectedGenes.contains(xref)) {
+					if(!positive.contains(xref)) {
+						positive.add(xref);
+					}
 				}
 			}
 		}
@@ -242,17 +248,27 @@ public class PositiveGeneList {
 	public Set<Xref> getTargets(Set<Xref> miRNAs) {
 		Set<Xref> result = new HashSet<Xref>();
 		for(Xref x : miRNAs) {
+			if(regintPlugin.getInteractions().containsKey(x)){
 			try {
+				
 				ResultsObj res = regintPlugin.findInteractions(x);
-				for(Xref tx : res.getTargetMap().keySet()) {
-					if(!result.contains(tx)) {
-						result.add(tx);
+				
+				
+				
+					
+					for(Xref tx : res.getTargetMap().keySet()) {
+						if(!result.contains(tx)) {
+							result.add(tx);
+						}
 					}
-				}
+			
+					
+				
 			} catch (IDMapperException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
 		}
 		return result;
 	}

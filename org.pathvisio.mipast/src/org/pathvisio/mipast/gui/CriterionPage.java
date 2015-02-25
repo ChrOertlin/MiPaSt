@@ -38,6 +38,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.bridgedb.IDMapperException;
 import org.pathvisio.core.util.ProgressKeeper;
 import org.pathvisio.data.DataException;
 
@@ -721,6 +722,9 @@ public class CriterionPage extends WizardPanelDescriptor implements
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IDMapperException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
