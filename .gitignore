@@ -2,3 +2,4 @@
 org.pathvisio.mipast/bin/*
 org.pathvisio.mipast/build/*
 org.pathvisio.mipast/org.pathvisio.mipast.jar
+org.pathvisio.mipast/dist/*
