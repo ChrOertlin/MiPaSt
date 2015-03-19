@@ -266,7 +266,7 @@ public class StatisticsDialog implements ActionListener{
 			this.pk = pk;
 			calculator = new MiPastZScoreCalculator(pwDir, pk, desktop
 					.getGexManager().getCachedData(), desktop.getGexManager(),
-					plugin);
+					plugin, desktop);
 			temp = new StatisticsTableModel();
 			temp.setColumns(new Column[] { Column.PATHWAY_NAME, Column.R,
 					Column.N, Column.TOTAL, Column.PCT, Column.ZSCORE,

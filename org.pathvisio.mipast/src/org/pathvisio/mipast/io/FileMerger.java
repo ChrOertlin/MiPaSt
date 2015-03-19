@@ -116,7 +116,7 @@ public class FileMerger {
 				combinedHeader.remove(i);
 			}
 		}
-
+		
 		return combinedHeader;
 	}
 
@@ -133,6 +133,7 @@ public class FileMerger {
 		String[] geneValues = null;
 		List<String> combinedHeader = new ArrayList<String>();
 		combinedHeader = createCombinedHeader(miRNA, gene);
+		
 		List<String> miRNAData = new ArrayList<String>();
 		List<String> geneData = new ArrayList<String>();
 
@@ -166,10 +167,11 @@ public class FileMerger {
 			data.add("");
 		}
 		boolean systemCodeAdded;
-
+		
 		for (int k = 0; k < dataArray.length; k++) {
 			systemCodeAdded = false;
-
+			
+			
 			if (k == info.getIdColumn()) {
 				data.add(0, dataArray[k]);
 
@@ -190,17 +192,35 @@ public class FileMerger {
 
 			if (combinedHeader.contains(info.getColNames()[k])
 					&& k != info.getIdColumn()
-					&& combinedHeader.get(k) != "type") {
-
-				data.add(combinedHeader.indexOf(info.getColNames()[k]),
-						dataArray[k]);
+					&& combinedHeader.get(k) != "type"
+					&& !combinedHeader.isEmpty()
+					&& type == "miRNA") {
+			
+				
+				data.add(combinedHeader.indexOf(info.getColNames()[k]),dataArray[k]);	
+			
 			}
 
+			if(combinedHeader.contains(info.getColNames()[k])
+					&& type =="gene"
+					&& combinedHeader.get(k) != "type"
+					&& k != info.getIdColumn()){
+				for(String s : combinedHeader){
+					if(info.getColNames()[k].equals(s)){
+						data.add(combinedHeader.indexOf(s), dataArray[k]);
+					}
+				
+				
+				}
+				
+					
+				
+			}
+			
 			if (k == dataArray.length - 1) {
 				data.add(combinedHeader.indexOf("type"), type);
-			} else if (!combinedHeader.get(k).isEmpty()) {
-				data.add("");
-			}
+			} 
+			
 		}
 		
 		if (type == "gene"&& !info.isSyscodeFixed()) {

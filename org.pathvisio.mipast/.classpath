@@ -3,7 +3,6 @@
 	<classpathentry excluding="org/pathvisio/mipast/gui/RipColumnPage.java|org/pathvisio/mipast/gui/RipImportPage.java" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="/home/bigcat/Downloads/guava-18.0.jar"/>
 	<classpathentry kind="lib" path="/home/bigcat/Desktop/MiPaSt/org.pathvisio.mipast/lib/org.pathvisio.rip.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

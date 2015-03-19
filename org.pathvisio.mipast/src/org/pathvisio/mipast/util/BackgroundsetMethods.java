@@ -1,13 +1,15 @@
 package org.pathvisio.mipast.util;
 
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.bridgedb.DataSource;
+import org.bridgedb.IDMapperException;
 import org.bridgedb.Xref;
+import org.pathvisio.data.DataException;
 import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.mipast.DataHolding;
-import org.pathvisio.rip.Interaction;
 import org.pathvisio.rip.RegIntPlugin;
 
 public class BackgroundsetMethods {
@@ -15,7 +17,8 @@ public class BackgroundsetMethods {
 	private static PvDesktop desktop;
 	private RegIntPlugin plugin;
 
-	public BackgroundsetMethods(RegIntPlugin plugin) {
+	public BackgroundsetMethods(PvDesktop desktop, RegIntPlugin plugin) {
+		this.desktop= desktop;
 		this.plugin = plugin;
 
 	}
@@ -66,15 +69,19 @@ public class BackgroundsetMethods {
 		
 		DataHolding.setGeneTotal(geneMeasuredAndInterActionAndInPathway);
 	}
-	
-	
-	
-	public void pathwayMethod2(){
+
+	public void measuredInPathwaysMethod() throws DataException, IDMapperException{
+		Map<Xref,Set<Xref>>res = desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(DataHolding.pathwayGenes, DataSource.getBySystemCode("L"));
+		Set<Xref> xrefs = new HashSet<Xref>();
+		for(Xref x : res.keySet()) {
+			for(Xref x2 : res.get(x)) {
+				xrefs.add(x2);
+			}
+		}
 		
 		Set<Xref> genesMeasuredAndInPathway = new HashSet<Xref>();
-		
 		for (Xref x : DataHolding.getAllGenesList()){
-			if(DataHolding.pathwayGenes.contains(x)){
+			if(xrefs.contains(x)){
 				genesMeasuredAndInPathway.add(x);
 			}
 		}

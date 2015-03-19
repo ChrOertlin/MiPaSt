@@ -249,7 +249,6 @@ class GeneColumnPage extends WizardPanelDescriptor {
 	public void aboutToDisplayPanel() {
 		DataHolding.getGeneImportInformation().setSyscodeFixed(true);
 		getWizard().setNextFinishButtonEnabled(false);
-
 		// create an array of size getSampleMaxNumCols()
 		Integer[] columns;
 		int max = DataHolding.getGeneImportInformation().getSampleMaxNumCols();

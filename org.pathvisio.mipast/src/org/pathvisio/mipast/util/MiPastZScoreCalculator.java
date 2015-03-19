@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bridgedb.DataSource;
 import org.bridgedb.IDMapper;
 import org.bridgedb.IDMapperException;
 import org.bridgedb.Xref;
@@ -18,6 +19,7 @@ import org.pathvisio.core.util.Stats;
 import org.pathvisio.data.DataException;
 import org.pathvisio.data.DataInterface;
 import org.pathvisio.data.IRow;
+import org.pathvisio.desktop.PvDesktop;
 import org.pathvisio.desktop.gex.CachedData;
 import org.pathvisio.desktop.gex.GexManager;
 import org.pathvisio.desktop.visualization.Criterion;
@@ -63,13 +65,14 @@ public class MiPastZScoreCalculator {
 	private Map<PathwayInfo, StatisticsPathwayResult> statsMap = new HashMap<PathwayInfo, StatisticsPathwayResult>();
 	private GexManager gm;
 	private RegIntPlugin plugin;
+	private PvDesktop desktop;
 	
 	
 	/**
 	 * @param pwDir
 	 * @param pk
 	 */
-	public MiPastZScoreCalculator(File pwDir,ProgressKeeper pk, CachedData gex, GexManager gm, RegIntPlugin plugin) {
+	public MiPastZScoreCalculator(File pwDir,ProgressKeeper pk, CachedData gex, GexManager gm, RegIntPlugin plugin, PvDesktop desktop) {
 		if (pk != null) {
 			pk.setProgress(0);
 			pk.setTaskName("Analyzing data");
@@ -88,6 +91,7 @@ public class MiPastZScoreCalculator {
 		this.pk = pk;
 		this.gm = gm;
 		this.plugin = plugin;
+		this.desktop = desktop;
 	
 		
 		
@@ -118,8 +122,9 @@ public class MiPastZScoreCalculator {
 		 * calculate n and r for a single pathway.
 		 * 
 		 * dataMap should already have been initialized
+		 * @throws IDMapperException 
 		 */
-		public abstract StatisticsPathwayResult calculatePathway(PathwayInfo pi);
+		public abstract StatisticsPathwayResult calculatePathway(PathwayInfo pi) throws IDMapperException;
 
 		public abstract String getDescription();
 	}
@@ -206,23 +211,20 @@ public class MiPastZScoreCalculator {
 	public RefInfo evaluatedRef(Xref srcRef){
 		Set<String> cGeneTotal = new HashSet<String>();
 		Set<String> cGenePositive = new HashSet<String>();
-				
-		// srcRef = key
-		// ref info
-		// if xref in positive = zwei liste mit je 1 element
 		
-//		
-//		// if xref in total && !positive = zwei listen - background 1, positive 0
+	
+		
 		if (DataHolding.getGeneTotal().contains(srcRef)){
 			
 			cGeneTotal.add("1");
 			
 		}
-		if(DataHolding.getGeneFinal().contains(srcRef)){
+		
+	
+		if( DataHolding.getGeneFinal().contains(srcRef)){
 			cGenePositive.add("1");
 		}
 		
-//		// if xref !total = zwei leere listen
 		
 		
 		
@@ -344,12 +346,23 @@ public class MiPastZScoreCalculator {
 		 * <LI>r: the subset of n that has at least one significant row in the
 		 * dataset.
 		 * </UL>
+		 * @throws IDMapperException 
 		 */
-		public StatisticsPathwayResult calculatePathway(PathwayInfo pi) {
+		public StatisticsPathwayResult calculatePathway(PathwayInfo pi) throws IDMapperException {
 			int cPwyMeasured = 0;
 			int cPwyPositive = 0;
 			int cPwyTotal = pi.getSrcRefs().size();
-
+			
+			Map<Xref, Set<Xref>> res;
+			
+				res = desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(pi.getSrcRefs(), DataSource.getBySystemCode("L"));
+				Set<Xref> xrefs = new HashSet<Xref>();
+				for(Xref x : res.keySet()) {
+					for(Xref x2 : res.get(x)) {
+						xrefs.add(x2);
+					}
+				}
+		
 			for (Xref ref : pi.getSrcRefs()) {
 				RefInfo refInfo = dataMap.get(ref);
 				if (refInfo.isMeasured())
@@ -367,13 +380,24 @@ public class MiPastZScoreCalculator {
 		}
 	}
 
-	private void calculateDataMap() {
+	private void calculateDataMap() throws IDMapperException {
 		dataMap = new HashMap<Xref, RefInfo>();
 		// go over all datanodes in all pathways
-		for (Xref srcRef : pwyMap.getSrcRefs()) {
+		
+		Map<Xref,Set<Xref>>res = desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(DataHolding.pathwayGenes, DataSource.getBySystemCode("L"));
+		Set<Xref> xrefs = new HashSet<Xref>();
+		for(Xref x : res.keySet()) {
+			for(Xref x2 : res.get(x)) {
+				xrefs.add(x2);
+			}
+		}
+		for (Xref srcRef : xrefs) {
 			if (pk != null && pk.isCancelled())
 				return;
+			System.out.print(srcRef +"\n");
+			
 			RefInfo refInfo = evaluatedRef(srcRef);
+			System.out.print("aftereval\n");
 			dataMap.put(srcRef, refInfo);
 		}
 	}
@@ -411,8 +435,9 @@ public class MiPastZScoreCalculator {
 			pk.setTaskName("Calculating expression data");
 			pk.setProgress(40);
 		}
+		System.out.print("backgroundmethod\n");
 		
-		BackgroundsetMethods bm = new BackgroundsetMethods(plugin);
+		BackgroundsetMethods bm = new BackgroundsetMethods(desktop, plugin);
 		
 		if(DataHolding.isBolMethodDataset()){
 			bm.datasetMethod();
@@ -425,9 +450,10 @@ public class MiPastZScoreCalculator {
 			bm.allGenesMeasuredMethod();
 		}
 		if(DataHolding.isBolMethodPathway2()){
-			bm.pathwayMethod2();
+			bm.measuredInPathwaysMethod();
+			System.out.print("after BM\n");
 		}
-		
+		System.out.print("geneFinal" + DataHolding.getGeneFinal()+"\n");
 		calculateDataMap();
 		
 	
