@@ -32,6 +32,7 @@ import org.pathvisio.statistics.StatisticsPathwayResult;
 import org.pathvisio.statistics.StatisticsResult;
 import org.pathvisio.statistics.StatisticsTableModel;
 import org.pathvisio.statistics.PathwayMap.PathwayInfo;
+import org.pathvisio.statistics.ZScoreCalculator.RefInfo;
 
 
 
@@ -72,7 +73,7 @@ public class MiPastZScoreCalculator {
 	 * @param pwDir
 	 * @param pk
 	 */
-	public MiPastZScoreCalculator(File pwDir,ProgressKeeper pk, CachedData gex, GexManager gm, RegIntPlugin plugin, PvDesktop desktop) {
+	public MiPastZScoreCalculator(File pwDir,ProgressKeeper pk, CachedData gex, GexManager gm, IDMapper gdb, RegIntPlugin plugin, PvDesktop desktop) {
 		if (pk != null) {
 			pk.setProgress(0);
 			pk.setTaskName("Analyzing data");
@@ -87,7 +88,7 @@ public class MiPastZScoreCalculator {
 				Column.PERMPVAL });
 		result.pwDir = pwDir;
 		result.gex = gex;
-		//result.gdb = gdb;
+		result.gdb = gdb;
 		this.pk = pk;
 		this.gm = gm;
 		this.plugin = plugin;
@@ -115,16 +116,19 @@ public class MiPastZScoreCalculator {
 
 		/**
 		 * Do a permutation test to calculate permP and adjP
+		 * @throws DataException 
+		 * @throws IDMapperException 
 		 */
-		public abstract void permute();
+		public abstract void permute() throws IDMapperException, DataException;
 
 		/**
 		 * calculate n and r for a single pathway.
 		 * 
 		 * dataMap should already have been initialized
 		 * @throws IDMapperException 
+		 * @throws DataException 
 		 */
-		public abstract StatisticsPathwayResult calculatePathway(PathwayInfo pi) throws IDMapperException;
+		public abstract StatisticsPathwayResult calculatePathway(PathwayInfo pi) throws IDMapperException, DataException;
 
 		public abstract String getDescription();
 	}
@@ -193,44 +197,100 @@ public class MiPastZScoreCalculator {
 		 * For an alternative way, check getPositiveFraction
 		 */
 		boolean isPositive() {
-			return probesPositive.contains("1");
+			return probesPositive.size() > 0;
 		}
 
 		/**
 		 * returns true if at least one probe is measured
 		 */
 		boolean isMeasured() {
-			return probesMeasured.contains("1");
+			return probesMeasured.size() > 0;
 		}
+//		boolean isPositive() {
+//			return probesPositive.contains("1");
+//		}
+//
+//		/**
+//		 * returns true if at least one probe is measured
+//		 */
+//		boolean isMeasured() {
+//			return probesMeasured.contains("1");
+//		}
 
 			
 		
 		
 	}
 	
-	public RefInfo evaluatedRef(Xref srcRef){
-		Set<String> cGeneTotal = new HashSet<String>();
-		Set<String> cGenePositive = new HashSet<String>();
-		
+	public RefInfo evaluatedRef(Xref srcRef) throws IDMapperException{	
 	
-		
-		if (DataHolding.getGeneTotal().contains(srcRef)){
-			
-			cGeneTotal.add("1");
-			
-		}
-		
+	Set<String> cGeneTotal = new HashSet<String>();
+	Set<String> cGenePositive = new HashSet<String>();
+
+	List<? extends IRow> rows = result.gex.getData(srcRef);
+	String sysCode= new String(DataHolding.getGeneImportInformation().getDataSource().getSystemCode());
+	Set<Xref> ref= new HashSet<Xref>();
 	
-		if( DataHolding.getGeneFinal().contains(srcRef)){
-			cGenePositive.add("1");
-		}
-		
-		
-		
-		
-		return new RefInfo(cGeneTotal, cGenePositive);
+	//* make this generic...
+	
+	if(!srcRef.toString().startsWith(sysCode)){
+	
+	ref= desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(srcRef, DataSource.getBySystemCode(sysCode));
+	System.out.print("srcRef " + srcRef+ "\n");
+	System.out.print("ref " + ref + "\n");
+
+	
+	}
+	if(srcRef.toString().startsWith(sysCode)){
+		ref.add(srcRef);
+	}
+	
+	if (rows != null) {
+		for (IRow row : rows) {
+			
+			if (pk != null && pk.isCancelled())
+				return null;
+			// Use group (line number) to identify a measurement
+			cGeneTotal.add(row.getGroup() + "");
+			for(Xref x: ref){
+			boolean eval = DataHolding.getGeneFinal().contains(x);
+			System.out.print("evalrefs: " + x + "\n");
+			if (eval)
+				cGenePositive.add(row.getGroup() + "");
+				}
+			}
 		
 	}
+	
+	return new RefInfo(cGeneTotal, cGenePositive);
+}
+//	public RefInfo evaluatedRef(Xref srcRef){
+//		Set<String> cGeneTotal = new HashSet<String>();
+//		Set<String> cGenePositive = new HashSet<String>();
+//		
+//		
+//		
+//		if (DataHolding.getGeneTotal().contains(srcRef) && !DataHolding.getGeneFinal().contains(srcRef)){
+//			
+//			cGeneTotal.add("1");
+//			cGenePositive.add("0");
+//		}
+//		
+//	
+//		if( DataHolding.getGeneTotal().contains(srcRef) &&DataHolding.getGeneFinal().contains(srcRef)){
+//			cGeneTotal.add("1");
+//			cGenePositive.add("1");
+//		}
+//		
+//		if( !DataHolding.getGeneTotal().contains(srcRef) && !DataHolding.getGeneFinal().contains(srcRef)){
+//			cGeneTotal.add("0");
+//			cGenePositive.add("0");
+//		}
+//		
+//		
+//		return new RefInfo(cGeneTotal, cGenePositive);
+//		
+//	}
 //
 	/*
 	 * Implementation of the MAPPFinder method for calculating zscores. This
@@ -263,8 +323,10 @@ public class MiPastZScoreCalculator {
 		 * Calculate the rank of the actual zscore compared to the permuted
 		 * zscores. Two-tailed test, so checks for very low z-scores as well as
 		 * very high z-scores.
+		 * @throws DataException 
+		 * @throws IDMapperException 
 		 */
-		public void permute() {
+		public void permute() throws IDMapperException, DataException {
 			// create a deep copy of dataMap.
 			Map<Xref, RefInfo> dataMap2 = new HashMap<Xref, RefInfo>();
 			for (Xref key : dataMap.keySet()) {
@@ -286,6 +348,7 @@ public class MiPastZScoreCalculator {
 					int cPwyPositive = 0;
 
 					for (Xref ref : pi.getSrcRefs()) {
+						
 						RefInfo refInfo = dataMap2.get(ref);
 						if (refInfo.isMeasured())
 							
@@ -347,23 +410,25 @@ public class MiPastZScoreCalculator {
 		 * dataset.
 		 * </UL>
 		 * @throws IDMapperException 
+		 * @throws DataException 
 		 */
-		public StatisticsPathwayResult calculatePathway(PathwayInfo pi) throws IDMapperException {
+		public StatisticsPathwayResult calculatePathway(PathwayInfo pi) throws IDMapperException, DataException {
 			int cPwyMeasured = 0;
 			int cPwyPositive = 0;
 			int cPwyTotal = pi.getSrcRefs().size();
-			
-			Map<Xref, Set<Xref>> res;
-			
-				res = desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(pi.getSrcRefs(), DataSource.getBySystemCode("L"));
-				Set<Xref> xrefs = new HashSet<Xref>();
-				for(Xref x : res.keySet()) {
-					for(Xref x2 : res.get(x)) {
-						xrefs.add(x2);
-					}
-				}
+//			
+//			Map<Xref, Set<Xref>> res;
+//			
+//				res = desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(pi.getSrcRefs(), DataSource.getBySystemCode("L"));
+//				Set<Xref> xrefs = new HashSet<Xref>();
+//				for(Xref x : res.keySet()) {
+//					for(Xref x2 : res.get(x)) {
+//						xrefs.add(x2);
+//					}
+//				}
 		
 			for (Xref ref : pi.getSrcRefs()) {
+				
 				RefInfo refInfo = dataMap.get(ref);
 				if (refInfo.isMeasured())
 					cPwyMeasured++;
@@ -388,17 +453,19 @@ public class MiPastZScoreCalculator {
 		Set<Xref> xrefs = new HashSet<Xref>();
 		for(Xref x : res.keySet()) {
 			for(Xref x2 : res.get(x)) {
-				xrefs.add(x2);
+			xrefs.add(x2);
 			}
 		}
-		for (Xref srcRef : xrefs) {
+	
+		for (Xref srcRef : pwyMap.getSrcRefs()) {
 			if (pk != null && pk.isCancelled())
 				return;
-			System.out.print(srcRef +"\n");
+		
 			
 			RefInfo refInfo = evaluatedRef(srcRef);
-			System.out.print("aftereval\n");
+		
 			dataMap.put(srcRef, refInfo);
+			
 		}
 	}
 
@@ -425,17 +492,6 @@ public class MiPastZScoreCalculator {
 			pk.setTaskName("Reading dataset");
 			pk.setProgress(20);
 		}
-		//result.gex.setMapper(result.gdb);
-		//result.gex.syncSeed(pwyMap.getSrcRefs());
-
-		// calculate dataMap
-		if (pk != null) {
-			if (pk.isCancelled())
-				return null;
-			pk.setTaskName("Calculating expression data");
-			pk.setProgress(40);
-		}
-		System.out.print("backgroundmethod\n");
 		
 		BackgroundsetMethods bm = new BackgroundsetMethods(desktop, plugin);
 		
@@ -451,9 +507,25 @@ public class MiPastZScoreCalculator {
 		}
 		if(DataHolding.isBolMethodPathway2()){
 			bm.measuredInPathwaysMethod();
-			System.out.print("after BM\n");
 		}
-		System.out.print("geneFinal" + DataHolding.getGeneFinal()+"\n");
+			
+		result.gex.setMapper(result.gdb);
+		result.gex.syncSeed(pwyMap.getSrcRefs());
+		
+
+		// calculate dataMap
+		if (pk != null) {
+			if (pk.isCancelled())
+				return null;
+			pk.setTaskName("Calculating expression data");
+			pk.setProgress(40);
+		}
+		
+		
+
+		
+		
+		
 		calculateDataMap();
 		
 	

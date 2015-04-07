@@ -78,6 +78,14 @@ public class BackgroundsetMethods {
 				xrefs.add(x2);
 			}
 		}
+		Set<Xref> FinalGenesInPathway = new HashSet<Xref>();
+		for (Xref ref: DataHolding.getGeneFinal()){
+			if (xrefs.contains(ref)){
+				FinalGenesInPathway.add(ref);
+			}
+		}
+		
+		DataHolding.setGeneFinal(FinalGenesInPathway);
 		
 		Set<Xref> genesMeasuredAndInPathway = new HashSet<Xref>();
 		for (Xref x : DataHolding.getAllGenesList()){

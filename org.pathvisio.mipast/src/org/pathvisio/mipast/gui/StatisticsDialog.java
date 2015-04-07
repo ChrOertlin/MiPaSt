@@ -265,8 +265,8 @@ public class StatisticsDialog implements ActionListener{
 		ZScoreWorker(File pwDir, IDMapper gdb, ProgressKeeper pk) {
 			this.pk = pk;
 			calculator = new MiPastZScoreCalculator(pwDir, pk, desktop
-					.getGexManager().getCachedData(), desktop.getGexManager(),
-					plugin, desktop);
+					.getGexManager().getCachedData(), desktop.getGexManager(),se.getGdbManager().getCurrentGdb(),
+					plugin, desktop );
 			temp = new StatisticsTableModel();
 			temp.setColumns(new Column[] { Column.PATHWAY_NAME, Column.R,
 					Column.N, Column.TOTAL, Column.PCT, Column.ZSCORE,
