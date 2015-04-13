@@ -18,45 +18,47 @@ public class BackgroundsetMethods {
 	private RegIntPlugin plugin;
 
 	public BackgroundsetMethods(PvDesktop desktop, RegIntPlugin plugin) {
-		this.desktop= desktop;
+		this.desktop = desktop;
 		this.plugin = plugin;
 
 	}
-/**
- * datasetMethod
- * 
- * This method creates a backgroundlist for the pathway statistics based on all genes 
- * that are measured and have an interaction.
- * 
- */
+
+	/**
+	 * datasetMethod
+	 * 
+	 * This method creates a backgroundlist for the pathway statistics based on
+	 * all genes that are measured and have an interaction.
+	 * 
+	 */
 	public void datasetMethod() {
 		Set<Xref> geneMeasuredAndInteraction = new HashSet<Xref>();
 		for (Xref x : DataHolding.getAllGenesList()) {
 			if (plugin.getInteractions().containsKey(x)) {
 				geneMeasuredAndInteraction.add(x);
 			}
-//			for (Xref y : DataHolding.allmiRNAList) {
-//				if (plugin.getInteractions().containsKey(y)) {
-//
-//					geneMeasuredAndInteraction.add(x);
-//
-//				}
+			// for (Xref y : DataHolding.allmiRNAList) {
+			// if (plugin.getInteractions().containsKey(y)) {
+			//
+			// geneMeasuredAndInteraction.add(x);
+			//
+			// }
 
-	//		}
+			// }
 
 		}
-		
+
 		DataHolding.setGeneTotal(geneMeasuredAndInteraction);
 	}
 
-/**
- * PathwayMethod
- * 
- * this method creates a backgroundlist for the pathway statistics based on 
- * the genes that are measured, have an interaction and are found in the pathways.
- * 	
- */
-	
+	/**
+	 * PathwayMethod
+	 * 
+	 * this method creates a backgroundlist for the pathway statistics based on
+	 * the genes that are measured, have an interaction and are found in the
+	 * pathways.
+	 * 
+	 */
+
 	public void pathwayMethod() {
 		Set<Xref> geneMeasuredAndInterActionAndInPathway = new HashSet<Xref>();
 
@@ -66,38 +68,43 @@ public class BackgroundsetMethods {
 				geneMeasuredAndInterActionAndInPathway.add(x);
 			}
 		}
-		
+
 		DataHolding.setGeneTotal(geneMeasuredAndInterActionAndInPathway);
 	}
 
-	public void measuredInPathwaysMethod() throws DataException, IDMapperException{
-		Map<Xref,Set<Xref>>res = desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(DataHolding.pathwayGenes, DataSource.getBySystemCode("L"));
+	public void measuredInPathwaysMethod() throws DataException,
+			IDMapperException {
+		Map<Xref, Set<Xref>> res = desktop
+				.getSwingEngine()
+				.getGdbManager()
+				.getCurrentGdb()
+				.mapID(DataHolding.getPathwayGenes(),
+						DataSource.getBySystemCode("L"));
 		Set<Xref> xrefs = new HashSet<Xref>();
-		for(Xref x : res.keySet()) {
-			for(Xref x2 : res.get(x)) {
+		for (Xref x : res.keySet()) {
+			for (Xref x2 : res.get(x)) {
 				xrefs.add(x2);
 			}
 		}
 		Set<Xref> FinalGenesInPathway = new HashSet<Xref>();
-		for (Xref ref: DataHolding.getGeneFinal()){
-			if (xrefs.contains(ref)){
+		for (Xref ref : DataHolding.getGeneFinal()) {
+			if (xrefs.contains(ref)) {
 				FinalGenesInPathway.add(ref);
 			}
 		}
-		
-		DataHolding.setGeneFinal(FinalGenesInPathway);
-		
+
+		DataHolding.setGeneTotal(FinalGenesInPathway);
+
 		Set<Xref> genesMeasuredAndInPathway = new HashSet<Xref>();
-		for (Xref x : DataHolding.getAllGenesList()){
-			if(xrefs.contains(x)){
+		for (Xref x : DataHolding.getAllGenesList()) {
+			if (xrefs.contains(x)) {
 				genesMeasuredAndInPathway.add(x);
 			}
 		}
 		DataHolding.setGeneTotal(genesMeasuredAndInPathway);
 	}
-	
-	
-	public void allGenesMeasuredMethod(){
+
+	public void allGenesMeasuredMethod() {
 		DataHolding.setGeneTotal(DataHolding.getAllGenesList());
 	}
 }

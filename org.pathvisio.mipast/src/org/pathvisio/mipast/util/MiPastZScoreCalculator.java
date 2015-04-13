@@ -34,9 +34,6 @@ import org.pathvisio.statistics.StatisticsTableModel;
 import org.pathvisio.statistics.PathwayMap.PathwayInfo;
 import org.pathvisio.statistics.ZScoreCalculator.RefInfo;
 
-
-
-
 // PathVisio,
 // a tool for data visualization and analysis using Biological Pathways
 // Copyright 2006-2011 BiGCaT Bioinformatics
@@ -67,21 +64,21 @@ public class MiPastZScoreCalculator {
 	private GexManager gm;
 	private RegIntPlugin plugin;
 	private PvDesktop desktop;
-	
-	
+	Set<Xref> evalthis = new HashSet<Xref>();
 	/**
 	 * @param pwDir
 	 * @param pk
 	 */
-	public MiPastZScoreCalculator(File pwDir,ProgressKeeper pk, CachedData gex, GexManager gm, IDMapper gdb, RegIntPlugin plugin, PvDesktop desktop) {
+	public MiPastZScoreCalculator(File pwDir, ProgressKeeper pk,
+			CachedData gex, GexManager gm, IDMapper gdb, RegIntPlugin plugin,
+			PvDesktop desktop) {
 		if (pk != null) {
 			pk.setProgress(0);
 			pk.setTaskName("Analyzing data");
 		}
-		
-		
+
 		result = new StatisticsResult();
-		//result.crit = crit;
+		// result.crit = crit;
 		result.stm = new StatisticsTableModel();
 		result.stm.setColumns(new Column[] { Column.PATHWAY_NAME, Column.R,
 				Column.N, Column.TOTAL, Column.PCT, Column.ZSCORE,
@@ -93,11 +90,7 @@ public class MiPastZScoreCalculator {
 		this.gm = gm;
 		this.plugin = plugin;
 		this.desktop = desktop;
-	
-		
-		
-		
-		
+
 	}
 
 	/**
@@ -116,8 +109,9 @@ public class MiPastZScoreCalculator {
 
 		/**
 		 * Do a permutation test to calculate permP and adjP
-		 * @throws DataException 
-		 * @throws IDMapperException 
+		 * 
+		 * @throws DataException
+		 * @throws IDMapperException
 		 */
 		public abstract void permute() throws IDMapperException, DataException;
 
@@ -125,10 +119,12 @@ public class MiPastZScoreCalculator {
 		 * calculate n and r for a single pathway.
 		 * 
 		 * dataMap should already have been initialized
-		 * @throws IDMapperException 
-		 * @throws DataException 
+		 * 
+		 * @throws IDMapperException
+		 * @throws DataException
 		 */
-		public abstract StatisticsPathwayResult calculatePathway(PathwayInfo pi) throws IDMapperException, DataException;
+		public abstract StatisticsPathwayResult calculatePathway(PathwayInfo pi)
+				throws IDMapperException, DataException;
 
 		public abstract String getDescription();
 	}
@@ -151,11 +147,10 @@ public class MiPastZScoreCalculator {
 		 * @param aProbesPostive
 		 *            must be >= 0, and <= aProbesMeasured.
 		 */
-		public RefInfo(Set<String> aProbesMeasured, Set<String>aProbesPositive) {
+		public RefInfo(Set<String> aProbesMeasured, Set<String> aProbesPositive) {
 			probesMeasured = aProbesMeasured;
 			probesPositive = aProbesPositive;
-		
-			
+
 			if (probesPositive.size() > probesMeasured.size())
 				throw new IllegalArgumentException();
 		}
@@ -206,96 +201,74 @@ public class MiPastZScoreCalculator {
 		boolean isMeasured() {
 			return probesMeasured.size() > 0;
 		}
-//		boolean isPositive() {
-//			return probesPositive.contains("1");
-//		}
-//
-//		/**
-//		 * returns true if at least one probe is measured
-//		 */
-//		boolean isMeasured() {
-//			return probesMeasured.contains("1");
-//		}
 
-			
-		
-		
 	}
-	
-	public RefInfo evaluatedRef(Xref srcRef) throws IDMapperException{	
-	
-	Set<String> cGeneTotal = new HashSet<String>();
-	Set<String> cGenePositive = new HashSet<String>();
 
-	List<? extends IRow> rows = result.gex.getData(srcRef);
-	String sysCode= new String(DataHolding.getGeneImportInformation().getDataSource().getSystemCode());
-	Set<Xref> ref= new HashSet<Xref>();
-	
-	//* make this generic...
-	
-	if(!srcRef.toString().startsWith(sysCode)){
-	
-	ref= desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(srcRef, DataSource.getBySystemCode(sysCode));
-	System.out.print("srcRef " + srcRef+ "\n");
-	System.out.print("ref " + ref + "\n");
+	public RefInfo evaluatedRef(Xref srcRef) throws IDMapperException {
 
-	
-	}
-	if(srcRef.toString().startsWith(sysCode)){
-		ref.add(srcRef);
-	}
-	
-	if (rows != null) {
-		for (IRow row : rows) {
-			
-			if (pk != null && pk.isCancelled())
-				return null;
-			// Use group (line number) to identify a measurement
-			cGeneTotal.add(row.getGroup() + "");
-			for(Xref x: ref){
-			boolean eval = DataHolding.getGeneFinal().contains(x);
-			System.out.print("evalrefs: " + x + "\n");
-			if (eval)
-				cGenePositive.add(row.getGroup() + "");
+		Set<String> cGeneTotal = new HashSet<String>();
+		Set<String> cGenePositive = new HashSet<String>();
+
+		List<? extends IRow> rows = result.gex.getData(srcRef);
+
+		Set<Xref> ref = new HashSet<Xref>();
+
+		// * make this generic...
+		if (DataHolding.isGeneFileLoaded()) {
+			String sysCode = new String(DataHolding.getGeneImportInformation()
+					.getDataSource().getSystemCode());
+
+			if (!srcRef.toString().startsWith(sysCode)) {
+
+				ref = desktop.getSwingEngine().getGdbManager().getCurrentGdb()
+						.mapID(srcRef, DataSource.getBySystemCode(sysCode));
+
+			}
+			if (srcRef.toString().startsWith(sysCode)) {
+				ref.add(srcRef);
+			}
+
+			if (rows != null) {
+				for (IRow row : rows) {
+
+					if (pk != null && pk.isCancelled())
+						return null;
+					// Use group (line number) to identify a measurement
+					cGeneTotal.add(row.getGroup() + "");
+					for (Xref x : ref) {
+						boolean eval = DataHolding.getGeneFinal().contains(x);
+						System.out.print(eval + "\n");
+						if (eval == true) {
+							cGenePositive.add(row.getGroup() + "");
+						}
+					}
 				}
 			}
-		
+
+		}
+
+		if (!DataHolding.isGeneFileLoaded()) {
+			boolean eval=false;
+			cGeneTotal.add(srcRef + "");
+			
+			
+			
+			Set<Xref> evalRef= new HashSet<Xref>();
+			
+			evalRef.addAll(desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(srcRef, DataSource.getBySystemCode("En")));
+			for(Xref x: evalRef){
+			eval = evalthis.contains(x);
+			}
+			if(eval){
+				cGenePositive.add(srcRef + "");
+			}
+			
+			
+		}
+
+		return new RefInfo(cGeneTotal, cGenePositive);
 	}
-	
-	return new RefInfo(cGeneTotal, cGenePositive);
-}
-//	public RefInfo evaluatedRef(Xref srcRef){
-//		Set<String> cGeneTotal = new HashSet<String>();
-//		Set<String> cGenePositive = new HashSet<String>();
-//		
-//		
-//		
-//		if (DataHolding.getGeneTotal().contains(srcRef) && !DataHolding.getGeneFinal().contains(srcRef)){
-//			
-//			cGeneTotal.add("1");
-//			cGenePositive.add("0");
-//		}
-//		
-//	
-//		if( DataHolding.getGeneTotal().contains(srcRef) &&DataHolding.getGeneFinal().contains(srcRef)){
-//			cGeneTotal.add("1");
-//			cGenePositive.add("1");
-//		}
-//		
-//		if( !DataHolding.getGeneTotal().contains(srcRef) && !DataHolding.getGeneFinal().contains(srcRef)){
-//			cGeneTotal.add("0");
-//			cGenePositive.add("0");
-//		}
-//		
-//		
-//		return new RefInfo(cGeneTotal, cGenePositive);
-//		
-//	}
-//
-	/*
-	 * Implementation of the MAPPFinder method for calculating zscores. This
-	 * takes only the part of the dataset into account that maps to pathways.
-	 */
+
 	private class MappFinderMethod extends Method {
 		/**
 		 * Shuffle the values of the map, so that each K, V pair is (likely)
@@ -323,8 +296,9 @@ public class MiPastZScoreCalculator {
 		 * Calculate the rank of the actual zscore compared to the permuted
 		 * zscores. Two-tailed test, so checks for very low z-scores as well as
 		 * very high z-scores.
-		 * @throws DataException 
-		 * @throws IDMapperException 
+		 * 
+		 * @throws DataException
+		 * @throws IDMapperException
 		 */
 		public void permute() throws IDMapperException, DataException {
 			// create a deep copy of dataMap.
@@ -348,10 +322,10 @@ public class MiPastZScoreCalculator {
 					int cPwyPositive = 0;
 
 					for (Xref ref : pi.getSrcRefs()) {
-						
+
 						RefInfo refInfo = dataMap2.get(ref);
 						if (refInfo.isMeasured())
-							
+
 							cPwyMeasured++;
 						if (refInfo.isPositive())
 							cPwyPositive++;
@@ -388,17 +362,15 @@ public class MiPastZScoreCalculator {
 		public void calculateTotals() {
 			// go over all datanodes in all pathways
 			for (Xref ref : dataMap.keySet()) {
-				
-				
+
 				RefInfo refInfo = dataMap.get(ref);
-				
+
 				if (refInfo.isMeasured())
 					result.bigN++;
 				if (refInfo.isPositive())
 					result.bigR++;
 			}
-			
-			
+
 		}
 
 		/**
@@ -409,26 +381,18 @@ public class MiPastZScoreCalculator {
 		 * <LI>r: the subset of n that has at least one significant row in the
 		 * dataset.
 		 * </UL>
-		 * @throws IDMapperException 
-		 * @throws DataException 
+		 * 
+		 * @throws IDMapperException
+		 * @throws DataException
 		 */
-		public StatisticsPathwayResult calculatePathway(PathwayInfo pi) throws IDMapperException, DataException {
+		public StatisticsPathwayResult calculatePathway(PathwayInfo pi)
+				throws IDMapperException, DataException {
 			int cPwyMeasured = 0;
 			int cPwyPositive = 0;
 			int cPwyTotal = pi.getSrcRefs().size();
-//			
-//			Map<Xref, Set<Xref>> res;
-//			
-//				res = desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(pi.getSrcRefs(), DataSource.getBySystemCode("L"));
-//				Set<Xref> xrefs = new HashSet<Xref>();
-//				for(Xref x : res.keySet()) {
-//					for(Xref x2 : res.get(x)) {
-//						xrefs.add(x2);
-//					}
-//				}
-		
+
 			for (Xref ref : pi.getSrcRefs()) {
-				
+
 				RefInfo refInfo = dataMap.get(ref);
 				if (refInfo.isMeasured())
 					cPwyMeasured++;
@@ -445,27 +409,73 @@ public class MiPastZScoreCalculator {
 		}
 	}
 
-	private void calculateDataMap() throws IDMapperException {
+	
+		private Set<Xref> filterGenesforPathway(Set<Xref> set) throws IDMapperException{
+			Set<Xref> mappedPw = new HashSet<Xref>();
+			Set<Xref> mappedGenes = new HashSet<Xref>();
+			Set<Xref> filteredGenes = new HashSet<Xref>();
+			
+			for(Xref x: DataHolding.getPathwayGenes()){
+				mappedPw.addAll(desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(x, DataSource.getBySystemCode("En")));
+			}
+		
+			for(Xref y: set){
+				mappedGenes.addAll(desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(y, DataSource.getBySystemCode("En")));
+			}
+		
+			for(Xref z: mappedGenes){
+				if(mappedPw.contains(z)){
+					filteredGenes.add(z);
+				}
+			}
+			
+	
+		
+		return filteredGenes;
+		
+		
+	}
+	
+	private void calculateDataMapSingle() throws IDMapperException {
 		dataMap = new HashMap<Xref, RefInfo>();
 		// go over all datanodes in all pathways
-		
-		Map<Xref,Set<Xref>>res = desktop.getSwingEngine().getGdbManager().getCurrentGdb().mapID(DataHolding.pathwayGenes, DataSource.getBySystemCode("L"));
-		Set<Xref> xrefs = new HashSet<Xref>();
-		for(Xref x : res.keySet()) {
-			for(Xref x2 : res.get(x)) {
-			xrefs.add(x2);
-			}
-		}
-	
+
 		for (Xref srcRef : pwyMap.getSrcRefs()) {
 			if (pk != null && pk.isCancelled())
 				return;
-		
-			
+
 			RefInfo refInfo = evaluatedRef(srcRef);
-		
+
 			dataMap.put(srcRef, refInfo);
-			
+
+		}
+	}
+
+	private void calculateDataMapBoth() throws IDMapperException {
+		dataMap = new HashMap<Xref, RefInfo>();
+		// go over all datanodes in all pathways
+
+		Map<Xref, Set<Xref>> res = desktop
+				.getSwingEngine()
+				.getGdbManager()
+				.getCurrentGdb()
+				.mapID(DataHolding.pathwayGenes,
+						DataSource.getBySystemCode("L"));
+		Set<Xref> xrefs = new HashSet<Xref>();
+		for (Xref x : res.keySet()) {
+			for (Xref x2 : res.get(x)) {
+				xrefs.add(x2);
+			}
+		}
+
+		for (Xref srcRef : pwyMap.getSrcRefs()) {
+			if (pk != null && pk.isCancelled())
+				return;
+
+			RefInfo refInfo = evaluatedRef(srcRef);
+
+			dataMap.put(srcRef, refInfo);
+
 		}
 	}
 
@@ -482,9 +492,7 @@ public class MiPastZScoreCalculator {
 		}
 		pwyMap = new PathwayMap(result.pwDir);
 		DataHolding.setPathwayGenes(pwyMap.getSrcRefs());
-		
-	
-		
+
 		// cache data for all pathways at once.
 		if (pk != null) {
 			if (pk.isCancelled())
@@ -492,26 +500,25 @@ public class MiPastZScoreCalculator {
 			pk.setTaskName("Reading dataset");
 			pk.setProgress(20);
 		}
-		
+
 		BackgroundsetMethods bm = new BackgroundsetMethods(desktop, plugin);
-		
-		if(DataHolding.isBolMethodDataset()){
+
+		if (DataHolding.isBolMethodDataset()) {
 			bm.datasetMethod();
 		}
-		
-		if(DataHolding.isBolMethodPathway()){
+
+		if (DataHolding.isBolMethodPathway()) {
 			bm.pathwayMethod();
 		}
-		if(DataHolding.isBolMethodAllGenesMeasured()){
+		if (DataHolding.isBolMethodAllGenesMeasured()) {
 			bm.allGenesMeasuredMethod();
 		}
-		if(DataHolding.isBolMethodPathway2()){
+		if (DataHolding.isBolMethodPathway2()) {
 			bm.measuredInPathwaysMethod();
 		}
-			
+
 		result.gex.setMapper(result.gdb);
 		result.gex.syncSeed(pwyMap.getSrcRefs());
-		
 
 		// calculate dataMap
 		if (pk != null) {
@@ -520,28 +527,23 @@ public class MiPastZScoreCalculator {
 			pk.setTaskName("Calculating expression data");
 			pk.setProgress(40);
 		}
-		
-		
+		if (!DataHolding.isGeneFileLoaded()) {
+			evalthis = filterGenesforPathway(DataHolding.getGeneFinal());
+			calculateDataMapSingle();
+		}
+		if (DataHolding.isGeneFileLoaded()) {
+			calculateDataMapBoth();
+		}
 
-		
-		
-		
-		calculateDataMap();
-		
-	
-		
 		if (pk != null) {
 			if (pk.isCancelled())
 				return null;
 			pk.setTaskName("Calculating on dataset");
 			pk.setProgress(60);
 		}
-		
-		
-		
-		
+
 		m.calculateTotals();
-		
+
 		Logger.log.info("N: " + result.bigN + ", R: " + result.bigR);
 
 		int i = 0;
@@ -585,7 +587,6 @@ public class MiPastZScoreCalculator {
 	 * 
 	 * @throws DataException
 	 */
-
 
 	public StatisticsResult calculateMappFinder() throws IDMapperException,
 			DataException {

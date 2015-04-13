@@ -79,7 +79,6 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	private static Criterion miRNADownCrit = new Criterion();
 	private static Criterion geneDownCrit = new Criterion();
 
-
 	private Criterion myCriterion = new Criterion();
 	private List<String> sampleNames;
 
@@ -95,8 +94,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	final static String ACTION_ALL_REG = "allRegulation";
 
 	final static String ACTION_INFO = "InfoButton";
-	
-	
+
 	final static String ACTION_METHOD_DATASET = "methodDataset";
 	final static String ACTION_METHOD_PATHWAY = "methodPathwayAndInteractions";
 	final static String ACTION_METHOD_PATHWAY2 = "methodPathway";
@@ -144,20 +142,18 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 	private JLabel allRegulations;
 	private JCheckBox allRegulationsCheck;
-	
-	
+
 	private JLabel methodDataset;
 	private JCheckBox methodDatasetCheck;
-	
+
 	private JLabel methodInteractionPathway;
 	private JCheckBox methodInteractionPathwayCheck;
-	
+
 	private JLabel methodPathway;
 	private JCheckBox methodPathwayCheck;
-	
+
 	private JLabel methodAllGenesMeasured;
 	private JCheckBox methodAllGenesMeasuredCheck;
-	
 
 	public CriterionPage(PvDesktop desktop, SwingEngine se, RegIntPlugin plugin) {
 		super(IDENTIFIER);
@@ -168,7 +164,7 @@ public class CriterionPage extends WizardPanelDescriptor implements
 	}
 
 	public Object getNextPanelDescriptor() {
-		
+
 		return StatisticsPage.IDENTIFIER;
 	}
 
@@ -216,7 +212,8 @@ public class CriterionPage extends WizardPanelDescriptor implements
 				"Inverse: miRNA downregulated, Gene upregulated");
 		miRNADownGeneUpCheck = new JCheckBox();
 
-		miRNADownGeneDown = new JLabel("Direct: miRNA downregulated, Gene downregulated");
+		miRNADownGeneDown = new JLabel(
+				"Direct: miRNA downregulated, Gene downregulated");
 		miRNADownGeneDownCheck = new JCheckBox();
 
 		miRNAUpGeneUp = new JLabel(
@@ -226,20 +223,19 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		allRegulations = new JLabel("All of the above");
 		allRegulationsCheck = new JCheckBox();
 
-		
 		methodDataset = new JLabel("Interaction Background");
 		methodDatasetCheck = new JCheckBox();
-		
-		methodInteractionPathway = new JLabel("Pathway with Interaction Background");
+
+		methodInteractionPathway = new JLabel(
+				"Pathway with Interaction Background");
 		methodInteractionPathwayCheck = new JCheckBox();
-		
+
 		methodPathway = new JLabel("Pathway Background");
-		methodPathwayCheck= new JCheckBox();
-		
-		
+		methodPathwayCheck = new JCheckBox();
+
 		methodAllGenesMeasured = new JLabel("All genes measured Background");
-		methodAllGenesMeasuredCheck= new JCheckBox();
-		
+		methodAllGenesMeasuredCheck = new JCheckBox();
+
 		// pathway objects
 
 		CellConstraints cc = new CellConstraints();
@@ -286,29 +282,25 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 		builder.add(miRNAUpGeneUp, cc.xy(1, 19));
 		builder.add(miRNAUpGeneUpCheck, cc.xy(3, 19));
-		
+
 		builder.add(miRNADownGeneDown, cc.xy(1, 21));
 		builder.add(miRNADownGeneDownCheck, cc.xy(3, 21));
-		
 
 		builder.add(allRegulations, cc.xy(1, 23));
 		builder.add(allRegulationsCheck, cc.xy(3, 23));
-		
-		
+
 		builder.add(methodDataset, cc.xy(7, 15));
 		builder.add(methodDatasetCheck, cc.xy(9, 15));
-		
+
 		builder.add(methodInteractionPathway, cc.xy(7, 17));
 		builder.add(methodInteractionPathwayCheck, cc.xy(9, 17));
-		
+
 		builder.add(methodPathway, cc.xy(7, 19));
 		builder.add(methodPathwayCheck, cc.xy(9, 19));
-		
-		builder.add(methodAllGenesMeasured, cc.xy(7,21));
-		builder.add(methodAllGenesMeasuredCheck, cc.xy(9,21));
 
-		
-		
+		builder.add(methodAllGenesMeasured, cc.xy(7, 21));
+		builder.add(methodAllGenesMeasuredCheck, cc.xy(9, 21));
+
 		infoBtn.addActionListener(this);
 		infoBtn.setActionCommand(ACTION_INFO);
 
@@ -338,21 +330,20 @@ public class CriterionPage extends WizardPanelDescriptor implements
 
 		allRegulationsCheck.addActionListener(this);
 		allRegulationsCheck.setActionCommand(ACTION_ALL_REG);
-		
+
 		methodDatasetCheck.addActionListener(this);
 		methodDatasetCheck.setActionCommand(ACTION_METHOD_DATASET);
-		
 
 		methodInteractionPathwayCheck.addActionListener(this);
 		methodInteractionPathwayCheck.setActionCommand(ACTION_METHOD_PATHWAY);
-		
+
 		methodPathwayCheck.addActionListener(this);
 		methodPathwayCheck.setActionCommand(ACTION_METHOD_PATHWAY2);
-		
+
 		methodAllGenesMeasuredCheck.addActionListener(this);
-		methodAllGenesMeasuredCheck.setActionCommand(ACTION_METHOD_ALL_GENES_MEASURED);
-		
-		
+		methodAllGenesMeasuredCheck
+				.setActionCommand(ACTION_METHOD_ALL_GENES_MEASURED);
+
 		return builder.getPanel();
 	}
 
@@ -428,107 +419,107 @@ public class CriterionPage extends WizardPanelDescriptor implements
 		}
 
 		if (ACTION_NEG_INVERSE.equals(action)) {
-			if(miRNAUpGeneDownCheck.isSelected()){
+			if (miRNAUpGeneDownCheck.isSelected()) {
 				DataHolding.setBolmiRNAUpGeneDown(true);
-				
+
 			}
-			if(!miRNAUpGeneDownCheck.isSelected()){
+			if (!miRNAUpGeneDownCheck.isSelected()) {
 				DataHolding.setBolmiRNAUpGeneDown(false);
 			}
 		}
 		if (ACTION_POS_INVERSE.equals(action)) {
-			if(miRNADownGeneUpCheck.isSelected()){
+			if (miRNADownGeneUpCheck.isSelected()) {
 				DataHolding.setBolmiRNADownGeneUp(true);
-				
+
 			}
-			if(!miRNADownGeneUpCheck.isSelected()){
+			if (!miRNADownGeneUpCheck.isSelected()) {
 				DataHolding.setBolmiRNADownGeneUp(false);
 			}
 
 		}
 		if (ACTION_NEG_DIRECT.equals(action)) {
-			if(miRNADownGeneDownCheck.isSelected()){
+			if (miRNADownGeneDownCheck.isSelected()) {
 				DataHolding.setBolmiRNADownGeneDown(true);
-				
+
 			}
-			if(!miRNADownGeneDownCheck.isSelected()){
+			if (!miRNADownGeneDownCheck.isSelected()) {
 				DataHolding.setBolmiRNADownGeneDown(false);
 			}
 
 		}
 		if (ACTION_POS_DIRECT.equals(action)) {
-			if(miRNAUpGeneUpCheck.isSelected()){
+			if (miRNAUpGeneUpCheck.isSelected()) {
 				DataHolding.setBolmiRNAUpGeneUp(true);
-				
+
 			}
-			if(!miRNAUpGeneUpCheck.isSelected()){
+			if (!miRNAUpGeneUpCheck.isSelected()) {
 				DataHolding.setBolmiRNAUpGeneUp(false);
 			}
 		}
 		if (ACTION_ALL_REG.equals(action)) {
-			if(allRegulationsCheck.isSelected()){
+			if (allRegulationsCheck.isSelected()) {
 				DataHolding.setBolAllReg(true);
 			}
-			if(!allRegulationsCheck.isSelected()){
+			if (!allRegulationsCheck.isSelected()) {
 				DataHolding.setBolAllReg(false);
 			}
 
 		}
-		
-		if ( ACTION_METHOD_DATASET.equals(action)){
-			if(methodDatasetCheck.isSelected()){
+
+		if (ACTION_METHOD_DATASET.equals(action)) {
+			if (methodDatasetCheck.isSelected()) {
 				DataHolding.setBolMethodDataset(true);
 				methodInteractionPathwayCheck.setEnabled(false);
 				methodPathwayCheck.setEnabled(false);
 				methodAllGenesMeasuredCheck.setEnabled(false);
 			}
-			if(!methodDatasetCheck.isSelected()){
+			if (!methodDatasetCheck.isSelected()) {
 				DataHolding.setBolMethodDataset(false);
 				methodInteractionPathwayCheck.setEnabled(true);
 				methodPathwayCheck.setEnabled(true);
 				methodAllGenesMeasuredCheck.setEnabled(true);
 			}
 		}
-		
-		if(ACTION_METHOD_PATHWAY.equals(action)){
-			if(methodInteractionPathwayCheck.isSelected()){
+
+		if (ACTION_METHOD_PATHWAY.equals(action)) {
+			if (methodInteractionPathwayCheck.isSelected()) {
 				DataHolding.setBolMethodPathway(true);
 				methodDatasetCheck.setEnabled(false);
 				methodPathwayCheck.setEnabled(false);
 				methodAllGenesMeasuredCheck.setEnabled(false);
 			}
-			if(!methodInteractionPathwayCheck.isSelected()){
+			if (!methodInteractionPathwayCheck.isSelected()) {
 				DataHolding.setBolMethodPathway(false);
 				methodDatasetCheck.setEnabled(true);
 				methodPathwayCheck.setEnabled(true);
 				methodAllGenesMeasuredCheck.setEnabled(true);
 			}
 		}
-		
-		if(ACTION_METHOD_PATHWAY2.equals(action)){
-			if(methodPathwayCheck.isSelected()){
+
+		if (ACTION_METHOD_PATHWAY2.equals(action)) {
+			if (methodPathwayCheck.isSelected()) {
 				DataHolding.setBolMethodPathway2(true);
 				methodInteractionPathwayCheck.setEnabled(false);
 				methodDatasetCheck.setEnabled(false);
 				methodAllGenesMeasuredCheck.setEnabled(false);
-				
+
 			}
-			if(!methodPathwayCheck.isSelected()){
+			if (!methodPathwayCheck.isSelected()) {
 				DataHolding.setBolMethodPathway2(false);
 				methodInteractionPathwayCheck.setEnabled(true);
 				methodDatasetCheck.setEnabled(true);
 				methodAllGenesMeasuredCheck.setEnabled(true);
 			}
 		}
-		
-		if(ACTION_METHOD_ALL_GENES_MEASURED.equals(action)){
-			if(methodAllGenesMeasuredCheck.isSelected()){
+
+		if (ACTION_METHOD_ALL_GENES_MEASURED.equals(action)) {
+			if (methodAllGenesMeasuredCheck.isSelected()) {
 				DataHolding.setBolMethodAllGenesMeasured(true);
 				methodInteractionPathwayCheck.setEnabled(false);
 				methodDatasetCheck.setEnabled(false);
 				methodPathwayCheck.setEnabled(false);
 			}
-			if(!methodAllGenesMeasuredCheck.isSelected()){
+			if (!methodAllGenesMeasuredCheck.isSelected()) {
 				DataHolding.setBolMethodAllGenesMeasured(false);
 				methodInteractionPathwayCheck.setEnabled(true);
 				methodDatasetCheck.setEnabled(true);

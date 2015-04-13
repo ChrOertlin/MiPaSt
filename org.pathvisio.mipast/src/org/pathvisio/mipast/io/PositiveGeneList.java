@@ -70,7 +70,7 @@ public class PositiveGeneList {
 	private Set<Xref> geneUp;
 	private Set<Xref> miRNADown;
 	private Set<Xref> geneDown;
-
+	Set<Xref> genesFinal = new HashSet<Xref>();
 	Set<Xref> xrefSet = new HashSet<Xref>();
 
 	public void execute() throws DataException, IOException, IDMapperException {
@@ -80,78 +80,119 @@ public class PositiveGeneList {
 
 		
 		allMiRNAInDataset = getallXrefs(DataHolding.getMiRNAImportInformation().getDataSource(), "miRNA");
-		System.out.println("all microRNAs\t" + allMiRNAInDataset.size());
+		
 		
 		if (DataHolding.getGeneImportInformation() != null) {
 			allGenesInDataset = getallXrefs(DataHolding.getGeneImportInformation().getDataSource(), "gene");
 		}
-		System.out.println("all genes\t" + allGenesInDataset.size());
+		
 
 		if (DataHolding.isMiRNAUpCritCheck()) {
 			miRNAUp = criterionEvaluation(DataHolding.getMiRNAUpCriterion(), allMiRNAInDataset);
 		}
-		System.out.println("miRNAUp\t" + miRNAUp.size());
+		
 		if (DataHolding.isMiRNADownCritCheck()) {
 			miRNADown = criterionEvaluation(DataHolding.getMiRNADownCriterion(), allMiRNAInDataset);
-			System.out.println("miRNADown\t" + miRNADown.size());
+			
 		}
 		
 		if (DataHolding.isGeneFileLoaded() & DataHolding.isGeneUpCritCheck()) {
 			geneUp = criterionEvaluation(DataHolding.geneUpCriterion, allGenesInDataset);
-			System.out.println("geneUp\t" + geneUp.size());
+			
 		}
-		System.out.println("geneUp\t" + geneUp.size());
+
 		if (DataHolding.isGeneFileLoaded() & DataHolding.isGeneDownCritCheck()) {
 			geneDown = criterionEvaluation(DataHolding.geneDownCriterion, allGenesInDataset);
-			System.out.println("geneDown\t" + geneDown.size());
+			
 		}
 	
 		
 		Set<Xref> targetsDown = getTargets(miRNADown);
-		System.out.println("targetsDown\t" + targetsDown.size());
-		Set<Xref> targetsUp = getTargets(miRNAUp);
-		System.out.println("targetsUp\t" + targetsUp.size());
 		
-		// different regulation 
-		Set<Xref> genesFinal = new HashSet<Xref>();
+		Set<Xref> targetsUp = getTargets(miRNAUp);
+		
+		
+		// different regulation
+		if(!DataHolding.isGeneFileLoaded()){
+		
+			if(DataHolding.isBolAllReg()){
+				for(Xref x: targetsDown){
+					if(!genesFinal.contains(x)){
+						genesFinal.add(x);
+					}
+				}
+				for(Xref x: targetsUp){
+					if(!genesFinal.contains(x)){
+						genesFinal.add(x);
+					}
+				}
+				
+				DataHolding.setGeneBackgroundSet(getTargets(allMiRNAInDataset));
+			}
+		} 
+		if(DataHolding.isBolmiRNADownGeneDown()) {
+		
+			genesFinal.addAll(targetsDown);
+		}
+		if(DataHolding.isBolmiRNADownGeneUp()) {
+			
+		
+			genesFinal.addAll(targetsDown);
+		}
+		if(DataHolding.isBolmiRNAUpGeneDown()) {
+		
+			
+			genesFinal.addAll(targetsUp);
+		}
+		if(DataHolding.isBolmiRNAUpGeneUp()) {
+			
+		
+			genesFinal.addAll(targetsUp);
+			
+		}
+	
+		
+		if(DataHolding.isGeneFileLoaded()){
+		
 		if(DataHolding.isBolAllReg()) {
 			System.out.println("all regulation");
 			Set<Xref> allGenes = new HashSet<Xref>();
 			allGenes.addAll(geneUp);
 			allGenes.addAll(geneDown);
-			System.out.println("\tallGenes\t" + allGenes.size());
+	
 			Set<Xref> validTargetsDown = findRegulatedTargets(targetsDown, allGenes);
 			Set<Xref> validTargetsUp = findRegulatedTargets(targetsUp, allGenes);
 			genesFinal.addAll(validTargetsUp);
 			genesFinal.addAll(validTargetsDown);
-			System.out.println("All regulation: Number of positive genes: " + genesFinal.size());
+	
 		} 
 		if(DataHolding.isBolmiRNADownGeneDown()) {
 			Set<Xref> validTargetsDown = findRegulatedTargets(targetsDown, geneDown);
-			System.out.println("Down / Down: Number of positive genes: " + validTargetsDown.size());
+		
 			genesFinal.addAll(validTargetsDown);
 		}
 		if(DataHolding.isBolmiRNADownGeneUp()) {
 			Set<Xref> validTargetsUp = findRegulatedTargets(targetsDown, geneUp);
-			System.out.println("Down / Up: Number of positive genes: " + validTargetsUp.size());
+		
 			genesFinal.addAll(validTargetsUp);
 		}
 		if(DataHolding.isBolmiRNAUpGeneDown()) {
 			Set<Xref> validTargetsDown = findRegulatedTargets(targetsUp, geneDown);
-			System.out.println("Up / Down: Number of positive genes: " + validTargetsDown.size());
+			
 			genesFinal.addAll(validTargetsDown);
 		}
 		if(DataHolding.isBolmiRNAUpGeneUp()) {
 			Set<Xref> validTargetsUp = findRegulatedTargets(targetsUp, geneUp);
-			System.out.println("Up / Up: Number of positive genes: " + validTargetsUp.size());
+		
 			genesFinal.addAll(validTargetsUp);
 		}
-
+		}
 
 
 		DataHolding.setAllGenesList(allGenesInDataset);
 		DataHolding.setAllmiRNAList(allMiRNAInDataset);
 		DataHolding.setGeneFinal(genesFinal);
+	
 	}
 
 	public Set<Xref> addLists(Set<Xref> allReg, Set<Xref> miRNAUpGeneUp,
@@ -356,4 +397,8 @@ public class PositiveGeneList {
 
 		return cGenePositive;
 	}
+	
+
+	
+	
 }
